@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 import sys
@@ -21,12 +23,7 @@ class SettingsLoader(BaseModel):
     """Settings model with validation."""
 
     class Secret(BaseModel):
-        token: str = Field(
-            ...,
-            title="Bot Token",
-            description="Discord bot token",
-            min_length=50,  # Discord tokens are typically longer
-        )
+        token: str = Field(..., title="Bot Token", description="Discord bot token")
 
         @field_validator("token")
         @classmethod
@@ -41,25 +38,55 @@ class SettingsLoader(BaseModel):
 class Settings:
     """Settings manager with caching and validation."""
 
-    _instance: Optional["Settings"] = None
-    _data: Optional[SettingsLoader] = None
+    _instance: Settings | None = None
+    _data: SettingsLoader | None = None
     _config_path: Path = DEFAULT_CONFIG_PATH
 
-    def __new__(cls) -> "Settings":
+    def __new__(cls) -> Settings:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
 
     @classmethod
-    def initialize(cls, config_path: Optional[Path] = None) -> None:
-        """Initialize settings with optional custom config path."""
+    def initialize(cls, config_path: Path | None = None) -> None:
+        """
+        Initializes the JSON wrapper with an optional configuration file path.
+        If a configuration path is provided, it sets the internal `_config_path`
+        to the given path. Then, it loads the configuration data.
+
+        Args:
+            config_path (Path | None): Optional path to the configuration file.
+                                       If not provided, the default path is used.
+        Returns:
+            None
+        """
+
         if config_path:
             cls._config_path = config_path
         cls.load()
 
     @classmethod
     def load(cls) -> None:
-        """Load settings from file with error handling."""
+        """
+        Load the settings from the JSON configuration file.
+
+        This method attempts to read and parse the JSON file specified by the `_config_path` attribute.
+        It validates the settings and initializes the `_data` attribute with the parsed configuration.
+
+        Raises:
+            FileNotFoundError: If the configuration file does not exist at the specified path.
+            json.JSONDecodeError: If the configuration file contains invalid JSON.
+            ValidationError: If the parsed settings do not meet the required validation criteria.
+            Exception: For any other unexpected errors during the loading process.
+
+        Logs:
+            - Critical errors for missing files, invalid JSON, validation issues, or unexpected errors.
+            - Informational message upon successful loading of settings.
+
+        Exits:
+            The application will terminate with a non-zero exit code if any critical error occurs.
+        """
+
         try:
             if not cls._config_path.exists():
                 raise FileNotFoundError(f"Settings file not found at {cls._config_path}")
@@ -87,14 +114,20 @@ class Settings:
             sys.exit(1)
 
     @classmethod
-    def reload(cls) -> None:
-        """Reload settings from file."""
-        cls._data = None  # Clear cache
-        cls.load()
-
-    @classmethod
     def _validate_required_settings(cls) -> None:
-        """Validate that all required settings are present."""
+        """
+        Validates that all required settings are properly loaded and accessible.
+        This method checks if the settings data has been loaded and ensures that
+        all settings defined in the `SettingsType` enumeration can be accessed
+        without errors. If the settings data is not loaded, a `RuntimeError` is raised.
+        If any required setting is missing or inaccessible, a `ValueError` is raised
+        with details about the missing setting.
+
+        Raises:
+            RuntimeError: If the settings data has not been loaded.
+            ValueError: If a required setting is missing or cannot be accessed.
+        """
+
         if cls._data is None:
             raise RuntimeError("Settings not loaded")
 
@@ -110,19 +143,20 @@ class Settings:
     @lru_cache(maxsize=128)
     def get(cls, key: SettingsType, default: Optional[T] = None) -> Any:
         """
-        Get the value of a setting by its key with caching.
+        Retrieve a value from the settings data using a dot-separated key.
 
         Args:
-            key: The settings enum key
-            default: Optional default value if not found
+            key (SettingsType): A dot-separated key representing the path to the desired value.
+            default (Optional[T], optional): A default value to return if the key is not found. Defaults to None.
 
         Returns:
-            The setting value
+            Any: The value associated with the specified key, or the default value if the key is not found.
 
         Raises:
-            ValueError: If settings are not loaded
-            AttributeError: If setting key doesn't exist
+            ValueError: If the settings data has not been loaded.
+            AttributeError: If the key is not found and no default value is provided.
         """
+
         if cls._data is None:
             raise ValueError("Settings not loaded")
 
@@ -141,5 +175,11 @@ class Settings:
 
     @classmethod
     def get_config_path(cls) -> Path:
-        """Get the current config file path."""
+        """
+        Retrieves the configuration file path.
+
+        Returns:
+            Path: The path to the configuration file.
+        """
+
         return cls._config_path

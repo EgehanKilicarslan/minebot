@@ -4,7 +4,7 @@ import logging.config
 import sys
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, ClassVar, Dict, Final, Optional
+from typing import Any, ClassVar, Final
 
 from model.ready_keys import LogStyle
 
@@ -13,16 +13,22 @@ class ColoredFormatter(logging.Formatter):
     """Custom formatter for colored log output with improved readability."""
 
     # Cache format strings to avoid rebuilding them for each log record
-    _FORMATS: ClassVar[Dict[str, str]] = {}
+    _FORMATS: ClassVar[dict[str, str]] = {}
 
     def format(self, record: logging.LogRecord) -> str:
-        """Format log record with color coding and improved structure.
+        """
+        Formats a logging record into a styled string based on its log level.
+
+        This method customizes the log message format by applying specific styles
+        (e.g., colors) to different parts of the log message, such as the log level,
+        logger name, timestamp, and message content. The styles are cached for each
+        log level to improve performance.
 
         Args:
-            record: The log record to format
+            record (logging.LogRecord): The log record to format.
 
         Returns:
-            Formatted log string with color codes
+            str: The formatted log message as a string.
         """
         # Get cached format for this level if available
         if record.levelname not in self._FORMATS:
@@ -52,7 +58,7 @@ class ColoredFormatter(logging.Formatter):
 
 # Configuration constants
 DEFAULT_CONFIG_PATH: Final[Path] = Path("configuration/debug.json")
-FALLBACK_CONFIG: Final[Dict[str, Any]] = {
+FALLBACK_CONFIG: Final[dict[str, Any]] = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
@@ -95,15 +101,34 @@ FALLBACK_CONFIG: Final[Dict[str, Any]] = {
 }
 
 
-def setup_logging(config_path: Optional[Path] = None) -> bool:
+def setup_logging(config_path: Path | None = None) -> bool:
     """
-    Set up logging configuration from JSON file with fallback options.
+    Configures the logging system for the application.
+
+    This function sets up logging based on a configuration file provided via
+    `config_path`. If no path is provided, a default configuration path is used.
+    It ensures that the necessary directories for log files exist and falls back
+    to a basic logging configuration in case of errors.
 
     Args:
-        config_path: Optional custom path to logging config file
+        config_path (Path | None): The path to the logging configuration file.
+            If not provided, a default path is used.
 
     Returns:
-        True if configuration was successful, False otherwise
+        bool: True if logging was successfully configured, False otherwise.
+
+    Exceptions Handled:
+        - json.JSONDecodeError, ValueError: Raised when the configuration file
+          contains invalid JSON or formatting issues.
+        - PermissionError, OSError: Raised when there are issues accessing the
+          configuration file or creating necessary directories.
+        - Exception: Catches all other unexpected errors.
+
+    Notes:
+        - If the configuration file is invalid or inaccessible, the function
+          falls back to a basic logging configuration and logs the error.
+        - The function ensures that a "logs" directory exists for file-based
+          logging handlers.
     """
     try:
         config_path = config_path or DEFAULT_CONFIG_PATH
@@ -114,7 +139,7 @@ def setup_logging(config_path: Optional[Path] = None) -> bool:
 
         if config_path.exists():
             with config_path.open("rt", encoding="utf-8") as f:
-                config: Dict[str, Any] = json.load(f)
+                config: dict[str, Any] = json.load(f)
         else:
             config = FALLBACK_CONFIG
 
@@ -141,7 +166,14 @@ def setup_logging(config_path: Optional[Path] = None) -> bool:
 
 
 def _setup_emergency_logging() -> None:
-    """Configure basic logging when the main configuration fails."""
+    """
+    Configures emergency logging settings for the application.
+
+    This function sets up basic logging with the INFO level, a standard log
+    message format, and outputs log messages to the standard output stream.
+    It is intended to provide a fallback logging mechanism in case other
+    logging configurations fail or are unavailable.
+    """
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -152,12 +184,12 @@ def _setup_emergency_logging() -> None:
 @lru_cache(maxsize=128)
 def get_logger(name: str) -> logging.Logger:
     """
-    Get a cached logger with the minebot namespace.
+    Retrieves a logger instance with a specified name, prefixed by 'minebot.'.
 
     Args:
-        name: Logger name
+        name (str): The name to append to the 'minebot.' prefix for the logger.
 
     Returns:
-        Logger instance with minebot namespace
+        logging.Logger: A logger instance with the specified name.
     """
     return logging.getLogger(f"minebot.{name}")

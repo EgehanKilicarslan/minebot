@@ -2,6 +2,7 @@ import sys
 from logging import Logger
 
 import hikari
+import lightbulb
 
 from debug.debugger import get_logger, setup_logging
 from model.config_keys import SecretEnum
@@ -15,7 +16,15 @@ if __name__ == "__main__":
 
     try:
         Settings.initialize()
-        bot = hikari.GatewayBot(token=Settings.get(SecretEnum.TOKEN))
+
+        bot = hikari.GatewayBot(
+            token=Settings.get(SecretEnum.TOKEN),
+            intents=hikari.Intents.ALL,
+            suppress_optimization_warning=True,
+            banner=None,
+        )
+
+        client = lightbulb.client_from_app(bot)
 
         logger.info("Starting bot")
         bot.run()
