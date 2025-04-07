@@ -7,11 +7,11 @@ from typing import Any, Final, LiteralString, Optional, TypeVar, cast
 
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
-from model import settings_enums
+from model import config_keys
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
 
-SettingsType = settings_enums.SecretEnum
+SettingsType = config_keys.SecretEnum
 T = TypeVar("T")
 
 DEFAULT_CONFIG_PATH: Final[Path] = Path("configuration/settings.json")
@@ -79,7 +79,7 @@ class Settings:
         except ValidationError as e:
             logger.critical("Invalid settings configuration:")
             for error in e.errors():
-                field_path = " -> ".join(str(loc) for loc in error["loc"])
+                field_path: str = " -> ".join(str(loc) for loc in error["loc"])
                 logger.critical(f"• {field_path}: {error['msg']}")
             sys.exit(1)
         except Exception as e:
