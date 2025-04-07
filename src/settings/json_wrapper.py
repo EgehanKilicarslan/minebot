@@ -13,7 +13,7 @@ from model import config_keys
 
 logger: logging.Logger = logging.getLogger(__name__)
 
-SettingsType = config_keys.SecretEnum
+SettingsType = config_keys.SecretKeys
 T = TypeVar("T")
 
 DEFAULT_CONFIG_PATH: Final[Path] = Path("configuration/settings.json")

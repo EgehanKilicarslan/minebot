@@ -5,7 +5,7 @@ import hikari
 import lightbulb
 
 from debug.debugger import get_logger, setup_logging
-from model.config_keys import SecretEnum
+from model.config_keys import SecretKeys
 from settings.json_wrapper import Settings
 
 if __name__ == "__main__":
@@ -18,7 +18,7 @@ if __name__ == "__main__":
         Settings.initialize()
 
         bot = hikari.GatewayBot(
-            token=Settings.get(SecretEnum.TOKEN),
+            token=Settings.get(SecretKeys.TOKEN),
             intents=hikari.Intents.ALL,
             suppress_optimization_warning=True,
             banner=None,
