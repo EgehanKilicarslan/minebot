@@ -29,10 +29,12 @@ if __name__ == "__main__":
         @bot.listen(hikari.StartingEvent)
         async def on_starting(_: hikari.StartingEvent) -> None:
             logger.info("Starting bot")
+            await client.start()
 
         @bot.listen(hikari.StoppingEvent)
         async def on_stopping(_: hikari.StoppingEvent) -> None:
             logger.info("Stopping bot")
+            await client.stop()
 
         bot.run()
     except Exception as e:
