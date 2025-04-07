@@ -26,7 +26,14 @@ if __name__ == "__main__":
 
         client = lightbulb.client_from_app(bot)
 
-        logger.info("Starting bot")
+        @bot.listen(hikari.StartingEvent)
+        async def on_starting(_: hikari.StartingEvent) -> None:
+            logger.info("Starting bot")
+
+        @bot.listen(hikari.StoppingEvent)
+        async def on_stopping(_: hikari.StoppingEvent) -> None:
+            logger.info("Stopping bot")
+
         bot.run()
     except Exception as e:
         logger.critical(f"Failed to start bot: {e}")
