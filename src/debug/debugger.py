@@ -6,7 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, ClassVar, Final
 
-from model.ready_keys import LogStyle
+from model import LogStyle
 
 
 class ColoredFormatter(logging.Formatter):

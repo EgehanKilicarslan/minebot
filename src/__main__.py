@@ -4,9 +4,10 @@ from logging import Logger
 import hikari
 import lightbulb
 
-from debug.debugger import get_logger, setup_logging
-from model.config_keys import SecretKeys
-from settings.json_wrapper import Settings
+import events
+from debug import get_logger, setup_logging
+from model import SecretKeys
+from settings import Localization, Settings
 
 if __name__ == "__main__":
     setup_logging()
@@ -16,6 +17,7 @@ if __name__ == "__main__":
 
     try:
         Settings.initialize()
+        Localization.initialize()
 
         bot = hikari.GatewayBot(
             token=Settings.get(SecretKeys.TOKEN),
@@ -29,6 +31,8 @@ if __name__ == "__main__":
         @bot.listen(hikari.StartingEvent)
         async def on_starting(_: hikari.StartingEvent) -> None:
             logger.info("Starting bot")
+            await client.load_extensions_from_package(events)
+
             await client.start()
 
         @bot.listen(hikari.StoppingEvent)

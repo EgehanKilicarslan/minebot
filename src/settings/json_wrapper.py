@@ -5,18 +5,21 @@ import logging
 import sys
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Final, LiteralString, Optional, TypeVar, cast
+from typing import Any, Final, LiteralString, cast
 
-from pydantic import BaseModel, Field, ValidationError, field_validator
+import hikari
+from pydantic import BaseModel, Field, PositiveInt, ValidationError, field_validator
 
-from model import config_keys
+from debug import get_logger
+from model import config_keys, message_keys
 
-logger: logging.Logger = logging.getLogger(__name__)
+logger: logging.Logger = get_logger(__name__)
 
 SettingsType = config_keys.SecretKeys
-T = TypeVar("T")
+LocalizationType = message_keys.CommandKeys | message_keys.MessageKeys
 
-DEFAULT_CONFIG_PATH: Final[Path] = Path("configuration/settings.json")
+DEFAULT_CONFIG_PATH: Final[Path] = Path("configuration/settings.json").resolve()
+DEFAULT_LOCALIZATION_PATH: Final[Path] = Path("configuration/localization").resolve()
 
 
 class SettingsLoader(BaseModel):
@@ -24,6 +27,9 @@ class SettingsLoader(BaseModel):
 
     class Secret(BaseModel):
         token: str = Field(..., title="Bot Token", description="Discord bot token")
+        default_guild: PositiveInt = Field(
+            ..., title="Default Guild ID", description="Default guild ID for the bot"
+        )
 
         @field_validator("token")
         @classmethod
@@ -33,6 +39,58 @@ class SettingsLoader(BaseModel):
             return v
 
     secret: Secret
+
+
+class LocalizationLoader(BaseModel):
+    """Localization model with validation."""
+
+    locale: str = Field(..., title="Locale", description="Language locale")
+
+    class Ban(BaseModel):
+        class Command(BaseModel):
+            label: str = Field(..., title="Label", description="Command label")
+            description: str = Field(..., title="Description", description="Command description")
+
+            class Options(BaseModel):
+                user: User
+                duration: Duration
+                reason: Reason
+
+                class User(BaseModel):
+                    label: str = Field(..., title="Label", description="User label")
+                    description: str = Field(
+                        ..., title="Description", description="User description"
+                    )
+
+                class Duration(BaseModel):
+                    label: str = Field(..., title="Label", description="Duration label")
+                    description: str = Field(
+                        ..., title="Description", description="Duration description"
+                    )
+
+                class Reason(BaseModel):
+                    label: str = Field(..., title="Label", description="Reason label")
+                    description: str = Field(
+                        ..., title="Description", description="Reason description"
+                    )
+
+            options: Options
+
+        class Messages(BaseModel):
+            class User(BaseModel):
+                success: str = Field(..., title="Success", description="Success message")
+
+            user: User
+
+        command: Command
+        messages: Messages
+
+    class Error(BaseModel):
+        title: str = Field(..., title="Title", description="Error title")
+        unknown: str = Field(..., title="Unknown", description="Unknown error message")
+
+    ban: Ban
+    error: Error
 
 
 class Settings:
@@ -141,7 +199,7 @@ class Settings:
 
     @classmethod
     @lru_cache(maxsize=128)
-    def get(cls, key: SettingsType, default: Optional[T] = None) -> Any:
+    def get(cls, key: SettingsType, default: Any = None) -> Any:
         """
         Retrieve a value from the settings data using a dot-separated key.
 
@@ -167,19 +225,197 @@ class Settings:
             for part in parts:
                 value = getattr(value, part)
 
-            return cast(T, value)
+            return cast(Any, value)
         except AttributeError:
             if default is not None:
                 return default
             raise
 
+
+class Localization:
+    """Localization manager with caching and validation."""
+
+    _instance: Localization | None = None
+    _data: dict[str, LocalizationLoader] | None = None
+    _localization_path: Path = DEFAULT_LOCALIZATION_PATH
+    _guild_lang: hikari.Locale = hikari.Locale.EN_US
+
+    def __new__(cls) -> Localization:
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     @classmethod
-    def get_config_path(cls) -> Path:
+    def initialize(cls, localization_path: Path | None = None) -> None:
         """
-        Retrieves the configuration file path.
+        Initializes the localization manager with an optional localization folder path.
+        If a localization path is provided, it sets the internal `_localization_path`
+        to the given path. Then, it loads the localization data.
+
+        Args:
+            localization_path (Path | None): Optional path to the localization folder.
+                                              If not provided, the default path is used.
+        Returns:
+            None
+        """
+
+        if localization_path:
+            cls._localization_path = localization_path
+        cls.load()
+
+    @classmethod
+    def load(cls) -> None:
+        """
+        Load localization data from JSON files in the localization directory.
+
+        This method reads all JSON files in the specified localization directory,
+        validates them against the LocalizationLoader model, and stores them in
+        the _data dictionary keyed by locale.
+
+        The method performs the following steps:
+        1. Check if the localization directory exists
+        2. Find all JSON files in the directory
+        3. For each file, attempt to:
+           - Parse the JSON content
+           - Match the filename to a hikari.Locale
+           - Validate against the LocalizationLoader model
+           - Store in the _data dictionary
+
+        Raises:
+            FileNotFoundError: If the localization directory does not exist.
+            ValueError: If a localization file does not match a valid locale.
+            json.JSONDecodeError: If a localization file contains invalid JSON.
+            ValidationError: If a localization file fails validation against the model.
+
+        Logs:
+            - Critical errors for missing directory, invalid JSON, validation issues.
+            - Warning for files that don't match a valid locale.
+            - Info for successful loading of localization files.
+        """
+        try:
+            if not cls._localization_path.exists() or not cls._localization_path.is_dir():
+                error_msg = f"Localization directory not found at {cls._localization_path}"
+                logger.critical(error_msg)
+                raise FileNotFoundError(error_msg)
+
+            # Initialize empty dictionary for localization data
+            cls._data = {}
+
+            # Get all JSON files in the localization directory
+            json_files = list(cls._localization_path.glob("*.json"))
+            if not json_files:
+                logger.warning(f"No localization files found in {cls._localization_path}")
+                return
+
+            # Map locale values to enum objects for faster lookup
+            locale_map = {locale.value: locale for locale in hikari.Locale}
+
+            # Process each localization file
+            for json_file in json_files:
+                locale_name = json_file.stem
+
+                # Check if filename matches a valid locale
+                if locale_name not in locale_map:
+                    logger.warning(f"Skipping file {json_file.name}: Not a valid locale identifier")
+                    continue
+
+                locale = locale_map[locale_name]
+
+                try:
+                    # Read and parse the JSON file
+                    with json_file.open("r", encoding="utf-8") as file:
+                        data = json.load(file)
+
+                        # Add locale to the data for validation
+                        data["locale"] = locale_name
+
+                        # Validate and create model instance
+                        loader = LocalizationLoader(**data)
+
+                        # Store in the data dictionary
+                        cls._data[locale] = loader
+                        logger.debug(f"Loaded localization for {locale_name}")
+
+                except json.JSONDecodeError as e:
+                    logger.error(f"Invalid JSON in localization file {json_file.name}: {e}")
+                except ValidationError as e:
+                    logger.error(f"Validation error in localization file {json_file.name}:")
+                    for error in e.errors():
+                        field_path = " -> ".join(str(loc) for loc in error["loc"])
+                        logger.error(f"• {field_path}: {error['msg']}")
+                except Exception as e:
+                    logger.error(f"Error loading localization file {json_file.name}: {e}")
+
+            loaded_locales = list(cls._data.keys())
+            if loaded_locales:
+                logger.info(
+                    f"Successfully loaded {len(loaded_locales)} localizations: {loaded_locales}"
+                )
+            else:
+                logger.warning("No valid localization files were loaded")
+
+        except Exception as e:
+            logger.critical(f"Unexpected error loading localizations: {e}")
+            cls._data = None
+            sys.exit(1)
+
+    @classmethod
+    def set_guild_language(cls, guild_lang: hikari.Locale) -> None:
+        """
+        Set the guild language for localization.
+
+        Args:
+            guild_lang (hikari.Locale): The locale representing the guild language.
+        """
+        cls._guild_lang = guild_lang
+        logger.info(f"Guild language set to {guild_lang}")
+
+    @classmethod
+    @lru_cache(maxsize=128)
+    def get(
+        cls,
+        key: LocalizationType,
+        locale: str | hikari.Locale = _guild_lang,
+        default: str = "Unknown",
+    ) -> str:
+        """
+        Retrieve a specific localization value for a given locale and key.
+
+        Args:
+            key (LocalizationType): The key representing the localization value to retrieve.
+            locale (str | hikari.Locale): The locale identifier (e.g., "en-US"). Defaults to guild language.
+            default (str): The default value to return if the key is not found. Defaults to "Unknown".
 
         Returns:
-            Path: The path to the configuration file.
+            str: The localized value for the specified key, or the default value if not found.
         """
+        if cls._data is None:
+            logger.debug("Localization data not loaded, attempting to load now.")
+            cls.load()
 
-        return cls._config_path
+        try:
+            # Convert hikari.Locale enum to string if needed
+            locale_key = locale.value if isinstance(locale, hikari.Locale) else locale
+
+            localization_data = cls._data.get(locale_key) if cls._data else None
+            if not localization_data:
+                logger.warning(
+                    f"Localization data for locale '{locale}' not found. Returning default."
+                )
+                return default
+
+            parts: list[LiteralString] = key.value.split(".")
+            value = localization_data
+
+            for part in parts:
+                value = getattr(value, part)
+
+            logger.debug(
+                f"Successfully retrieved localization value for key '{key}' in locale '{locale}'."
+            )
+            return str(value)
+        except AttributeError as e:
+            logger.error(
+                f"Failed to retrieve localization value for key '{key}' in locale '{locale}'. Returning default. Error: {str(e)}"
+            )
+            return default

@@ -1,0 +1,31 @@
+{
+    "ban": {
+        "command": {
+            "label": "ban",
+            "description": "Ban a user from the server.",
+            "options": {
+                "user": {
+                    "label": "user",
+                    "description": "The user to ban."
+                },
+                "duration": {
+                    "label": "duration",
+                    "description": "The duration of the ban."
+                },
+                "reason": {
+                    "label": "reason",
+                    "description": "The reason for the ban."
+                }
+            }
+        },
+        "messages": {
+            "user": {
+                "success": "User {user} has been banned successfully."
+            }
+        }
+    },
+    "error": {
+        "title": "Error",
+        "unknown": "An unknown error occurred."
+    }
+}
