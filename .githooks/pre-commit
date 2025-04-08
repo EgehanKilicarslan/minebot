@@ -98,7 +98,4 @@ fi
 # Add the sanitized config file to git
 git add "$CONFIG_FILE"
 
-# Remove backup file on success
-rm -f "$BACKUP_FILE"
-
 echo "✅ Pre-commit hook completed successfully"
