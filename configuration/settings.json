@@ -1,6 +1,6 @@
 {
     "secret": {
         "token": "",
-        "default_guild": 0
+        "default_guild": null
     }
 }
