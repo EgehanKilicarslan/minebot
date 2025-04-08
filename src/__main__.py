@@ -26,7 +26,7 @@ if __name__ == "__main__":
             banner=None,
         )
 
-        client = lightbulb.client_from_app(bot)
+        client = lightbulb.client_from_app(bot, localization_provider=Localization.serialize())
 
         @bot.listen(hikari.StartingEvent)
         async def on_starting(_: hikari.StartingEvent) -> None:

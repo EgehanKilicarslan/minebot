@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Final, LiteralString, cast
 
 import hikari
+import lightbulb
 from pydantic import BaseModel, Field, PositiveInt, ValidationError, field_validator
 
 from debug import get_logger
@@ -358,6 +359,82 @@ class Localization:
             logger.critical(f"Unexpected error loading localizations: {e}")
             cls._data = None
             sys.exit(1)
+
+    @classmethod
+    def serialize(cls) -> lightbulb.DictLocalizationProvider:
+        """
+        Creates and returns a dictionary-based localization provider for commands and messages.
+
+        This method processes command labels, descriptions, and options for all supported locales
+        and organizes the data in a structure suitable for lightbulb's localization system.
+
+        The localization structure follows these patterns:
+        - For commands: "extensions.{command_name}.label/description"
+        - For options: "extensions.{command_name}.options.{option_name}.label/description"
+
+        Returns:
+            lightbulb.DictLocalizationProvider: A localization provider containing all processed
+            translations organized by locale.
+        """
+        if cls._data is None:
+            logger.info("Localization data not loaded, loading now")
+            cls.load()
+
+        if not cls._data:
+            logger.warning("No localization data available, returning empty provider")
+            return lightbulb.DictLocalizationProvider({})
+
+        # Initialize the localization data dictionary with valid locales
+        localization_data: dict[hikari.Locale, dict[str, str]] = {}
+
+        # First, collect all available locales
+        for locale_str, loader in cls._data.items():
+            try:
+                locale = hikari.Locale(locale_str)
+                localization_data[locale] = {}
+            except (ValueError, KeyError):
+                logger.warning(f"Skipping invalid locale: {locale_str}")
+                continue
+
+        # Process commands directly from the loaded data structure
+        for locale, locale_data in cls._data.items():
+            try:
+                hikari_locale = hikari.Locale(locale)
+
+                # Process commands (e.g., ban command)
+                # We'll directly access the structure we know exists based on the model
+                for command_name, command_data in vars(locale_data).items():
+                    # Skip non-command attributes like 'locale' or 'error'
+                    if not hasattr(command_data, "command"):
+                        continue
+
+                    # Process command label and description
+                    cmd = command_data.command
+                    localization_data[hikari_locale].update(
+                        {
+                            f"extensions.{command_name}.label": cmd.label,
+                            f"extensions.{command_name}.description": cmd.description,
+                        }
+                    )
+
+                    # Process command options if they exist
+                    if hasattr(cmd, "options"):
+                        for option_name, option_data in vars(cmd.options).items():
+                            if hasattr(option_data, "label") and hasattr(
+                                option_data, "description"
+                            ):
+                                localization_data[hikari_locale].update(
+                                    {
+                                        f"extensions.{command_name}.options.{option_name}.label": option_data.label,
+                                        f"extensions.{command_name}.options.{option_name}.description": option_data.description,
+                                    }
+                                )
+
+            except Exception as e:
+                logger.warning(f"Error processing localization for locale {locale}: {e}")
+
+        logger.info(f"Serialized localization data for {len(localization_data)} locales")
+        return lightbulb.DictLocalizationProvider(localization_data)
 
     @classmethod
     def set_guild_language(cls, guild_lang: hikari.Locale) -> None:
