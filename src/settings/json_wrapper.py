@@ -9,10 +9,10 @@ from typing import Any, Final, LiteralString, cast
 
 import hikari
 import lightbulb
-from pydantic import BaseModel, Field, PositiveInt, ValidationError, field_validator
+from pydantic import ValidationError
 
 from debug import get_logger
-from model import config_keys, message_keys
+from model import LocalizationSchema, SettingsSchema, config_keys, message_keys
 
 logger: logging.Logger = get_logger(__name__)
 
@@ -23,82 +23,11 @@ DEFAULT_CONFIG_PATH: Final[Path] = Path("configuration/settings.json").resolve()
 DEFAULT_LOCALIZATION_PATH: Final[Path] = Path("configuration/localization").resolve()
 
 
-class SettingsLoader(BaseModel):
-    """Settings model with validation."""
-
-    class Secret(BaseModel):
-        token: str = Field(..., title="Bot Token", description="Discord bot token")
-        default_guild: PositiveInt = Field(
-            ..., title="Default Guild ID", description="Default guild ID for the bot"
-        )
-
-        @field_validator("token")
-        @classmethod
-        def validate_token(cls, v: str) -> str:
-            if not v.strip():
-                raise ValueError("Token cannot be empty or whitespace")
-            return v
-
-    secret: Secret
-
-
-class LocalizationLoader(BaseModel):
-    """Localization model with validation."""
-
-    locale: str = Field(..., title="Locale", description="Language locale")
-
-    class Ban(BaseModel):
-        class Command(BaseModel):
-            label: str = Field(..., title="Label", description="Command label")
-            description: str = Field(..., title="Description", description="Command description")
-
-            class Options(BaseModel):
-                user: User
-                duration: Duration
-                reason: Reason
-
-                class User(BaseModel):
-                    label: str = Field(..., title="Label", description="User label")
-                    description: str = Field(
-                        ..., title="Description", description="User description"
-                    )
-
-                class Duration(BaseModel):
-                    label: str = Field(..., title="Label", description="Duration label")
-                    description: str = Field(
-                        ..., title="Description", description="Duration description"
-                    )
-
-                class Reason(BaseModel):
-                    label: str = Field(..., title="Label", description="Reason label")
-                    description: str = Field(
-                        ..., title="Description", description="Reason description"
-                    )
-
-            options: Options
-
-        class Messages(BaseModel):
-            class User(BaseModel):
-                success: str = Field(..., title="Success", description="Success message")
-
-            user: User
-
-        command: Command
-        messages: Messages
-
-    class Error(BaseModel):
-        title: str = Field(..., title="Title", description="Error title")
-        unknown: str = Field(..., title="Unknown", description="Unknown error message")
-
-    ban: Ban
-    error: Error
-
-
 class Settings:
     """Settings manager with caching and validation."""
 
     _instance: Settings | None = None
-    _data: SettingsLoader | None = None
+    _data: SettingsSchema | None = None
     _config_path: Path = DEFAULT_CONFIG_PATH
 
     def __new__(cls) -> Settings:
@@ -152,7 +81,7 @@ class Settings:
 
             with cls._config_path.open("r", encoding="utf-8") as file:
                 data = json.load(file)
-                cls._data = SettingsLoader(**data)
+                cls._data = SettingsSchema(**data)
                 cls._validate_required_settings()
                 logger.info("Settings loaded successfully")
 
@@ -237,7 +166,7 @@ class Localization:
     """Localization manager with caching and validation."""
 
     _instance: Localization | None = None
-    _data: dict[str, LocalizationLoader] | None = None
+    _data: dict[str, LocalizationSchema] | None = None
     _localization_path: Path = DEFAULT_LOCALIZATION_PATH
     _guild_lang: hikari.Locale = hikari.Locale.EN_US
 
@@ -270,7 +199,7 @@ class Localization:
         Load localization data from JSON files in the localization directory.
 
         This method reads all JSON files in the specified localization directory,
-        validates them against the LocalizationLoader model, and stores them in
+        validates them against the LocalizationSchema model, and stores them in
         the _data dictionary keyed by locale.
 
         The method performs the following steps:
@@ -279,7 +208,7 @@ class Localization:
         3. For each file, attempt to:
            - Parse the JSON content
            - Match the filename to a hikari.Locale
-           - Validate against the LocalizationLoader model
+           - Validate against the LocalizationSchema model
            - Store in the _data dictionary
 
         Raises:
@@ -331,7 +260,7 @@ class Localization:
                         data["locale"] = locale_name
 
                         # Validate and create model instance
-                        loader = LocalizationLoader(**data)
+                        loader = LocalizationSchema(**data)
 
                         # Store in the data dictionary
                         cls._data[locale] = loader
