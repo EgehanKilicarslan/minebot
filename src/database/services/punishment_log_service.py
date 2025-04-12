@@ -93,14 +93,19 @@ class PunishmentLogService:
         """
         async with get_db_session() as session:
             repository = PunishmentLogRepository(session)
-            existing_log: PunishmentLog | None = await repository.get_by_id(log_data.id)
 
-            if existing_log:
-                updated_log: PunishmentLog | None = await repository.update(log_data.id, log_data)
-                return PunishmentLogSchema.model_validate(updated_log)
-            else:
-                new_log: PunishmentLog = await repository.create(log_data)
-                return PunishmentLogSchema.model_validate(new_log)
+            # Check if we have an ID and if it exists in the database
+            if log_data.id is not None:
+                existing_log: PunishmentLog | None = await repository.get_by_id(log_data.id)
+                if existing_log:
+                    updated_log: PunishmentLog | None = await repository.update(
+                        log_data.id, log_data
+                    )
+                    return PunishmentLogSchema.model_validate(updated_log)
+
+            # If no ID or record doesn't exist, create a new one
+            new_log: PunishmentLog = await repository.create(log_data)
+            return PunishmentLogSchema.model_validate(new_log)
 
     @staticmethod
     async def delete_punishment_log(log_id: int) -> bool:

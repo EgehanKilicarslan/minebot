@@ -81,16 +81,19 @@ class TemporaryActionService:
         """
         async with get_db_session() as session:
             repository = TemporaryActionRepository(session)
-            existing_action: TemporaryAction | None = await repository.get_by_id(action_data.id)
 
-            if existing_action:
-                updated_action: TemporaryAction | None = await repository.update(
-                    action_data.id, action_data
-                )
-                return TemporaryActionSchema.model_validate(updated_action)
-            else:
-                new_action: TemporaryAction = await repository.create(action_data)
-                return TemporaryActionSchema.model_validate(new_action)
+            # Check if we have an ID and if it exists in the database
+            if action_data.id is not None:
+                existing_action: TemporaryAction | None = await repository.get_by_id(action_data.id)
+                if existing_action:
+                    updated_action: TemporaryAction | None = await repository.update(
+                        action_data.id, action_data
+                    )
+                    return TemporaryActionSchema.model_validate(updated_action)
+
+            # If no ID or record doesn't exist, create a new one
+            new_action: TemporaryAction = await repository.create(action_data)
+            return TemporaryActionSchema.model_validate(new_action)
 
     @staticmethod
     async def delete_temporary_action(action_id: int) -> bool:

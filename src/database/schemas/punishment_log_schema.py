@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, PositiveInt
 
 
 class PunishmentLogSchema(BaseModel):
-    id: PositiveInt
+    id: PositiveInt | None = Field(default=None)
     user_id: PositiveInt
     punishment_type: str = Field(max_length=50)
     reason: str
