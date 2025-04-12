@@ -20,7 +20,12 @@
         },
         "messages": {
             "user": {
-                "success": "User {user} has been banned successfully."
+                "success": {
+                    "message_type": "plain",
+                    "content": {
+                        "text": "User {user} has been banned successfully."
+                    }
+                }
             }
         }
     },

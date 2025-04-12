@@ -20,7 +20,12 @@
         },
         "messages": {
             "user": {
-                "success": "{user} kullanıcısı başarıyla yasaklandı."
+                "success": {
+                    "message_type": "plain",
+                    "content": {
+                        "text": "{user} kullanıcısı başarıyla yasaklandı."
+                    }
+                }
             }
         }
     },

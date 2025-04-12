@@ -386,18 +386,18 @@ class Localization:
         cls,
         key: LocalizationType,
         locale: str | hikari.Locale = _guild_lang,
-        default: str = "Unknown",
-    ) -> str:
+        default: Any = "Unknown",
+    ) -> Any:
         """
         Retrieve a specific localization value for a given locale and key.
 
         Args:
             key (LocalizationType): The key representing the localization value to retrieve.
             locale (str | hikari.Locale): The locale identifier (e.g., "en-US"). Defaults to guild language.
-            default (str): The default value to return if the key is not found. Defaults to "Unknown".
+            default (Any): The default value to return if the key is not found. Defaults to "Unknown".
 
         Returns:
-            str: The localized value for the specified key, or the default value if not found.
+            Any: The localized value for the specified key, or the default value if not found.
         """
         if cls._data is None:
             logger.debug("Localization data not loaded, attempting to load now.")
@@ -423,7 +423,7 @@ class Localization:
             logger.debug(
                 f"Successfully retrieved localization value for key '{key}' in locale '{locale}'."
             )
-            return str(value)
+            return value  # Return as-is, could be a string or MessageSchema
         except AttributeError as e:
             logger.error(
                 f"Failed to retrieve localization value for key '{key}' in locale '{locale}'. Returning default. Error: {str(e)}"

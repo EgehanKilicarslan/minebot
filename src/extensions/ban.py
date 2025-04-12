@@ -1,8 +1,8 @@
 import hikari
 import lightbulb
 
-from model import MessageKeys
-from settings import Localization
+from helper.message_helper import MessageHelper
+from model.message_keys import MessageKeys
 
 loader = lightbulb.Loader()
 
@@ -38,4 +38,8 @@ class Ban(
 
     @lightbulb.invoke
     async def invoke(self, ctx: lightbulb.Context) -> None:
-        await ctx.respond(Localization.get(MessageKeys.BAN_COMMAND_USER_SUCCESS))
+        await MessageHelper(
+            key=MessageKeys.BAN_COMMAND_USER_SUCCESS,
+            locale=ctx.interaction.locale,
+            user=self.user.mention,
+        ).respond(ctx)
