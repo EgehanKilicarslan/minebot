@@ -1,3 +1,5 @@
+import asyncio
+import os
 import sys
 from logging import Logger
 
@@ -17,6 +19,14 @@ if __name__ == "__main__":
 
     logger: Logger = get_logger(__name__)
     logger.info("Starting bot initialization")
+
+    if os.name != "nt":
+        import uvloop
+
+        logger.debug("Using uvloop as the event loop policy")
+        asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+    else:
+        logger.debug("Using default asyncio event loop policy")
 
     try:
         Settings.initialize()
