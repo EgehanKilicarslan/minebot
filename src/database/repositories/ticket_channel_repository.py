@@ -18,30 +18,43 @@ class TicketChannelRepository:
     def __init__(self, session: AsyncSession) -> None:
         """Initialize with a database session."""
         self.session: AsyncSession = session
+        logger.debug("Initialized TicketChannelRepository with session")
 
     async def get_by_id(self, channel_id: int) -> TicketChannel | None:
         """Get a ticket channel by ID."""
+        logger.debug(f"Fetching ticket channel with ID: {channel_id}")
         result: Result[tuple[TicketChannel]] = await self.session.execute(
             select(TicketChannel).where(TicketChannel.id == channel_id)
         )
-        return result.scalars().first()
+        channel = result.scalars().first()
+        logger.debug(f"Ticket channel with ID {channel_id} found: {channel is not None}")
+        return channel
 
     async def get_by_owner_id(self, owner_id: int) -> list[TicketChannel]:
         """Get all ticket channels for a specific owner."""
+        logger.debug(f"Fetching ticket channels for owner ID: {owner_id}")
         result: Result[tuple[TicketChannel]] = await self.session.execute(
             select(TicketChannel).where(TicketChannel.owner_id == owner_id)
         )
-        return list(result.scalars().all())
+        channels = list(result.scalars().all())
+        logger.debug(f"Found {len(channels)} ticket channels for owner ID: {owner_id}")
+        return channels
 
     async def get_by_category_id(self, category_id: int) -> list[TicketChannel]:
         """Get all ticket channels in a specific category."""
+        logger.debug(f"Fetching ticket channels for category ID: {category_id}")
         result: Result[tuple[TicketChannel]] = await self.session.execute(
             select(TicketChannel).where(TicketChannel.category_id == category_id)
         )
-        return list(result.scalars().all())
+        channels = list(result.scalars().all())
+        logger.debug(f"Found {len(channels)} ticket channels for category ID: {category_id}")
+        return channels
 
     async def create(self, channel_schema: TicketChannelSchema) -> TicketChannel:
         """Create a new ticket channel."""
+        logger.debug(
+            f"Creating new ticket channel for owner ID: {channel_schema.owner_id}, category ID: {channel_schema.category_id}"
+        )
         # Convert schema to model
         ticket_channel = TicketChannel(
             id=channel_schema.id,
@@ -51,15 +64,17 @@ class TicketChannelRepository:
 
         self.session.add(ticket_channel)
         await self.session.flush()
-        logger.info(f"Created ticket channel with ID: {ticket_channel.id}")
+        logger.debug(f"Created ticket channel with details: {vars(ticket_channel)}")
         return ticket_channel
 
     async def update(
         self, channel_id: int, channel_schema: TicketChannelSchema
     ) -> TicketChannel | None:
         """Update an existing ticket channel."""
+        logger.debug(f"Attempting to update ticket channel ID: {channel_id}")
         ticket_channel: TicketChannel | None = await self.get_by_id(channel_id)
         if not ticket_channel:
+            logger.debug(f"Ticket channel ID {channel_id} not found for update")
             return None
 
         # Update fields
@@ -67,16 +82,18 @@ class TicketChannelRepository:
         ticket_channel.category_id = channel_schema.category_id
 
         await self.session.flush()
-        logger.info(f"Updated ticket channel with ID: {channel_id}")
+        logger.debug(f"Updated ticket channel with details: {vars(ticket_channel)}")
         return ticket_channel
 
     async def delete(self, channel_id: int) -> bool:
         """Delete a ticket channel by ID."""
+        logger.debug(f"Attempting to delete ticket channel ID: {channel_id}")
         ticket_channel: TicketChannel | None = await self.get_by_id(channel_id)
         if not ticket_channel:
+            logger.debug(f"Ticket channel ID {channel_id} not found for deletion")
             return False
 
         await self.session.delete(ticket_channel)
         await self.session.flush()
-        logger.info(f"Deleted ticket channel with ID: {channel_id}")
+        logger.debug(f"Successfully deleted ticket channel ID: {channel_id}")
         return True

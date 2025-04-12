@@ -25,11 +25,14 @@ class TemporaryActionService:
         Returns:
             TemporaryActionSchema or None if the action doesn't exist
         """
+        logger.debug(f"Getting temporary action with ID: {action_id}")
         async with get_db_session() as session:
             repository = TemporaryActionRepository(session)
             action: TemporaryAction | None = await repository.get_by_id(action_id)
             if action:
+                logger.debug(f"Found temporary action: {action}")
                 return TemporaryActionSchema.model_validate(action)
+            logger.debug(f"No temporary action found with ID: {action_id}")
             return None
 
     @staticmethod
@@ -43,9 +46,11 @@ class TemporaryActionService:
         Returns:
             List of TemporaryActionSchema objects
         """
+        logger.debug(f"Getting temporary actions for user with ID: {user_id}")
         async with get_db_session() as session:
             repository = TemporaryActionRepository(session)
             actions: list[TemporaryAction] = await repository.get_by_user_id(user_id)
+            logger.debug(f"Found {len(actions)} temporary actions for user {user_id}")
             return [TemporaryActionSchema.model_validate(action) for action in actions]
 
     @staticmethod
@@ -59,11 +64,13 @@ class TemporaryActionService:
         Returns:
             List of TemporaryActionSchema objects
         """
+        logger.debug(f"Getting temporary actions of type: {punishment_type}")
         async with get_db_session() as session:
             repository = TemporaryActionRepository(session)
             actions: list[TemporaryAction] = await repository.get_by_punishment_type(
                 punishment_type
             )
+            logger.debug(f"Found {len(actions)} temporary actions of type {punishment_type}")
             return [TemporaryActionSchema.model_validate(action) for action in actions]
 
     @staticmethod
@@ -79,20 +86,26 @@ class TemporaryActionService:
         Returns:
             The created/updated temporary action schema
         """
+        logger.debug(f"Creating or updating temporary action: {action_data}")
         async with get_db_session() as session:
             repository = TemporaryActionRepository(session)
 
             # Check if we have an ID and if it exists in the database
             if action_data.id is not None:
+                logger.debug(f"Checking if temporary action with ID {action_data.id} exists")
                 existing_action: TemporaryAction | None = await repository.get_by_id(action_data.id)
                 if existing_action:
+                    logger.debug(f"Updating existing temporary action with ID: {action_data.id}")
                     updated_action: TemporaryAction | None = await repository.update(
                         action_data.id, action_data
                     )
+                    logger.debug(f"Updated temporary action: {updated_action}")
                     return TemporaryActionSchema.model_validate(updated_action)
 
             # If no ID or record doesn't exist, create a new one
+            logger.debug("Creating new temporary action")
             new_action: TemporaryAction = await repository.create(action_data)
+            logger.debug(f"Created new temporary action with ID: {new_action.id}")
             return TemporaryActionSchema.model_validate(new_action)
 
     @staticmethod
@@ -106,6 +119,9 @@ class TemporaryActionService:
         Returns:
             True if the action was deleted, False otherwise
         """
+        logger.debug(f"Attempting to delete temporary action with ID: {action_id}")
         async with get_db_session() as session:
             repository = TemporaryActionRepository(session)
-            return await repository.delete(action_id)
+            result = await repository.delete(action_id)
+            logger.debug(f"Deletion result for temporary action {action_id}: {result}")
+            return result

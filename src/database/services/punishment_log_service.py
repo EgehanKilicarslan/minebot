@@ -25,11 +25,14 @@ class PunishmentLogService:
         Returns:
             PunishmentLogSchema or None if the log doesn't exist
         """
+        logger.debug(f"Getting punishment log with ID: {log_id}")
         async with get_db_session() as session:
             repository = PunishmentLogRepository(session)
             log: PunishmentLog | None = await repository.get_by_id(log_id)
             if log:
+                logger.debug(f"Found punishment log: {log}")
                 return PunishmentLogSchema.model_validate(log)
+            logger.debug(f"No punishment log found with ID: {log_id}")
             return None
 
     @staticmethod
@@ -43,9 +46,11 @@ class PunishmentLogService:
         Returns:
             List of PunishmentLogSchema objects
         """
+        logger.debug(f"Getting punishment logs for user with ID: {user_id}")
         async with get_db_session() as session:
             repository = PunishmentLogRepository(session)
             logs: list[PunishmentLog] = await repository.get_by_user_id(user_id)
+            logger.debug(f"Found {len(logs)} punishment logs for user {user_id}")
             return [PunishmentLogSchema.model_validate(log) for log in logs]
 
     @staticmethod
@@ -59,9 +64,11 @@ class PunishmentLogService:
         Returns:
             List of PunishmentLogSchema objects
         """
+        logger.debug(f"Getting punishment logs for moderator with ID: {moderator_id}")
         async with get_db_session() as session:
             repository = PunishmentLogRepository(session)
             logs: list[PunishmentLog] = await repository.get_by_moderator_id(moderator_id)
+            logger.debug(f"Found {len(logs)} punishment logs for moderator {moderator_id}")
             return [PunishmentLogSchema.model_validate(log) for log in logs]
 
     @staticmethod
@@ -75,9 +82,11 @@ class PunishmentLogService:
         Returns:
             List of PunishmentLogSchema objects
         """
+        logger.debug(f"Getting punishment logs of type: {punishment_type}")
         async with get_db_session() as session:
             repository = PunishmentLogRepository(session)
             logs: list[PunishmentLog] = await repository.get_by_punishment_type(punishment_type)
+            logger.debug(f"Found {len(logs)} punishment logs of type {punishment_type}")
             return [PunishmentLogSchema.model_validate(log) for log in logs]
 
     @staticmethod
@@ -91,20 +100,26 @@ class PunishmentLogService:
         Returns:
             The created/updated punishment log schema
         """
+        logger.debug(f"Creating or updating punishment log: {log_data}")
         async with get_db_session() as session:
             repository = PunishmentLogRepository(session)
 
             # Check if we have an ID and if it exists in the database
             if log_data.id is not None:
+                logger.debug(f"Checking if punishment log with ID {log_data.id} exists")
                 existing_log: PunishmentLog | None = await repository.get_by_id(log_data.id)
                 if existing_log:
+                    logger.debug(f"Updating existing punishment log with ID: {log_data.id}")
                     updated_log: PunishmentLog | None = await repository.update(
                         log_data.id, log_data
                     )
+                    logger.debug(f"Updated punishment log: {updated_log}")
                     return PunishmentLogSchema.model_validate(updated_log)
 
             # If no ID or record doesn't exist, create a new one
+            logger.debug("Creating new punishment log")
             new_log: PunishmentLog = await repository.create(log_data)
+            logger.debug(f"Created new punishment log with ID: {new_log.id}")
             return PunishmentLogSchema.model_validate(new_log)
 
     @staticmethod
@@ -118,6 +133,9 @@ class PunishmentLogService:
         Returns:
             True if the log was deleted, False otherwise
         """
+        logger.debug(f"Attempting to delete punishment log with ID: {log_id}")
         async with get_db_session() as session:
             repository = PunishmentLogRepository(session)
-            return await repository.delete(log_id)
+            result = await repository.delete(log_id)
+            logger.debug(f"Deletion result for punishment log {log_id}: {result}")
+            return result

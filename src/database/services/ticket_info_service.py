@@ -25,11 +25,14 @@ class TicketInfoService:
         Returns:
             TicketInfoSchema or None if the ticket doesn't exist
         """
+        logger.debug(f"Getting ticket with ID: {ticket_id}")
         async with get_db_session() as session:
             repository = TicketInfoRepository(session)
             ticket_info: TicketInfo | None = await repository.get_by_id(ticket_id)
             if ticket_info:
+                logger.debug(f"Found ticket with ID {ticket_id}: {ticket_info}")
                 return TicketInfoSchema.model_validate(ticket_info)
+            logger.debug(f"No ticket found with ID: {ticket_id}")
             return None
 
     @staticmethod
@@ -43,11 +46,14 @@ class TicketInfoService:
         Returns:
             TicketInfoSchema or None if the ticket doesn't exist
         """
+        logger.debug(f"Getting ticket by channel ID: {channel_id}")
         async with get_db_session() as session:
             repository = TicketInfoRepository(session)
             ticket_info: TicketInfo | None = await repository.get_by_channel_id(channel_id)
             if ticket_info:
+                logger.debug(f"Found ticket for channel {channel_id}: {ticket_info}")
                 return TicketInfoSchema.model_validate(ticket_info)
+            logger.debug(f"No ticket found for channel ID: {channel_id}")
             return None
 
     @staticmethod
@@ -61,11 +67,14 @@ class TicketInfoService:
         Returns:
             TicketInfoSchema or None if the ticket doesn't exist
         """
+        logger.debug(f"Getting ticket by message ID: {message_id}")
         async with get_db_session() as session:
             repository = TicketInfoRepository(session)
             ticket_info: TicketInfo | None = await repository.get_by_message_id(message_id)
             if ticket_info:
+                logger.debug(f"Found ticket for message {message_id}: {ticket_info}")
                 return TicketInfoSchema.model_validate(ticket_info)
+            logger.debug(f"No ticket found for message ID: {message_id}")
             return None
 
     @staticmethod
@@ -79,17 +88,22 @@ class TicketInfoService:
         Returns:
             The created/updated ticket schema
         """
+        logger.debug(f"Creating or updating ticket: {ticket_data}")
         async with get_db_session() as session:
             repository = TicketInfoRepository(session)
             existing_ticket: TicketInfo | None = await repository.get_by_id(ticket_data.id)
 
             if existing_ticket:
+                logger.debug(f"Updating existing ticket with ID: {ticket_data.id}")
                 updated_ticket: TicketInfo | None = await repository.update(
                     ticket_data.id, ticket_data
                 )
+                logger.debug(f"Updated ticket: {updated_ticket}")
                 return TicketInfoSchema.model_validate(updated_ticket)
             else:
+                logger.debug(f"Creating new ticket with data: {ticket_data}")
                 new_ticket: TicketInfo = await repository.create(ticket_data)
+                logger.debug(f"Created new ticket with ID: {new_ticket.id}")
                 return TicketInfoSchema.model_validate(new_ticket)
 
     @staticmethod
@@ -103,6 +117,9 @@ class TicketInfoService:
         Returns:
             True if the ticket was deleted, False otherwise
         """
+        logger.debug(f"Attempting to delete ticket with ID: {ticket_id}")
         async with get_db_session() as session:
             repository = TicketInfoRepository(session)
-            return await repository.delete(ticket_id)
+            result = await repository.delete(ticket_id)
+            logger.debug(f"Deletion result for ticket {ticket_id}: {result}")
+            return result

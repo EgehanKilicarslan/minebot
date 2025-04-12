@@ -25,11 +25,14 @@ class TicketChannelService:
         Returns:
             TicketChannelSchema or None if the ticket channel doesn't exist
         """
+        logger.debug(f"Getting ticket channel with ID: {channel_id}")
         async with get_db_session() as session:
             repository = TicketChannelRepository(session)
             ticket_channel: TicketChannel | None = await repository.get_by_id(channel_id)
             if ticket_channel:
+                logger.debug(f"Found ticket channel: {ticket_channel}")
                 return TicketChannelSchema.model_validate(ticket_channel)
+            logger.debug(f"No ticket channel found with ID: {channel_id}")
             return None
 
     @staticmethod
@@ -43,9 +46,11 @@ class TicketChannelService:
         Returns:
             List of TicketChannelSchema objects
         """
+        logger.debug(f"Getting ticket channels for owner with ID: {owner_id}")
         async with get_db_session() as session:
             repository = TicketChannelRepository(session)
             ticket_channels: list[TicketChannel] = await repository.get_by_owner_id(owner_id)
+            logger.debug(f"Found {len(ticket_channels)} ticket channels for owner {owner_id}")
             return [TicketChannelSchema.model_validate(channel) for channel in ticket_channels]
 
     @staticmethod
@@ -59,9 +64,11 @@ class TicketChannelService:
         Returns:
             List of TicketChannelSchema objects
         """
+        logger.debug(f"Getting ticket channels for category with ID: {category_id}")
         async with get_db_session() as session:
             repository = TicketChannelRepository(session)
             ticket_channels: list[TicketChannel] = await repository.get_by_category_id(category_id)
+            logger.debug(f"Found {len(ticket_channels)} ticket channels in category {category_id}")
             return [TicketChannelSchema.model_validate(channel) for channel in ticket_channels]
 
     @staticmethod
@@ -77,17 +84,22 @@ class TicketChannelService:
         Returns:
             The created/updated ticket channel schema
         """
+        logger.debug(f"Creating or updating ticket channel: {channel_data}")
         async with get_db_session() as session:
             repository = TicketChannelRepository(session)
             existing_channel: TicketChannel | None = await repository.get_by_id(channel_data.id)
 
             if existing_channel:
+                logger.debug(f"Updating existing ticket channel with ID: {channel_data.id}")
                 updated_channel: TicketChannel | None = await repository.update(
                     channel_data.id, channel_data
                 )
+                logger.debug(f"Updated ticket channel: {updated_channel}")
                 return TicketChannelSchema.model_validate(updated_channel)
             else:
+                logger.debug(f"Creating new ticket channel with ID: {channel_data.id}")
                 new_channel: TicketChannel = await repository.create(channel_data)
+                logger.debug(f"Created new ticket channel: {new_channel}")
                 return TicketChannelSchema.model_validate(new_channel)
 
     @staticmethod
@@ -101,6 +113,9 @@ class TicketChannelService:
         Returns:
             True if the ticket channel was deleted, False otherwise
         """
+        logger.debug(f"Attempting to delete ticket channel with ID: {channel_id}")
         async with get_db_session() as session:
             repository = TicketChannelRepository(session)
-            return await repository.delete(channel_id)
+            result = await repository.delete(channel_id)
+            logger.debug(f"Deletion result for ticket channel {channel_id}: {result}")
+            return result
