@@ -6,5 +6,5 @@ sqlalchemy==2.0.40
 aiosqlite==0.21.0
 aiomysql==0.2.0
 asyncpg==0.30.0
-uvloop==0.21.0 # Optional (for Linux)
+uvloop==0.21.0; os_name != "nt"  # Only install on non-Windows systems
 py-mon==2.0.5
