@@ -16,7 +16,7 @@ from model import LocalizationSchema, SettingsSchema, config_keys, message_keys
 
 logger: logging.Logger = get_logger(__name__)
 
-SettingsType = config_keys.SecretKeys
+SettingsType = config_keys.SecretKeys | config_keys.DatabaseKeys
 LocalizationType = message_keys.CommandKeys | message_keys.MessageKeys
 
 DEFAULT_CONFIG_PATH: Final[Path] = Path("configuration/settings.json").resolve()
@@ -120,12 +120,16 @@ class Settings:
             raise RuntimeError("Settings not loaded")
 
         # Validate all enum values can be accessed
-        for setting in SettingsType:
-            try:
-                cls.get(setting)
-            except AttributeError as e:
-                logger.critical(f"Missing required setting: {setting.value}")
-                raise ValueError(f"Missing required setting: {setting.value}") from e
+        from enum import Enum
+
+        for enum_type in SettingsType.__args__:
+            if issubclass(enum_type, Enum):
+                for setting in enum_type:
+                    try:
+                        cls.get(setting)
+                    except AttributeError as e:
+                        logger.critical(f"Missing required setting: {setting.value}")
+                        raise ValueError(f"Missing required setting: {setting.value}") from e
 
     @classmethod
     @lru_cache(maxsize=128)

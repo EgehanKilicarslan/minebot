@@ -5,19 +5,13 @@ from typing import AsyncGenerator, TypeVar
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from database import Base, engine
+from database import Base, create_engine, engine
 from debug import get_logger
 
 logger: Logger = get_logger(__name__)
 
-# Create async session factory
-AsyncSessionLocal = async_sessionmaker(
-    engine,
-    expire_on_commit=False,
-    autoflush=False,
-    autocommit=False,
-    class_=AsyncSession,
-)
+# Session factory will be initialized later
+AsyncSessionLocal = None
 
 T = TypeVar("T")
 
@@ -37,6 +31,9 @@ async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
         async with get_db_session() as session:
             result = await session.execute(...)
     """
+    if AsyncSessionLocal is None:
+        raise RuntimeError("Database not initialized. Call initialize_database() first.")
+
     session: AsyncSession = AsyncSessionLocal()
     try:
         yield session
@@ -69,8 +66,23 @@ async def initialize_database() -> None:
     )
 
     try:
+        # Create engine and session factory
+        global AsyncSessionLocal, engine
+        if engine is None:
+            engine = create_engine()
+            if engine is None:
+                raise RuntimeError("Failed to create database engine")
+
+        AsyncSessionLocal = async_sessionmaker(
+            engine,
+            expire_on_commit=False,
+            autoflush=False,
+            autocommit=False,
+            class_=AsyncSession,
+        )
+
+        # Create tables
         async with engine.begin() as conn:
-            # Create all tables defined in Base
             await conn.run_sync(Base.metadata.create_all)
             logger.info("Database initialized successfully")
     except SQLAlchemyError as e:
@@ -81,13 +93,13 @@ async def initialize_database() -> None:
 async def close_database() -> None:
     """
     Close database connections and dispose of the engine.
-
-    This should be called during application shutdown to ensure
-    all connections are properly closed and resources are released.
     """
+    from database.base import engine
+
     try:
-        logger.info("Closing database engine and releasing connections...")
-        await engine.dispose()
-        logger.info("Database connections successfully closed")
+        if engine is not None:
+            logger.info("Closing database engine and releasing connections...")
+            await engine.dispose()
+            logger.info("Database connections successfully closed")
     except Exception as e:
         logger.error(f"Error while closing database connections: {e}")

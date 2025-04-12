@@ -6,3 +6,7 @@ class SecretKeys(Enum):
 
     TOKEN = "secret.token"
     DEFAULT_GUILD = "secret.default_guild"
+
+
+class DatabaseKeys(Enum):
+    URL = "database.url"

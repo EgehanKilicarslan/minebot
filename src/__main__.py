@@ -1,4 +1,3 @@
-import asyncio
 import sys
 from logging import Logger
 
@@ -22,7 +21,6 @@ if __name__ == "__main__":
     try:
         Settings.initialize()
         Localization.initialize()
-        asyncio.run(initialize_database())
 
         bot = hikari.GatewayBot(
             token=Settings.get(SecretKeys.TOKEN),
@@ -38,6 +36,7 @@ if __name__ == "__main__":
         @bot.listen(hikari.StartingEvent)
         async def on_starting(_: hikari.StartingEvent) -> None:
             logger.info("Starting bot")
+            await initialize_database()
             await client.load_extensions_from_package(events)
             await client.load_extensions_from_package(extensions, recursive=True)
             await client.start()
