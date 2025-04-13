@@ -16,7 +16,7 @@ from model import LocalizationSchema, SettingsSchema, config_keys, message_keys
 
 logger: logging.Logger = get_logger(__name__)
 
-SettingsType = config_keys.SecretKeys | config_keys.DatabaseKeys
+SettingsType = config_keys.SecretKeys | config_keys.DatabaseKeys | config_keys.CommandsKeys
 LocalizationType = message_keys.CommandKeys | message_keys.MessageKeys
 
 DEFAULT_CONFIG_PATH: Final[Path] = Path("configuration/settings.json").resolve()

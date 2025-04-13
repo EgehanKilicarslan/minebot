@@ -5,5 +5,21 @@
     },
     "database": {
         "url": ""
+    },
+    "commands": {
+        "ban": {
+            "enabled": null,
+            "permissions": [],
+            "cooldown": {
+                "algorithm": "",
+                "bucket": "",
+                "window_length": null,
+                "allowed_invocations": null
+            },
+            "log": {
+                "enabled": null,
+                "channel": null
+            }
+        }
     }
 }

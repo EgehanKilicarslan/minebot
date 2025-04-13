@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any
 
+import hikari
 from pydantic import (
     BaseModel,
     Field,
@@ -57,8 +58,69 @@ class SettingsSchema(BaseModel):
                 "sqlite+aiosqlite:///, mysql+aiomysql://, postgresql+asyncpg://"
             )
 
+    class Commands(BaseModel):
+        class SimpleCommand(BaseModel):
+            enabled: bool = Field(..., title="Enabled", description="Is the command enabled")
+            permissions: list[str] = Field(
+                default=["NONE"],
+                title="Permissions",
+                description="Command permissions",
+            )
+
+            class Cooldown(BaseModel):
+                algorithm: str = Field(
+                    ...,
+                    title="Algorithm",
+                    description="Cooldown algorithm",
+                    pattern=r"^(fixed_window|sliding_window)$",
+                )
+                bucket: str = Field(
+                    ...,
+                    title="Bucket",
+                    description="Cooldown bucket",
+                    pattern=r"^(global|user|channel|guild)$",
+                )
+                window_length: PositiveInt = Field(
+                    ..., title="Window Length", description="Cooldown window length"
+                )
+                allowed_invocations: PositiveInt = Field(
+                    ..., title="Allowed Invocations", description="Allowed invocations"
+                )
+
+            cooldown: Cooldown | None = Field(
+                default=None, title="Cooldown", description="Command cooldown"
+            )
+
+            @model_validator(mode="before")
+            @classmethod
+            def validate_permissions(cls, data: Any) -> Any:
+                if isinstance(data, dict):
+                    enabled: bool = data.get("enabled", False)
+                    permissions = data.get("permissions", ["NONE"])
+
+                    if enabled and isinstance(permissions, list):
+                        # Validate string permissions
+                        valid_permissions = hikari.Permissions.__members__
+                        for permission in permissions:
+                            if permission not in valid_permissions and permission != "NONE":
+                                raise ValueError(
+                                    f"Invalid permission: {permission}. Valid permissions are: {', '.join(valid_permissions)}"
+                                )
+
+                return data
+
+        class LoggedCommand(SimpleCommand):
+            class Log(BaseModel):
+                enabled: bool = Field(..., title="Enabled", description="Is logging enabled")
+                channel: PositiveInt = Field(..., title="Channel ID", description="Log channel ID")
+
+            log: Log
+
+        ban: LoggedCommand
+
     secret: Secret
     database: Database
+    commands: Commands
 
 
 class PlainMessage(BaseModel):

@@ -10,3 +10,7 @@ class SecretKeys(Enum):
 
 class DatabaseKeys(Enum):
     URL = "database.url"
+
+
+class CommandsKeys(Enum):
+    BAN = "commands.ban"

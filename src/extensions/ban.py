@@ -1,10 +1,12 @@
 import hikari
 import lightbulb
 
-from helper.message_helper import MessageHelper
-from model.message_keys import MessageKeys
+from helper import CommandHelper, MessageHelper
+from model import CommandsKeys, MessageKeys
+from settings import Settings
 
-loader = lightbulb.Loader()
+helper = CommandHelper(CommandsKeys.BAN)
+loader: lightbulb.Loader = helper.get_loader()
 
 
 @loader.command
@@ -12,7 +14,8 @@ class Ban(
     lightbulb.SlashCommand,
     name="extensions.ban.label",
     description="extensions.ban.description",
-    default_member_permissions=hikari.Permissions.BAN_MEMBERS,
+    default_member_permissions=helper.get_permissions(),
+    hooks=[].append(helper.get_cooldown()),
     contexts=[hikari.ApplicationContextType.GUILD],
     localize=True,
 ):
@@ -43,3 +46,5 @@ class Ban(
             locale=ctx.interaction.locale,
             user=self.user.mention,
         ).respond(ctx)
+
+        await ctx.respond(Settings.get(CommandsKeys.BAN))

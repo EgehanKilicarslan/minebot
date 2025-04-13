@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Any, Literal, cast
+from typing import Any, cast
 
 import hikari
 import lightbulb
@@ -56,7 +56,7 @@ class MessageHelper:
         self.key: MessageKeys = key
         self.locale: str | hikari.Locale | None = locale
         self.kwargs: dict[str, Any] = kwargs
-        logger.debug(f"MessageHelper initialized with key={key}, locale={locale}, kwargs={kwargs}")
+        logger.debug(f"[Message: {key.name}] Initialized with locale: {locale}, params: {kwargs}")
 
     def decode(self) -> str | hikari.Embed:
         """
@@ -76,19 +76,19 @@ class MessageHelper:
         Logs:
             Debug information about the decoding process.
         """
-        logger.debug(f"Decoding message with key={self.key}, locale={self.locale}")
+        logger.debug(f"[Message: {self.key.name}] Decoding {self.locale} message")
         message: MessageSchema = Localization.get(key=self.key, locale=self.locale)
         content: PlainMessage | EmbedMessage = message.content
-        logger.debug(f"Retrieved message schema: message_type={message.message_type}")
 
         if message.message_type == "plain":
             content = cast(PlainMessage, content)
             result: str = content.text.format(**self.kwargs) if content.text else ""
-            logger.debug(f"Decoded plain message: {result[:50]}{'...' if len(result) > 50 else ''}")
+            truncated = result[:50] + ("..." if len(result) > 50 else "")
+            logger.debug(f"[Message: {self.key.name}] Plain content: {truncated}")
             return result
 
         # Must be an embed message
-        logger.debug("Decoding embed message")
+        logger.debug(f"[Message: {self.key.name}] Building embed message")
         content = cast(EmbedMessage, content)
         embed = hikari.Embed(
             title=content.title.format(**self.kwargs) if content.title else None,
@@ -97,11 +97,10 @@ class MessageHelper:
             color=content.color.as_hex() if content.color else None,
             timestamp=content.timestamp,
         )
-        logger.debug(f"Created base embed with title: {content.title}")
 
         # Add fields if they exist
         if content.fields:
-            logger.debug(f"Adding {len(content.fields)} fields to embed")
+            logger.debug(f"[Message: {self.key.name}] Adding {len(content.fields)} fields")
             for field in content.fields:
                 embed.add_field(
                     name=field.name.format(**self.kwargs) if field.name else None,
@@ -111,7 +110,6 @@ class MessageHelper:
 
         # Set footer if exists
         if content.footer:
-            logger.debug("Setting footer for embed")
             embed.set_footer(
                 text=content.footer.text.format(**self.kwargs) if content.footer.text else "",
                 icon=str(content.footer.icon) if content.footer.icon else None,
@@ -119,22 +117,19 @@ class MessageHelper:
 
         # Set image, thumbnail and author if they exist
         if content.image:
-            logger.debug(f"Setting image: {content.image}")
             embed.set_image(str(content.image))
 
         if content.thumbnail:
-            logger.debug(f"Setting thumbnail: {content.thumbnail}")
             embed.set_thumbnail(str(content.thumbnail))
 
         if content.author:
-            logger.debug("Setting author information")
             embed.set_author(
                 name=content.author.name.format(**self.kwargs) if content.author.name else None,
                 url=str(content.author.url) if content.author.url else None,
                 icon=str(content.author.icon) if content.author.icon else None,
             )
 
-        logger.debug("Embed message fully constructed")
+        logger.debug(f"[Message: {self.key.name}] Embed message construction completed")
         return embed
 
     async def respond(self, ctx: ContextType, ephemeral: bool = False) -> None:
@@ -152,11 +147,12 @@ class MessageHelper:
         Raises:
             Any exceptions that might be raised by the context's respond method.
         """
-        logger.debug(f"Responding to context with ephemeral={ephemeral}")
         message: str | hikari.Embed = self.decode()
-        message_type: Literal["embed"] | Literal["plain"] = (
-            "embed" if isinstance(message, hikari.Embed) else "plain"
+        message_type = "embed" if isinstance(message, hikari.Embed) else "plain"
+
+        logger.debug(
+            f"[Message: {self.key.name}] Responding with {message_type} message (ephemeral: {ephemeral})"
         )
-        logger.debug(f"Sending {message_type} message response")
+
         await ctx.respond(content=message, ephemeral=ephemeral)
-        logger.debug("Response sent successfully")
+        logger.debug(f"[Message: {self.key.name}] Response sent successfully")
