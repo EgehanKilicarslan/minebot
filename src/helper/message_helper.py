@@ -5,6 +5,7 @@ import hikari
 import lightbulb
 
 from debug import get_logger
+from helper import ChannelHelper, CommandHelper
 from model import EmbedMessage, MessageKeys, MessageSchema, PlainMessage
 from settings import Localization
 
@@ -132,7 +133,7 @@ class MessageHelper:
         logger.debug(f"[Message: {self.key.name}] Embed message construction completed")
         return embed
 
-    async def respond(self, ctx: ContextType, ephemeral: bool = False) -> None:
+    async def send_response(self, ctx: ContextType, ephemeral: bool = False) -> None:
         """
         Responds to a context with a message.
 
@@ -156,3 +157,40 @@ class MessageHelper:
 
         await ctx.respond(content=message, ephemeral=ephemeral)
         logger.debug(f"[Message: {self.key.name}] Response sent successfully")
+
+    async def send_to_log_channel(self, client: lightbulb.Client, helper: CommandHelper) -> None:
+        """
+        Sends the message to the configured log channel.
+
+        This method checks if logging is enabled, retrieves the log channel ID,
+        fetches the channel, and then sends the decoded message to it.
+
+        Args:
+            client: The Lightbulb client instance.
+            helper: The CommandHelper instance to check logging configuration.
+
+        Returns:
+            None: The method returns early if logging is disabled or no channel is configured.
+        """
+        logger.debug(f"[Message: {self.key.name}] Checking if logging is enabled")
+        if not helper.has_logging_enabled():
+            logger.debug(f"[Message: {self.key.name}] Logging is disabled, skipping")
+            return
+
+        logger.debug(f"[Message: {self.key.name}] Getting log channel ID")
+        channel_id = helper.get_log_channel_id()
+        if not channel_id:
+            logger.debug(f"[Message: {self.key.name}] No log channel configured, skipping")
+            return
+
+        logger.debug(f"[Message: {self.key.name}] Fetching channel {channel_id}")
+        channel: hikari.TextableGuildChannel = await ChannelHelper.fetch_channel(
+            client, channel_id, hikari.TextableGuildChannel
+        )
+
+        message: str | hikari.Embed = self.decode()
+        message_type = "embed" if isinstance(message, hikari.Embed) else "plain"
+        logger.debug(f"[Message: {self.key.name}] Sending {message_type} message to log channel")
+
+        await channel.send(content=message)
+        logger.debug(f"[Message: {self.key.name}] Log message sent successfully")

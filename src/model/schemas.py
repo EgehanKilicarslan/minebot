@@ -112,7 +112,21 @@ class SettingsSchema(BaseModel):
         class LoggedCommand(SimpleCommand):
             class Log(BaseModel):
                 enabled: bool = Field(..., title="Enabled", description="Is logging enabled")
-                channel: PositiveInt = Field(..., title="Channel ID", description="Log channel ID")
+                channel: PositiveInt | None = Field(
+                    ..., title="Channel ID", description="Log channel ID"
+                )
+
+                @model_validator(mode="before")
+                @classmethod
+                def validate_channel(cls, data: Any) -> Any:
+                    if isinstance(data, dict):
+                        enabled: bool = data.get("enabled", False)
+                        channel: PositiveInt | None = data.get("channel")
+
+                        if enabled and channel is None:
+                            raise ValueError("Channel ID must be provided when logging is enabled.")
+
+                    return data
 
             log: Log
 

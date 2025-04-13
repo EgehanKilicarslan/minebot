@@ -60,7 +60,7 @@ class CommandHelper:
             # Optional logging properties - only log if it's a LoggedCommand
             if isinstance(command_info, LoggedCommand):
                 self.command_log_enabled: bool = command_info.log.enabled
-                self.command_log_channel: PositiveInt = command_info.log.channel
+                self.command_log_channel: PositiveInt | None = command_info.log.channel
                 logger.debug(
                     f"[Command: {self.command_name}] Logging configured - Enabled: {self.command_log_enabled}, "
                     f"Channel: {self.command_log_channel}"
@@ -160,3 +160,21 @@ class CommandHelper:
             raise ValueError(
                 f"Failed to configure cooldown for {self.command_name}: {str(e)}"
             ) from e
+
+    def has_logging_enabled(self) -> bool:
+        """
+        Check if logging is enabled for the command.
+
+        Returns:
+            bool: True if logging is enabled, False otherwise.
+        """
+        return self.command_log_enabled
+
+    def get_log_channel_id(self) -> PositiveInt | None:
+        """
+        Get the ID of the channel where command logs should be sent.
+
+        Returns:
+            PositiveInt | None: The channel ID if logging is enabled, None otherwise.
+        """
+        return self.command_log_channel

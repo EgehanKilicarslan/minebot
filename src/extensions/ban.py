@@ -3,7 +3,6 @@ import lightbulb
 
 from helper import CommandHelper, MessageHelper
 from model import CommandsKeys, MessageKeys
-from settings import Settings
 
 helper = CommandHelper(CommandsKeys.BAN)
 loader: lightbulb.Loader = helper.get_loader()
@@ -40,11 +39,15 @@ class Ban(
     )
 
     @lightbulb.invoke
-    async def invoke(self, ctx: lightbulb.Context) -> None:
+    async def invoke(self, ctx: lightbulb.Context, client: lightbulb.Client) -> None:
         await MessageHelper(
             key=MessageKeys.BAN_COMMAND_USER_SUCCESS,
             locale=ctx.interaction.locale,
             user=self.user.mention,
-        ).respond(ctx)
+        ).send_to_log_channel(client, helper)
 
-        await ctx.respond(Settings.get(CommandsKeys.BAN))
+        await MessageHelper(
+            key=MessageKeys.BAN_COMMAND_USER_SUCCESS,
+            locale=ctx.interaction.locale,
+            user=self.user.mention,
+        ).send_response(ctx)
