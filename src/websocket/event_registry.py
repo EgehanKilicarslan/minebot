@@ -1,12 +1,12 @@
 from logging import Logger
-from typing import Callable, Dict
+from typing import Callable
 
 from debug import get_logger
 
 logger: Logger = get_logger(__name__)
 
 # Dictionary to store event handlers
-event_handlers: Dict[str, Callable] = {}
+event_handlers: dict[str, Callable] = {}
 
 
 def websocket_event(event_name: str, should_load_hook: bool = True) -> Callable:
