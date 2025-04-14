@@ -11,7 +11,7 @@ from websocket.event_registry import event_handlers
 logger: Logger = get_logger(__name__)
 
 
-async def handle_connection(websocket: ServerConnection):
+async def handle_connection(websocket: ServerConnection) -> None:
     """
     Handle an incoming WebSocket connection.
 
@@ -29,7 +29,7 @@ async def handle_connection(websocket: ServerConnection):
         async for message in websocket:
             try:
                 data: dict[str, Any] = json.loads(message)
-                event = data.get("event")
+                event: Any | None = data.get("event")
 
                 if not event:
                     logger.warning(f"Received message without event type [client={client_id}]")

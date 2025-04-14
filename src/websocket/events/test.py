@@ -18,7 +18,7 @@ async def test(websocket: ServerConnection, data: TestSchema) -> None:
         websocket: The WebSocket connection object
         data: The parsed JSON data from the client
     """
-    client_id = id(websocket)
+    client_id: int = id(websocket)
 
     # Downgrade to debug level for routine operations
     logger.debug(f"Received 'test' event [client={client_id}]: {data.text}")
