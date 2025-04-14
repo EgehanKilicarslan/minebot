@@ -1,20 +1,25 @@
 from logging import Logger
-from typing import Callable
+from typing import Any, Callable
+
+from pydantic import BaseModel
 
 from debug import get_logger
 
 logger: Logger = get_logger(__name__)
 
 # Dictionary to store event handlers
-event_handlers: dict[str, Callable] = {}
+event_handlers: dict[str, dict[str, Any]] = {}
 
 
-def websocket_event(event_name: str, should_load_hook: bool = True) -> Callable:
+def websocket_event(
+    event_name: str, schema: type[BaseModel], should_load_hook: bool = True
+) -> Callable:
     """
     Decorator function to register event handlers.
 
     Args:
         event_name (str): The name of the event to register the handler for.
+        schema (type[BaseModel]): The Pydantic model class for validating the event data.
         should_load_hook (bool, optional): Flag to control if the handler should be registered.
             Defaults to True.
 
@@ -27,7 +32,10 @@ def websocket_event(event_name: str, should_load_hook: bool = True) -> Callable:
             if event_name in event_handlers:
                 logger.warning(f"Overriding existing handler for WebSocket event: {event_name}")
 
-            event_handlers[event_name] = func
+            event_handlers[event_name] = {
+                "handler": func,
+                "schema": schema,
+            }
 
             # Only log at debug level instead of info to reduce noise
             logger.debug(

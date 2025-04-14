@@ -1,5 +1,9 @@
 import json
 from logging import Logger
+from typing import Any, Callable
+
+from pydantic import BaseModel, ValidationError
+from websockets import ServerConnection
 
 from debug import get_logger
 from websocket.event_registry import event_handlers
@@ -7,7 +11,7 @@ from websocket.event_registry import event_handlers
 logger: Logger = get_logger(__name__)
 
 
-async def handle_connection(websocket):
+async def handle_connection(websocket: ServerConnection):
     """
     Handle an incoming WebSocket connection.
 
@@ -24,7 +28,7 @@ async def handle_connection(websocket):
     try:
         async for message in websocket:
             try:
-                data = json.loads(message)
+                data: dict[str, Any] = json.loads(message)
                 event = data.get("event")
 
                 if not event:
@@ -34,9 +38,20 @@ async def handle_connection(websocket):
                 # Use debug level for routine message handling
                 logger.debug(f"Received '{event}' event [client={client_id}]")
 
-                handler = event_handlers.get(event)
-                if handler:
-                    await handler(websocket, data)
+                event_info: dict[str, Any] | None = event_handlers.get(event)
+                if event_info:
+                    handler: Callable | None = event_info.get("handler")
+                    schema: type[BaseModel] | None = event_info.get("schema")
+
+                    if handler and schema:
+                        try:
+                            await handler(websocket, schema(**data))
+                        except ValidationError as e:
+                            logger.error(
+                                f"Validation error for event '{event}' [client={client_id}]: {e}"
+                            )
+                            continue
+
                 else:
                     logger.warning(f"No handler registered for event: {event}")
 
