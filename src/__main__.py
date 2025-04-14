@@ -56,9 +56,9 @@ if __name__ == "__main__":
         @bot.listen(hikari.StoppingEvent)
         async def on_stopping(_: hikari.StoppingEvent) -> None:
             logger.info("Stopping bot")
+            await shutdown_websocket_server()
             await client.stop()
             await close_database()
-            await shutdown_websocket_server()
 
         bot.run()
     except Exception as e:
