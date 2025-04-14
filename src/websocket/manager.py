@@ -16,7 +16,7 @@ class WebSocketManager:
     Handles initialization, running, and graceful shutdown of the WebSocket server.
     """
 
-    def __init__(self, host: str = "localhost", port: int = 8765):
+    def __init__(self, host: str = "localhost", port: int = 8080) -> None:
         """
         Initialize the WebSocket manager with host and port configuration.
 
@@ -24,8 +24,8 @@ class WebSocketManager:
             host (str): Hostname to bind the server to. Defaults to "localhost".
             port (int): Port number to run the server on. Defaults to 8765.
         """
-        self.host = host
-        self.port = port
+        self.host: str = host
+        self.port: int = port
         self.server = None
         self._task = None
         self._shutdown_event = asyncio.Event()

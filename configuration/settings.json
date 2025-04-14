@@ -6,6 +6,12 @@
     "database": {
         "url": ""
     },
+    "websocket": {
+        "server": {
+            "host": "",
+            "port": null
+        }
+    },
     "commands": {
         "ban": {
             "enabled": null,
