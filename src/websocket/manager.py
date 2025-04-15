@@ -4,8 +4,7 @@ from logging import Logger
 import websockets
 
 from debug import get_logger
-from websocket import handle_connection
-from websocket.event_registry import event_handlers
+from websocket import action_handlers, handle_connection
 
 logger: Logger = get_logger(__name__)
 
@@ -41,19 +40,19 @@ class WebSocketManager:
             logger.warning("WebSocket server already running")
             return
 
-        # Import events here to avoid circular imports
-        # This triggers registration of event handlers
+        # Import actionss here to avoid circular imports
+        # This triggers registration of action handlers
         try:
             # Downgraded to debug
-            logger.debug("Loading WebSocket event handlers")
-            import websocket.events  # noqa: F401
+            logger.debug("Loading WebSocket action handlers")
+            import websocket.actions  # noqa: F401
 
             # Keep this as info since it's a summary of handlers
             logger.info(
-                f"Starting WebSocket server with {len(event_handlers)} registered event handlers"
+                f"Starting WebSocket server with {len(action_handlers)} registered action handlers"
             )
         except Exception as e:
-            logger.error(f"Failed to load WebSocket event handlers: {e}", exc_info=True)
+            logger.error(f"Failed to load WebSocket action handlers: {e}", exc_info=True)
             return
 
         self._task = asyncio.create_task(self._run_server())
