@@ -6,8 +6,8 @@
     "database": {
         "url": ""
     },
-    "websocket": {
-        "server": {
+    "server": {
+        "websocket": {
             "host": "",
             "port": null
         }

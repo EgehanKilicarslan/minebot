@@ -13,8 +13,8 @@ class DatabaseKeys(Enum):
 
 
 class WebSocketKeys(Enum):
-    HOST = "websocket.server.host"
-    PORT = "websocket.server.port"
+    HOST = "server.websocket.host"
+    PORT = "server.websocket.port"
 
 
 class CommandsKeys(Enum):

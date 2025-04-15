@@ -58,8 +58,8 @@ class SettingsSchema(BaseModel):
                 "sqlite+aiosqlite:///, mysql+aiomysql://, postgresql+asyncpg://"
             )
 
-    class WebSocket(BaseModel):
-        class Server(BaseModel):
+    class Server(BaseModel):
+        class WebSocket(BaseModel):
             host: str = Field(
                 default="localhost", title="Host", description="WebSocket server host"
             )
@@ -67,7 +67,7 @@ class SettingsSchema(BaseModel):
                 default=8080, title="Port", description="WebSocket server port", ge=1, le=65535
             )
 
-        server: Server
+        websocket: WebSocket
 
     class Commands(BaseModel):
         class SimpleCommand(BaseModel):
@@ -145,7 +145,7 @@ class SettingsSchema(BaseModel):
 
     secret: Secret
     database: Database
-    websocket: WebSocket
+    server: Server
     commands: Commands
 
 

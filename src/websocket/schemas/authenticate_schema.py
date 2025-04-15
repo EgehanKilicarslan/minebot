@@ -1,5 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class AuthenticateSchema(BaseModel):
-    pass
+    action: str = Field(default="authenticate")
+    username: str
+    password: str
