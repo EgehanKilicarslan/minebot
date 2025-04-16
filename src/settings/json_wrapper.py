@@ -151,7 +151,7 @@ class Settings:
 
         Raises:
             ValueError: If the settings data has not been loaded.
-            AttributeError: If the key is not found and no default value is provided.
+            AttributeError: If the key is not found and no default is specified (default=NO_DEFAULT).
         """
 
         if cls._data is None:
@@ -166,9 +166,8 @@ class Settings:
 
             return cast(Any, value)
         except AttributeError:
-            if default is not None:
-                return default
-            raise
+            # Always return default without raising, even if default is None
+            return default
 
 
 class Localization:

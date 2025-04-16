@@ -145,7 +145,7 @@ class SettingsSchema(BaseModel):
 
     secret: Secret
     database: Database
-    server: Server
+    server: Server | None = Field(default=None, title="Server", description="Server settings")
     commands: Commands
 
 

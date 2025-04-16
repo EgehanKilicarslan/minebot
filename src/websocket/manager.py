@@ -15,7 +15,7 @@ class WebSocketManager:
     Handles initialization, running, and graceful shutdown of the WebSocket server.
     """
 
-    def __init__(self, host: str = "localhost", port: int = 8080) -> None:
+    def __init__(self, host: str | None = None, port: int | None = None) -> None:
         """
         Initialize the WebSocket manager with host and port configuration.
 
@@ -23,11 +23,17 @@ class WebSocketManager:
             host (str): Hostname to bind the server to. Defaults to "localhost".
             port (int): Port number to run the server on. Defaults to 8765.
         """
-        self.host: str = host
-        self.port: int = port
+        self.host: str | None = host
+        self.port: int | None = port
         self.server = None
         self._task = None
         self._shutdown_event = asyncio.Event()
+
+        if self.host is None or self.port is None:
+            logger.info("WebSocket server is disabled (host or port not set)")
+            self.is_enabled = False
+        else:
+            self.is_enabled = True
 
     async def start(self) -> None:
         """
@@ -36,9 +42,14 @@ class WebSocketManager:
         Returns:
             None
         """
+        if not self.is_enabled:
+            return
+
         if self._task is not None:
             logger.warning("WebSocket server already running")
             return
+
+        logger.info("Starting WebSocket server")
 
         # Import actionss here to avoid circular imports
         # This triggers registration of action handlers
@@ -93,6 +104,9 @@ class WebSocketManager:
         Returns:
             None
         """
+        if not self.is_enabled or not self._task:
+            return
+
         if not self._task:
             return
 
