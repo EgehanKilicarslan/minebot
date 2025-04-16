@@ -13,7 +13,7 @@ from database import close_database, initialize_database
 from debug import get_logger, setup_logging
 from model import SecretKeys
 from settings import Localization, Settings
-from websocket import initialize_websocket_server, shutdown_websocket_server
+from websocket import WebSocketServer
 
 if __name__ == "__main__":
     setup_logging()
@@ -32,6 +32,7 @@ if __name__ == "__main__":
     try:
         Settings.initialize()
         Localization.initialize()
+        websocket = WebSocketServer()
 
         bot = hikari.GatewayBot(
             token=Settings.get(SecretKeys.TOKEN),
@@ -51,12 +52,12 @@ if __name__ == "__main__":
             await client.load_extensions_from_package(events)
             await client.load_extensions_from_package(extensions, recursive=True)
             await client.start()
-            await initialize_websocket_server()
+            await websocket.start()
 
         @bot.listen(hikari.StoppingEvent)
         async def on_stopping(_: hikari.StoppingEvent) -> None:
             logger.info("Stopping bot")
-            await shutdown_websocket_server()
+            await websocket.stop()
             await client.stop()
             await close_database()
 
