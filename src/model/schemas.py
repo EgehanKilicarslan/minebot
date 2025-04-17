@@ -68,6 +68,7 @@ class SettingsSchema(BaseModel):
             )
 
             class Auth(BaseModel):
+                allowed_ip: str = Field(..., title="Allowed IP", description="Allowed IP address")
                 password: str = Field(
                     ..., title="Password", description="WebSocket authentication password"
                 )

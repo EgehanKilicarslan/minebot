@@ -8,12 +8,15 @@ and a manager for the server lifecycle.
 """
 
 from .action_registry import action_handlers, websocket_action
-from .listener import handle_connection
+from .listener import authenticated_client, handle_connection
+from .manager import WebSocketManager
 from .server import WebSocketServer
 
 __all__: list[str] = [
     "action_handlers",
     "websocket_action",
+    "authenticated_client",
     "handle_connection",
+    "WebSocketManager",
     "WebSocketServer",
 ]

@@ -15,6 +15,8 @@ class DatabaseKeys(Enum):
 class WebSocketKeys(Enum):
     HOST = "server.websocket.host"
     PORT = "server.websocket.port"
+    ALLOWED_IP = "server.websocket.auth.allowed_ip"
+    PASSWORD = "server.websocket.auth.password"
 
 
 class CommandsKeys(Enum):
