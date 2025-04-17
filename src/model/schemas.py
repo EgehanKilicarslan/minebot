@@ -67,6 +67,13 @@ class SettingsSchema(BaseModel):
                 default=8080, title="Port", description="WebSocket server port", ge=1, le=65535
             )
 
+            class Auth(BaseModel):
+                password: str = Field(
+                    ..., title="Password", description="WebSocket authentication password"
+                )
+
+            auth: Auth
+
         websocket: WebSocket
 
     class Commands(BaseModel):
@@ -102,23 +109,17 @@ class SettingsSchema(BaseModel):
                 default=None, title="Cooldown", description="Command cooldown"
             )
 
-            @model_validator(mode="before")
-            @classmethod
-            def validate_permissions(cls, data: Any) -> Any:
-                if isinstance(data, dict):
-                    enabled: bool = data.get("enabled", False)
-                    permissions = data.get("permissions", ["NONE"])
-
-                    if enabled and isinstance(permissions, list):
-                        # Validate string permissions
-                        valid_permissions = hikari.Permissions.__members__
-                        for permission in permissions:
-                            if permission not in valid_permissions and permission != "NONE":
-                                raise ValueError(
-                                    f"Invalid permission: {permission}. Valid permissions are: {', '.join(valid_permissions)}"
-                                )
-
-                return data
+            @model_validator(mode="after")
+            def validate_permissions(self) -> Any:
+                if self.enabled and isinstance(self.permissions, list):
+                    # Validate string permissions
+                    valid_permissions = hikari.Permissions.__members__
+                    for permission in self.permissions:
+                        if permission not in valid_permissions and permission != "NONE":
+                            raise ValueError(
+                                f"Invalid permission: {permission}. Valid permissions are: {', '.join(valid_permissions)}"
+                            )
+                return self
 
         class LoggedCommand(SimpleCommand):
             class Log(BaseModel):
@@ -127,17 +128,11 @@ class SettingsSchema(BaseModel):
                     ..., title="Channel ID", description="Log channel ID"
                 )
 
-                @model_validator(mode="before")
-                @classmethod
-                def validate_channel(cls, data: Any) -> Any:
-                    if isinstance(data, dict):
-                        enabled: bool = data.get("enabled", False)
-                        channel: PositiveInt | None = data.get("channel")
-
-                        if enabled and channel is None:
-                            raise ValueError("Channel ID must be provided when logging is enabled.")
-
-                    return data
+                @model_validator(mode="after")
+                def validate_channel(self) -> Any:
+                    if self.enabled and self.channel is None:
+                        raise ValueError("Channel ID must be provided when logging is enabled.")
+                    return self
 
             log: Log
 
@@ -216,18 +211,13 @@ class EmbedMessage(BaseModel):
             return [v]
         return v
 
-    @model_validator(mode="before")
-    @classmethod
-    def validate_title_or_description(cls, data: Any) -> dict[str, Any]:
+    @model_validator(mode="after")
+    def validate_title_or_description(self) -> "EmbedMessage":
         """Ensure that either title or description is provided."""
-        if isinstance(data, dict):
-            title = data.get("title")
-            description = data.get("description")
+        if not self.title and not self.description:
+            raise ValueError("Either title or description must be provided.")
 
-            if not title and not description:
-                raise ValueError("Either title or description must be provided.")
-
-        return data
+        return self
 
 
 class MessageSchema(BaseModel):

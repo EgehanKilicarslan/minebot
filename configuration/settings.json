@@ -9,7 +9,10 @@
     "server": {
         "websocket": {
             "host": "",
-            "port": null
+            "port": null,
+            "auth": {
+                "password": ""
+            }
         }
     },
     "commands": {
