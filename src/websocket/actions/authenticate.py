@@ -24,5 +24,7 @@ async def authenticate(websocket: ServerConnection, data: AuthenticateSchema) ->
 
     authenticated_client[client_id] = (websocket, data)
 
-    logger.info(f"Client authenticated successfully [id={client_id}]")
+    logger.info(
+        f"Client [id={client_id}] authenticated successfully (server_list={data.server_list})"
+    )
     await websocket.send(json.dumps({"status": "success", "message": "Authentication successful"}))

@@ -1,6 +1,5 @@
-from pydantic import BaseModel, Field
+from websocket.schemas import BaseSchema
 
 
-class TestSchema(BaseModel):
-    action: str = Field(default="test")
+class TestSchema(BaseSchema, action="test"):
     text: str

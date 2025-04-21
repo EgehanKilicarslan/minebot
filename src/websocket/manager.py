@@ -13,7 +13,7 @@ logger: Logger = get_logger(__name__)
 
 class WebSocketManager:
     @staticmethod
-    async def send_message(data: dict[str, Any] | type[BaseModel]) -> bool:
+    async def send_message(data: dict[str, Any] | BaseModel) -> bool:
         """
         Send a message to the authenticated WebSocket client.
 
