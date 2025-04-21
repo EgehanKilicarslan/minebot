@@ -8,4 +8,4 @@ aiosqlite==0.21.0
 aiomysql==0.2.0
 asyncpg==0.30.0
 websockets==15.0.1 
-uvloop==0.21.0; os_name != "nt"  # Only install on non-Windows systems
+uvloop==0.21.0; sys_platform != 'win32'
