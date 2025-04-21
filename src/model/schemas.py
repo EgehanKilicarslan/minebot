@@ -42,7 +42,7 @@ class SettingsSchema(BaseModel):
                 raise ValueError("Database URL cannot be empty or whitespace")
 
             patterns: dict[str, str] = {
-                "sqlite+aiosqlite://": r"sqlite\+aiosqlite:///.*",
+                "sqlite+aiosqlite://": r"sqlite\+aiosqlite:///(?!.*?/database/)(?!database/).*",
                 "mysql+aiomysql://": r"mysql\+aiomysql://[^:]+:.*@[^:]+:[0-9]+/[^/]+",
                 "postgresql+asyncpg://": r"postgresql\+asyncpg://[^:]+:.*@[^:]+:[0-9]+/[^/]+",
             }
@@ -50,6 +50,11 @@ class SettingsSchema(BaseModel):
             for prefix, pattern in patterns.items():
                 if v.startswith(prefix):
                     if not re.match(pattern, v):
+                        if prefix == "sqlite+aiosqlite://":
+                            if re.search(r"/database/|^database/", v.replace(prefix, "")):
+                                raise ValueError(
+                                    "SQLite database path cannot contain a folder named 'database'"
+                                )
                         raise ValueError(f"{prefix} URL must follow the correct format.")
                     return v
 
