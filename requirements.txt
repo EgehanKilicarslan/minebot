@@ -1,4 +1,4 @@
-hikari[speedups]==2.2.1
+hikari[speedups]==2.3.0
 hikari-toolbox==0.1.7
 hikari-lightbulb==3.0.0a18
 pydantic==2.11.3
