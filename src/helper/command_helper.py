@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Literal, LiteralString
+from typing import Literal, LiteralString, cast
 
 import hikari
 import lightbulb
@@ -124,7 +124,8 @@ class CommandHelper:
             algorithm: str = self.command_cooldown.algorithm
 
             # Validate bucket type
-            assert isinstance(bucket, Literal["global", "user", "channel", "guild"])
+            assert bucket in ["global", "user", "channel", "guild"]
+            bucket_literal = cast(Literal["global", "user", "channel", "guild"], bucket)
 
             logger.debug(
                 f"[Command: {self.command_name}] Configuring {algorithm} cooldown: "
@@ -136,14 +137,14 @@ class CommandHelper:
                     return lightbulb.prefab.cooldowns.fixed_window(
                         window_length=window_length,
                         allowed_invocations=allowed_invocations,
-                        bucket=bucket,
+                        bucket=bucket_literal,
                     )
 
                 case "sliding_window":
                     return lightbulb.prefab.cooldowns.sliding_window(
                         window_length=window_length,
                         allowed_invocations=allowed_invocations,
-                        bucket=bucket,
+                        bucket=bucket_literal,
                     )
 
                 case _:
