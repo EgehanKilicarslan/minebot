@@ -1,3 +1,5 @@
+from logging import Logger
+
 import hikari
 import lightbulb
 import toolbox
@@ -6,10 +8,10 @@ from debug import get_logger
 from model import SecretKeys
 from settings import Localization, Settings
 
-REQUIRED_PERMISSIONS = 140737488355327  # Administrator permissions value
+REQUIRED_PERMISSIONS = 1829587348619263  # Administrator permissions value
 
 loader = lightbulb.Loader()
-logger = get_logger(__name__)
+logger: Logger = get_logger(__name__)
 
 
 @loader.listener(hikari.ShardReadyEvent)
