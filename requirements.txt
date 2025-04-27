@@ -1,6 +1,6 @@
 hikari[speedups]==2.3.1
 hikari-toolbox==0.1.7
-hikari-lightbulb==3.0.0a18
+hikari-lightbulb==3.0.0a19
 pydantic==2.11.3
 pydantic-extra-types==2.10.3
 sqlalchemy==2.0.40
