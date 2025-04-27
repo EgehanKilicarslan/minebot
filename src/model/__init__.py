@@ -5,12 +5,13 @@ This package defines essential models and enumerations used throughout the
 application, ensuring consistency and reusability of key components.
 """
 
-from .config_keys import CommandsKeys, DatabaseKeys, SecretKeys, WebSocketKeys
+from .config_keys import BotKeys, CommandsKeys, DatabaseKeys, SecretKeys, WebSocketKeys
 from .message_keys import CommandKeys, MessageKeys
 from .ready_keys import LogStyle
 from .schemas import EmbedMessage, LocalizationSchema, MessageSchema, PlainMessage, SettingsSchema
 
 __all__: list[str] = [
+    "BotKeys",
     "CommandsKeys",
     "DatabaseKeys",
     "SecretKeys",

@@ -11,7 +11,7 @@ import events
 import extensions
 from database import close_database, initialize_database
 from debug import get_logger, setup_logging
-from model import SecretKeys
+from model import BotKeys, SecretKeys
 from settings import Localization, Settings
 from websocket import WebSocketServer
 
@@ -61,7 +61,15 @@ if __name__ == "__main__":
             await client.stop()
             await close_database()
 
-        bot.run()
+        bot.run(
+            status=getattr(hikari.Status, Settings.get(BotKeys.STATUS)),
+            activity=hikari.Activity(
+                name=Settings.get(BotKeys.NAME),
+                state=Settings.get(BotKeys.STATE),
+                url=Settings.get(BotKeys.URL),
+                type=getattr(hikari.ActivityType, Settings.get(BotKeys.TYPE)),
+            ),
+        )
     except Exception as e:
         logger.critical(f"Failed to start bot: {e}")
         sys.exit(1)

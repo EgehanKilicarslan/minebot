@@ -30,6 +30,44 @@ class SettingsSchema(BaseModel):
                 raise ValueError("Token cannot be empty or whitespace")
             return v
 
+    class Bot(BaseModel):
+        status: str | None = Field(
+            default=None,
+            title="Status",
+            description="Bot status",
+            pattern=r"^(ONLINE|IDLE|DO_NOT_DISTURB|OFFLINE)$",
+        )
+
+        class Activity(BaseModel):
+            name: str = Field(..., title="Name", description="Activity name")
+            state: str | None = Field(default=None, title="State", description="Activity state")
+            url: str | None = Field(
+                default=None,
+                title="URL",
+                description="Activity URL (optional)",
+                pattern=r"^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$",
+            )
+            type: str = Field(
+                default="PLAYING",
+                title="Type",
+                description="Activity type (e.g., 'PLAYING', 'WATCHING')",
+                pattern=r"^(PLAYING|STREAMING|LISTENING|WATCHING|COMPETING)$",
+            )
+
+            @model_validator(mode="after")
+            def validate_streaming_url(self) -> Any:
+                is_streaming: bool = self.type == "STREAMING"
+                has_url: bool = self.url is not None
+
+                if is_streaming and not has_url:
+                    raise ValueError("URL must be provided if type is 'STREAMING'")
+                elif has_url and not is_streaming:
+                    raise ValueError("URL must be None if type is not 'STREAMING'")
+
+                return self
+
+        activity: Activity
+
     class Database(BaseModel):
         url: str = Field(..., title="Database URL", description="Database connection URL")
 
@@ -141,6 +179,7 @@ class SettingsSchema(BaseModel):
 
     secret: Secret
     database: Database
+    bot: Bot
     server: Server | None = Field(default=None, title="Server", description="Server settings")
     commands: Commands
 

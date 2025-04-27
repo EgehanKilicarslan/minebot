@@ -6,6 +6,15 @@
     "database": {
         "url": ""
     },
+    "bot": {
+        "status": "",
+        "activity": {
+            "name": "",
+            "state": "",
+            "url": "",
+            "type": ""
+        }
+    },
     "server": {
         "websocket": {
             "host": "",

@@ -12,6 +12,14 @@ class DatabaseKeys(Enum):
     URL = "database.url"
 
 
+class BotKeys(Enum):
+    STATUS = "bot.status"
+    NAME = "bot.activity.name"
+    STATE = "bot.activity.state"
+    URL = "bot.activity.url"
+    TYPE = "bot.activity.type"
+
+
 class WebSocketKeys(Enum):
     HOST = "server.websocket.host"
     PORT = "server.websocket.port"
