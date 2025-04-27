@@ -7,7 +7,6 @@ Actions are registered and dispatched through this system, allowing for modular
 and extensible message handling.
 """
 
-from .authenticate import authenticate
-from .test import test
+from . import event, request, response
 
-__all__: list[str] = ["authenticate", "test"]
+__all__: list[str] = ["request", "response", "event"]

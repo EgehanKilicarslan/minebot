@@ -7,4 +7,30 @@ modules for handling commands, managing events, and interacting with external
 services.
 """
 
-__version__ = "1.0.2"
+__version__ = "1.1.0"
+
+from . import (
+    data_types,
+    database,
+    debug,
+    events,
+    extensions,
+    helper,
+    model,
+    settings,
+    utils,
+    websocket,
+)
+
+__all__: list[str] = [
+    "database",
+    "debug",
+    "events",
+    "extensions",
+    "helper",
+    "model",
+    "settings",
+    "data_types",
+    "utils",
+    "websocket",
+]

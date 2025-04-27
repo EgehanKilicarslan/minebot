@@ -57,7 +57,9 @@ class WebSocketServer:
         try:
             # Downgraded to debug
             logger.debug("Loading WebSocket action handlers")
-            import websocket.actions  # noqa: F401
+            import websocket.actions.event  # noqa: F401
+            import websocket.actions.request  # noqa: F401
+            import websocket.actions.response  # noqa: F401
 
             # Keep this as info since it's a summary of handlers
             logger.info(
