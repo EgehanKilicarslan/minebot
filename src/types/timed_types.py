@@ -11,7 +11,7 @@ import heapq
 import threading
 import time
 from logging import Logger
-from typing import Dict, Generic, Hashable, Iterable, Iterator, TypeVar
+from typing import Generic, Hashable, Iterable, Iterator, TypeVar
 
 from debug import get_logger
 
@@ -74,7 +74,7 @@ class TimedSet(Generic[T]):
         self.lazy_expiration: bool = lazy_expiration
 
         # Core data structures
-        self._items: Dict[T, float] = {}  # Maps items to their insertion timestamps
+        self._items: dict[T, float] = {}  # Maps items to their insertion timestamps
         self._expiration_heap: list[tuple[float, int, T]] = []  # (expiry_time, sequence, item)
         self._sequence_counter: int = 0  # For stable ordering in the heap
         self._expired_items_count: int = 0  # Count expired items to trigger cleanup
@@ -433,12 +433,12 @@ class TimedSet(Generic[T]):
             logger.debug(f"TimedSet: extended item '{item}' expiration by {extra_time}s")
             return True
 
-    def items_with_expiry(self) -> Dict[T, float]:
+    def items_with_expiry(self) -> dict[T, float]:
         """
         Return all items with their expiration times.
 
         Returns:
-            Dict[T, float]: Dictionary mapping items to their expiration timestamps
+            dict[T, float]: Dictionary mapping items to their expiration timestamps
         """
         with self._lock:
             self._check_expiration_if_lazy()
