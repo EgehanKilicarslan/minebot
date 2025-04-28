@@ -9,5 +9,4 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     locale: Mapped[str] = mapped_column(String(5), nullable=False)
-    minecraft_username: Mapped[str | None] = mapped_column(String(16), nullable=True)
     minecraft_uuid: Mapped[str | None] = mapped_column(String(36), nullable=True)
