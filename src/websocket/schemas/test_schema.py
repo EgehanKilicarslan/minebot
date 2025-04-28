@@ -1,5 +1,5 @@
-from websocket.schemas import BaseSchema
+from websocket.schemas import ServerBaseSchema
 
 
-class TestSchema(BaseSchema, action="test"):
+class TestSchema(ServerBaseSchema, action="test"):
     text: str

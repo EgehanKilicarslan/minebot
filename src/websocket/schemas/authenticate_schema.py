@@ -1,7 +1,6 @@
-from pydantic import BaseModel, Field
+from websocket.schemas import BaseSchema
 
 
-class AuthenticateSchema(BaseModel):
-    action: str = Field(default="authenticate")
+class AuthenticateSchema(BaseSchema, action="authenticate"):
     password: str
     server_list: list[str]

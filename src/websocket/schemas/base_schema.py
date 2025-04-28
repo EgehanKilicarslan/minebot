@@ -2,13 +2,19 @@ from pydantic import BaseModel, Field, field_validator
 
 
 class BaseSchema(BaseModel):
-    server: str
+    """Base schema without server field."""
 
     def __init_subclass__(cls, action: str, **kwargs):
         super().__init_subclass__(**kwargs)
         cls.action: str = Field(default=action)
         # Add action to the class's __annotations__ to ensure Pydantic processes it correctly
         cls.__annotations__["action"] = str
+
+
+class ServerBaseSchema(BaseSchema):
+    """Base schema with server field and validation."""
+
+    server: str
 
     @field_validator("server", mode="after")
     @classmethod
