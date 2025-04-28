@@ -12,8 +12,7 @@ import lightbulb
 from pydantic import ValidationError
 
 from debug import get_logger
-from model import LocalizationSchema, SettingsSchema
-from src.model import config, message
+from model import LocalizationSchema, SettingsSchema, config, message
 
 logger: logging.Logger = get_logger(__name__)
 
