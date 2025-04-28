@@ -5,6 +5,6 @@ This package contains various utility functions and helpers used throughout the 
 including file handling, localization support, and other common operations.
 """
 
-from .file_utils import fetch_available_locales, fetch_files_with_extension
+from .file import fetch_available_locales, fetch_files_with_extension
 
 __all__: list[str] = ["fetch_available_locales", "fetch_files_with_extension"]

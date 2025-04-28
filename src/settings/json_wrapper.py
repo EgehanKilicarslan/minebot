@@ -12,17 +12,13 @@ import lightbulb
 from pydantic import ValidationError
 
 from debug import get_logger
-from model import LocalizationSchema, SettingsSchema, config_keys, message_keys
+from model import LocalizationSchema, SettingsSchema
+from src.model import config, message
 
 logger: logging.Logger = get_logger(__name__)
 
-SettingsType = (
-    config_keys.SecretKeys
-    | config_keys.DatabaseKeys
-    | config_keys.CommandsKeys
-    | config_keys.WebSocketKeys
-)
-LocalizationType = message_keys.CommandKeys | message_keys.MessageKeys
+SettingsType = config.SecretKeys | config.DatabaseKeys | config.CommandsKeys | config.WebSocketKeys
+LocalizationType = message.CommandKeys | message.MessageKeys
 
 DEFAULT_CONFIG_PATH: Final[Path] = Path("configuration/settings.json").resolve()
 DEFAULT_LOCALIZATION_PATH: Final[Path] = Path("configuration/localization").resolve()
