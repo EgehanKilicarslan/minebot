@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from pydantic import BaseModel, Field, PositiveInt
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 
 
 class PunishmentLogSchema(BaseModel):
@@ -14,5 +14,4 @@ class PunishmentLogSchema(BaseModel):
     expires_at: datetime | None = Field(default=None)
     source: str = Field(max_length=20)
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, PositiveInt
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 
 
 class UserSchema(BaseModel):
@@ -7,5 +7,4 @@ class UserSchema(BaseModel):
     minecraftUsername: str | None = Field(default=None, max_length=16)
     minecraftUUID: str | None = Field(default=None, max_length=36)
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

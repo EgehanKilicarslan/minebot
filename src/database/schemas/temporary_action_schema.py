@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field, PositiveInt
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 
 
 class TemporaryActionSchema(BaseModel):
@@ -10,5 +10,4 @@ class TemporaryActionSchema(BaseModel):
     expires_at: datetime
     refresh_at: datetime | None = Field(default=None)
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

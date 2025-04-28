@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, PositiveInt
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 
 
 class TicketChannelSchema(BaseModel):
@@ -6,5 +6,4 @@ class TicketChannelSchema(BaseModel):
     owner_id: PositiveInt
     category_id: PositiveInt | None = Field(default=None)
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
