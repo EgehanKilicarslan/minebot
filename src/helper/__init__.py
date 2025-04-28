@@ -8,5 +8,12 @@ formatting utilities, and common operations used throughout the application.
 from .channel_helper import ChannelHelper
 from .command_helper import CommandHelper
 from .message_helper import MessageHelper
+from .minecraft_helper import ONLINE_PLAYERS, MinecraftHelper
 
-__all__: list[str] = ["ChannelHelper", "CommandHelper", "MessageHelper"]
+__all__: list[str] = [
+    "ChannelHelper",
+    "CommandHelper",
+    "MessageHelper",
+    "MinecraftHelper",
+    "ONLINE_PLAYERS",
+]

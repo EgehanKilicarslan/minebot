@@ -33,12 +33,13 @@ class UserRepository:
     async def create(self, user_schema: UserSchema) -> User:
         """Create a new user."""
         logger.debug(
-            f"Creating new user with ID: {user_schema.id}, minecraft uuid: {user_schema.minecraftUUID}"
+            f"Creating new user with ID: {user_schema.id}, minecraft username: {user_schema.minecraftUsername}"
         )
         # Convert schema to model
         user = User(
             id=user_schema.id,
             locale=user_schema.locale,
+            minecraft_username=user_schema.minecraftUsername,
             minecraft_uuid=user_schema.minecraftUUID,
         )
 
@@ -57,6 +58,7 @@ class UserRepository:
 
         # Update fields
         user.locale = user_schema.locale
+        user.minecraft_username = user_schema.minecraftUsername
         user.minecraft_uuid = user_schema.minecraftUUID
 
         await self.session.flush()

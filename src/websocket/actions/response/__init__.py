@@ -8,6 +8,6 @@ requests have been processed, completing the request-response cycle of
 the WebSocket communication protocol.
 """
 
-from .test import test
+from .player_status_check import player_status_check
 
-__all__: list[str] = ["test"]
+__all__: list[str] = ["player_status_check"]

@@ -1,4 +1,4 @@
-from websocket.schemas import BaseSchema
+from .base_schema import BaseSchema
 
 
 class AuthenticateSchema(BaseSchema, action="authenticate"):

@@ -4,11 +4,12 @@ from pydantic import BaseModel, Field, field_validator
 class BaseSchema(BaseModel):
     """Base schema without server field."""
 
-    def __init_subclass__(cls, action: str, **kwargs):
+    def __init_subclass__(cls, action: str | None = None, **kwargs) -> None:
         super().__init_subclass__(**kwargs)
-        cls.action: str = Field(default=action)
-        # Add action to the class's __annotations__ to ensure Pydantic processes it correctly
-        cls.__annotations__["action"] = str
+        if action is not None:
+            cls.action: str = Field(default=action)
+            # Add action to the class's __annotations__ to ensure Pydantic processes it correctly
+            cls.__annotations__["action"] = str
 
 
 class ServerBaseSchema(BaseSchema):
