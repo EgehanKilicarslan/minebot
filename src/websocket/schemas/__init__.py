@@ -1,10 +1,10 @@
-from .authenticate_schema import AuthenticateSchema
-from .base_schema import BaseSchema, ServerBaseSchema
-from .player_status_check_schema import PlayerStatusCheckSchema
+from . import event, request, response
+from .base import BaseSchema, ServerBaseSchema
 
 __all__: list[str] = [
-    "PlayerStatusCheckSchema",
+    "event",
+    "request",
+    "response",
     "BaseSchema",
     "ServerBaseSchema",
-    "AuthenticateSchema",
 ]

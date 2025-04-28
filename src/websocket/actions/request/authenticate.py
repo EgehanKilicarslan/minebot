@@ -7,7 +7,7 @@ from debug import get_logger
 from model import WebSocketKeys
 from settings import Settings
 from websocket import authenticated_client, websocket_action
-from websocket.schemas import AuthenticateSchema
+from websocket.schemas.request import AuthenticateSchema
 
 logger: Logger = get_logger(__name__)
 

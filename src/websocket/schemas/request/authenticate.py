@@ -1,4 +1,4 @@
-from .base_schema import BaseSchema
+from ..base import BaseSchema
 
 
 class AuthenticateSchema(BaseSchema, action="authenticate"):

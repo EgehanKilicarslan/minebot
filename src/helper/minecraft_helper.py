@@ -8,7 +8,7 @@ from database.schemas import UserSchema
 from database.services import UserService
 from debug import get_logger
 from websocket import WebSocketManager
-from websocket.schemas import PlayerStatusCheckSchema
+from websocket.schemas.response import PlayerStatusCheckSchema
 
 logger: Logger = get_logger(__name__)
 

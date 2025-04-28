@@ -1,6 +1,6 @@
 from pydantic import Field, model_validator
 
-from .base_schema import BaseSchema
+from ..base import BaseSchema
 
 
 class PlayerStatusCheckSchema(BaseSchema, action="player-status-check"):
