@@ -7,6 +7,7 @@ from pydantic import BaseModel, ValidationError
 from websockets import ServerConnection
 
 from debug import get_logger
+from helper import MINECRAFT_SERVERS
 from model import WebSocketKeys
 from settings import Settings
 from websocket import action_handlers
@@ -117,6 +118,9 @@ async def handle_connection(websocket: ServerConnection) -> None:
         # Remove client from authenticated clients if present
         if client_id in authenticated_client:
             del authenticated_client[client_id]
+
+        if MINECRAFT_SERVERS:
+            MINECRAFT_SERVERS.clear()
 
         # Keep connections at debug level, not info
         logger.debug(f"WebSocket connection closed [id={client_id}]")

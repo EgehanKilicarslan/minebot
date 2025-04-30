@@ -6,6 +6,7 @@ from websockets import ServerConnection
 from debug import get_logger
 from model import WebSocketKeys
 from settings import Settings
+from src.helper.minecraft import MINECRAFT_SERVERS
 from websocket import authenticated_client, websocket_action
 from websocket.schemas.request import AuthenticateSchema
 
@@ -23,6 +24,7 @@ async def authenticate(websocket: ServerConnection, data: AuthenticateSchema) ->
         return
 
     authenticated_client[client_id] = (websocket, data)
+    MINECRAFT_SERVERS.extend(data.server_list)
 
     logger.info(
         f"Client [id={client_id}] authenticated successfully (server_list={data.server_list})"
