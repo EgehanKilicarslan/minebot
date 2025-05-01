@@ -7,8 +7,6 @@ modules for handling commands, managing events, and interacting with external
 services.
 """
 
-__version__ = "1.1.0"
-
 from . import (
     data_types,
     database,

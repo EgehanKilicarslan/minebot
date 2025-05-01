@@ -3,7 +3,7 @@
   "tasks": [
     {
       "label": "Run Development",
-      "command": "source /home/egehan/.miniconda3/etc/profile.d/conda.sh && conda activate hikari && python3 -OO src/__main__.py",
+      "command": "/home/egehan/.local/bin/uv run src/__main__.py",
       "type": "shell",
       "problemMatcher": [],
       "group": {
@@ -23,7 +23,7 @@
     },
     {
       "label": "Update Dependencies",
-      "command": "source /home/egehan/.miniconda3/etc/profile.d/conda.sh && conda activate hikari && pip install -r requirements.txt",
+      "command": "uv sync",
       "type": "shell",
       "problemMatcher": [],
       "group": {
