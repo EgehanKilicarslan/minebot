@@ -20,6 +20,10 @@ class ServerBaseSchema(BaseSchema):
     @field_validator("server", mode="after")
     @classmethod
     def validate_server(cls, value: str) -> str:
+        # Check if the server name is built-in
+        if value == "all":
+            return value
+
         # Import inside method to avoid circular import
         from websocket import authenticated_client
 

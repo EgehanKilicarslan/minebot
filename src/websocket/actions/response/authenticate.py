@@ -24,6 +24,7 @@ async def authenticate(websocket: ServerConnection, data: AuthenticateSchema) ->
         return
 
     authenticated_client[client_id] = (websocket, data)
+    MINECRAFT_SERVERS.append("all")
     MINECRAFT_SERVERS.extend(data.server_list)
 
     logger.info(

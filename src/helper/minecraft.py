@@ -10,6 +10,7 @@ from debug import get_logger
 from model import MessageType
 from websocket.schemas import ResponseAwaitableSchema
 from websocket.schemas.request import (
+    DispatchCommandSchema,
     SendGlobalMessageSchema,
     SendPlayerMessageSchema,
     SendServerMessageSchema,
@@ -345,4 +346,33 @@ class MinecraftHelper:
                 message=message,
             )
         )
+        return True
+
+    @staticmethod
+    async def dispatch_command(server: str, commands: str | list[str]) -> bool:
+        """
+        Dispatch a command to a specific Minecraft server.
+
+        Args:
+            commands: Command(s) to dispatch
+            server: Name of the target Minecraft server
+
+        Returns:
+            Whether the command was dispatched successfully
+
+        Raises:
+            ValueError: If the server is not found in available servers
+        """
+        if not MinecraftHelper._check_servers_available():
+            return False
+
+        if server not in MINECRAFT_SERVERS:
+            logger.warning(f"Server '{server}' not found in available servers")
+            raise ValueError(f"Server '{server}' not found in available servers")
+
+        # Import inside the method to avoid circular imports
+        from websocket import WebSocketManager
+
+        logger.debug(f"Dispatching command(s) to server {server}")
+        await WebSocketManager.send_message(DispatchCommandSchema(server=server, commands=commands))
         return True
