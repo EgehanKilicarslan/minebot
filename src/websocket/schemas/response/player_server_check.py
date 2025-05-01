@@ -1,9 +1,9 @@
 from pydantic import Field, model_validator
 
-from ..base import BaseSchema
+from ..base import BaseSchema, ResponseAwaitableSchema
 
 
-class PlayerServerCheckSchema(BaseSchema, action="player-server-check"):
+class PlayerServerCheckSchema(BaseSchema, ResponseAwaitableSchema, action="player-server-check"):
     username: str | None = Field(default=None, max_length=16)
     uuid: str | None = Field(default=None, max_length=36)
     server: str | None = Field(default=None)

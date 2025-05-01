@@ -7,11 +7,18 @@ from data_types import TimedDict, TimedSet
 from database.schemas import UserSchema
 from database.services import UserService
 from debug import get_logger
+from model import MessageType
+from websocket.schemas import ResponseAwaitableSchema
+from websocket.schemas.request import (
+    SendGlobalMessageSchema,
+    SendPlayerMessageSchema,
+    SendServerMessageSchema,
+)
 from websocket.schemas.response import PlayerServerCheckSchema, PlayerStatusCheckSchema
 
 logger: Logger = get_logger(__name__)
 
-
+# Global state
 MINECRAFT_SERVERS: list[str] = []
 ONLINE_PLAYERS: TimedSet[str] = TimedSet[str](10)
 PLAYER_SERVERS: TimedDict[str, str] = TimedDict[str, str](10)
@@ -57,13 +64,38 @@ class MinecraftHelper:
             return uuid, True
 
         # Validate we have exactly one identifier
-        elif not bool(username) ^ bool(uuid):  # XOR operation
+        if not bool(username) ^ bool(uuid):  # XOR operation
             logger.error(f"Invalid parameter combination: username={username}, uuid={uuid}")
             raise ValueError("Exactly one of 'username' or 'uuid' must be provided")
 
         # Return the identifier
-        identifier: str = username or uuid or ""
-        return identifier, False
+        return username or uuid or "", False
+
+    @staticmethod
+    def _check_servers_available() -> bool:
+        """Check if any Minecraft servers are available."""
+        if not MINECRAFT_SERVERS:
+            logger.warning("No Minecraft servers available for the requested operation")
+            return False
+        return True
+
+    @staticmethod
+    async def _get_player_websocket_response(
+        schema: ResponseAwaitableSchema,
+        response_timeout: float = 1.0,
+    ) -> None:
+        """
+        Send schema to WebSocket and wait for response.
+
+        Args:
+            schema: The schema to send
+            response_timeout: Timeout for waiting for response
+        """
+        from websocket import WebSocketManager
+
+        await WebSocketManager.send_message(schema)
+        logger.debug(f"Waiting {response_timeout}s for WebSocket response")
+        await asyncio.sleep(response_timeout)
 
     @staticmethod
     async def fetch_player_status(
@@ -86,13 +118,8 @@ class MinecraftHelper:
 
         Raises:
             ValueError: If invalid parameter combination is provided
-
-        Note:
-            When calling from a Discord interaction, consider using ctx.defer() before
-            calling this method as it may take longer than Discord's 3-second timeout.
         """
-        if not MINECRAFT_SERVERS:
-            logger.warning("No Minecraft servers available, cannot check player status")
+        if not MinecraftHelper._check_servers_available():
             return False
 
         logger.debug(
@@ -112,16 +139,12 @@ class MinecraftHelper:
 
         # Request status check from websocket
         logger.debug(f"Player {identifier} not in cache, requesting status from WebSocket")
-        from websocket import WebSocketManager
-
-        await WebSocketManager.send_message(
+        await MinecraftHelper._get_player_websocket_response(
             PlayerStatusCheckSchema(
                 username=None if from_db else username, uuid=identifier if from_db else uuid
-            )
+            ),
+            response_timeout,
         )
-
-        logger.debug(f"Waiting {response_timeout}s for WebSocket response")
-        await asyncio.sleep(response_timeout)
 
         is_online = ONLINE_PLAYERS.contains(identifier)
         logger.debug(f"Player {identifier} is {'online' if is_online else 'offline'}")
@@ -148,13 +171,8 @@ class MinecraftHelper:
 
         Raises:
             ValueError: If invalid parameter combination is provided
-
-        Note:
-            When calling from a Discord interaction, consider using ctx.defer() before
-            calling this method as it may take longer than Discord's 3-second timeout.
         """
-        if not MINECRAFT_SERVERS:
-            logger.warning("No Minecraft servers available, cannot check player status")
+        if not MinecraftHelper._check_servers_available():
             return None
 
         logger.debug(
@@ -197,17 +215,134 @@ class MinecraftHelper:
 
         # If we need to explicitly request server info
         logger.debug(f"Player {identifier} is online but server unknown, requesting from WebSocket")
-        from websocket import WebSocketManager
-
-        await WebSocketManager.send_message(
+        await MinecraftHelper._get_player_websocket_response(
             PlayerServerCheckSchema(
                 username=None if from_db else username, uuid=identifier if from_db else uuid
-            )
+            ),
+            response_timeout,
         )
-
-        logger.debug(f"Waiting {response_timeout}s for WebSocket response")
-        await asyncio.sleep(response_timeout)
 
         server = PLAYER_SERVERS.get(identifier)
         logger.debug(f"Player {identifier} is on server: {server}")
         return server
+
+    @staticmethod
+    async def send_player_message(
+        message_type: MessageType,
+        message: str,
+        user: hikari.User | None = None,
+        username: str | None = None,
+        uuid: str | None = None,
+        response_timeout: float = 1.0,
+    ) -> bool:
+        """
+        Send a message to a specific Minecraft player.
+
+        Args:
+            message_type: Type of message to send
+            message: Content of the message
+            user: Discord user (their UUID will be retrieved from database)
+            username: Minecraft username (mutually exclusive with user and uuid)
+            uuid: Minecraft UUID (mutually exclusive with user and username)
+            response_timeout: Timeout for the response from the websocket
+
+        Returns:
+            Whether the message was sent successfully
+
+        Raises:
+            ValueError: If invalid parameter combination is provided
+        """
+        if not MinecraftHelper._check_servers_available():
+            return False
+
+        logger.debug(
+            f"Sending message to player with: user={user and user.id}, username={username}, uuid={uuid}"
+        )
+
+        identifier, from_db = await MinecraftHelper._resolve_identifier(user, username, uuid)
+        if not identifier:
+            return False
+
+        # Check online status first
+        is_online = await MinecraftHelper.fetch_player_status(
+            uuid=identifier if from_db else uuid,
+            username=None if from_db else username,
+            response_timeout=response_timeout,
+        )
+
+        if not is_online:
+            logger.debug(f"Player {identifier} is offline, cannot send message")
+            return False
+
+        from websocket import WebSocketManager
+
+        await WebSocketManager.send_message(
+            SendPlayerMessageSchema(
+                username=None if from_db else username,
+                uuid=identifier if from_db else uuid,
+                message_type=message_type,
+                message=message,
+            )
+        )
+        logger.debug(f"Message sent to player {identifier}: {message}")
+        return True
+
+    @staticmethod
+    async def send_global_message(message_type: MessageType, message: str) -> bool:
+        """
+        Send a message to all online players across all Minecraft servers.
+
+        Args:
+            message_type: Type of message to send
+            message: Content of the message
+
+        Returns:
+            Whether the message was sent successfully
+        """
+        if not MinecraftHelper._check_servers_available():
+            return False
+
+        logger.debug(f"Sending global message: {message}")
+
+        from websocket import WebSocketManager
+
+        await WebSocketManager.send_message(
+            SendGlobalMessageSchema(
+                message_type=message_type,
+                message=message,
+            )
+        )
+        return True
+
+    @staticmethod
+    async def send_server_message(message_type: MessageType, message: str, server: str) -> bool:
+        """
+        Send a message to all players on a specific Minecraft server.
+
+        Args:
+            message_type: Type of message to send
+            message: Content of the message
+            server: Name of the target Minecraft server
+
+        Returns:
+            Whether the message was sent successfully
+        """
+        if not MinecraftHelper._check_servers_available():
+            return False
+
+        if server not in MINECRAFT_SERVERS:
+            logger.warning(f"Server '{server}' not found in available servers")
+            return False
+
+        logger.debug(f"Sending server message to {server}: {message}")
+
+        from websocket import WebSocketManager
+
+        await WebSocketManager.send_message(
+            SendServerMessageSchema(
+                server=server,
+                message_type=message_type,
+                message=message,
+            )
+        )
+        return True

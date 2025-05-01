@@ -7,7 +7,7 @@ application, ensuring consistency and reusability of key components.
 
 from .config import BotKeys, CommandsKeys, DatabaseKeys, SecretKeys, WebSocketKeys
 from .message import CommandKeys, MessageKeys
-from .ready import LogStyle
+from .ready import LogStyle, MessageType
 from .schemas import EmbedMessage, LocalizationSchema, MessageSchema, PlainMessage, SettingsSchema
 
 __all__: list[str] = [
@@ -19,6 +19,7 @@ __all__: list[str] = [
     "CommandKeys",
     "MessageKeys",
     "LogStyle",
+    "MessageType",
     "EmbedMessage",
     "LocalizationSchema",
     "MessageSchema",

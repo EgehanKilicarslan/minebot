@@ -14,3 +14,15 @@ class LogStyle(Enum):
     RESET = "\033[0m"  # Reset
     ARROW = "\033[35;1m"  # Bright Magenta
     BRACKET = "\033[37;1m"  # Bright White
+
+
+class MessageType(Enum):
+    """Message types for Minecraft server messages"""
+
+    INFO = "INFO"
+    SUCCESS = "SUCCESS"
+    WARN = "WARN"
+    ERROR = "ERROR"
+    QUESTION = "QUESTION"
+    ANNOUNCE = "ANNOUNCE"
+    NO_PREFIX = "NO_PREFIX"

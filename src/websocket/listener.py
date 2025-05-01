@@ -11,7 +11,7 @@ from helper import MINECRAFT_SERVERS
 from model import WebSocketKeys
 from settings import Settings
 from websocket import action_handlers
-from websocket.schemas.request import AuthenticateSchema
+from websocket.schemas.response import AuthenticateSchema
 
 logger: Logger = get_logger(__name__)
 

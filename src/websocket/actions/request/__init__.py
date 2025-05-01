@@ -8,6 +8,4 @@ produce appropriate responses, forming the API interface for remote
 control and monitoring of the bot.
 """
 
-from .authenticate import authenticate
-
-__all__: list[str] = ["authenticate"]
+__all__: list[str] = []

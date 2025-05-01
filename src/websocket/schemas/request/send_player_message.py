@@ -1,15 +1,18 @@
 from pydantic import Field, model_validator
 
+from model import MessageType
+
 from ..base import BaseSchema, ResponseAwaitableSchema
 
 
-class PlayerStatusCheckSchema(BaseSchema, ResponseAwaitableSchema, action="player-status-check"):
+class SendPlayerMessageSchema(BaseSchema, ResponseAwaitableSchema, action="send-player-message"):
+    message_type: MessageType
+    message: str
     username: str | None = Field(default=None, max_length=16)
     uuid: str | None = Field(default=None, max_length=36)
-    online: bool | None = Field(default=None)
 
     @model_validator(mode="after")
-    def validate_username_or_uuid(self) -> "PlayerStatusCheckSchema":
+    def validate_username_or_uuid(self) -> "SendPlayerMessageSchema":
         if self.username is None and self.uuid is None:
             raise ValueError("Either 'username' or 'uuid' must be provided.")
         return self

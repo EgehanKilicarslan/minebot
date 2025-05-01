@@ -28,3 +28,6 @@ class ServerBaseSchema(BaseSchema):
             if value in auth_schema.server_list:
                 return value
         raise ValueError(f"Server '{value}' is not authenticated")
+
+
+class ResponseAwaitableSchema(BaseModel): ...
