@@ -169,30 +169,45 @@ class MinecraftHelper:
 
         # Quick check if already in cache before making request
         if identifier in PLAYER_SERVERS:
-            logger.debug(f"Player {identifier} found in cache, returning server")
+            logger.debug(
+                f"Player {identifier} found in cache, returning server: {PLAYER_SERVERS[identifier]}"
+            )
             return PLAYER_SERVERS[identifier]
 
-        if await MinecraftHelper.fetch_player_status(
-            uuid=identifier if from_db else uuid, username=None if from_db else username
-        ):
-            if len(MINECRAFT_SERVERS) == 1:
-                logger.debug(f"Only one server available: {MINECRAFT_SERVERS[0]}")
-                return MINECRAFT_SERVERS[0]
+        # Check online status first, this already includes waiting for the response
+        is_online = await MinecraftHelper.fetch_player_status(
+            uuid=identifier if from_db else uuid,
+            username=None if from_db else username,
+            response_timeout=response_timeout,
+        )
 
-            logger.debug(f"Player {identifier} not in cache, requesting server from WebSocket")
-            from websocket import WebSocketManager
+        if not is_online:
+            logger.debug(f"Player {identifier} is offline, cannot fetch server")
+            return None
 
-            await WebSocketManager.send_message(
-                PlayerServerCheckSchema(
-                    username=None if from_db else username, uuid=identifier if from_db else uuid
-                )
+        # After status check, see if server info was populated
+        if identifier in PLAYER_SERVERS:
+            logger.debug(f"Server found in cache after status check: {PLAYER_SERVERS[identifier]}")
+            return PLAYER_SERVERS[identifier]
+
+        # If only one server is available, we know the player must be there
+        if len(MINECRAFT_SERVERS) == 1:
+            logger.debug(f"Only one server available: {MINECRAFT_SERVERS[0]}")
+            return MINECRAFT_SERVERS[0]
+
+        # If we need to explicitly request server info
+        logger.debug(f"Player {identifier} is online but server unknown, requesting from WebSocket")
+        from websocket import WebSocketManager
+
+        await WebSocketManager.send_message(
+            PlayerServerCheckSchema(
+                username=None if from_db else username, uuid=identifier if from_db else uuid
             )
+        )
 
-            logger.debug(f"Waiting {response_timeout}s for WebSocket response")
-            await asyncio.sleep(response_timeout)
+        logger.debug(f"Waiting {response_timeout}s for WebSocket response")
+        await asyncio.sleep(response_timeout)
 
-            server = PLAYER_SERVERS.get(identifier)
-            logger.debug(f"Player {identifier} is on server {server}")
-            return server
-
-        return None
+        server = PLAYER_SERVERS.get(identifier)
+        logger.debug(f"Player {identifier} is on server: {server}")
+        return server
