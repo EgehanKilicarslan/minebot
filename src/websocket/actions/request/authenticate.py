@@ -4,9 +4,9 @@ from logging import Logger
 from websockets import ServerConnection
 
 from debug import get_logger
+from helper.minecraft import MINECRAFT_SERVERS
 from model import WebSocketKeys
 from settings import Settings
-from src.helper.minecraft import MINECRAFT_SERVERS
 from websocket import authenticated_client, websocket_action
 from websocket.schemas.request import AuthenticateSchema
 

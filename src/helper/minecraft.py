@@ -7,7 +7,6 @@ from data_types import TimedDict, TimedSet
 from database.schemas import UserSchema
 from database.services import UserService
 from debug import get_logger
-from websocket import WebSocketManager
 from websocket.schemas.response import PlayerServerCheckSchema, PlayerStatusCheckSchema
 
 logger: Logger = get_logger(__name__)
@@ -113,6 +112,8 @@ class MinecraftHelper:
 
         # Request status check from websocket
         logger.debug(f"Player {identifier} not in cache, requesting status from WebSocket")
+        from websocket import WebSocketManager
+
         await WebSocketManager.send_message(
             PlayerStatusCheckSchema(
                 username=None if from_db else username, uuid=identifier if from_db else uuid
@@ -179,6 +180,8 @@ class MinecraftHelper:
                 return MINECRAFT_SERVERS[0]
 
             logger.debug(f"Player {identifier} not in cache, requesting server from WebSocket")
+            from websocket import WebSocketManager
+
             await WebSocketManager.send_message(
                 PlayerServerCheckSchema(
                     username=None if from_db else username, uuid=identifier if from_db else uuid
