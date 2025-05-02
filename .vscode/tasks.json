@@ -13,7 +13,7 @@
     },
     {
       "label": "Count Lines",
-      "command": "clear && find -type f -name '*.py' -o -name '*.json' | xargs wc -l | tail -1",
+      "command": "clear && find -type f -name '*.py' -o -name '*.json' | grep -v '.venv/' | xargs wc -l | tail -1",
       "type": "shell",
       "problemMatcher": [],
       "group": {
