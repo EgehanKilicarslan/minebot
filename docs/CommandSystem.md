@@ -1,12 +1,12 @@
-# Command Configuration Guide
+# 🛠️ Command Configuration Guide
 
-This document explains the command configuration system used in our Discord bot. Let's break down the configuration structure using the "ban" command as an example.
+This document explains the command configuration system used in our Discord bot. We'll break down the structure using the "ban" command as an example.
 
-## Command Configuration Structure
+## 📋 Command Configuration Structure
 
-Each command in the bot is configured through a JSON structure that determines its behavior, permissions, cooldowns, and logging features. Here's a detailed explanation of each component:
+Each command is configured through a JSON structure that determines its behavior, permissions, cooldowns, and logging features.
 
-### Basic Structure
+### ✨ Basic Structure
 
 ```json
 "ban": {
@@ -25,30 +25,35 @@ Each command in the bot is configured through a JSON structure that determines i
 }
 ```
 
-### Components Explained
+## 🧩 Components Explained
 
-#### Command Activation
+### Command Activation
 
 ```json
 "enabled": true
 ```
-- **Purpose**: Controls whether the command is active in the bot
-- **Values**: `true` (command is available) or `false` (command is disabled)
+
+| Property  | Purpose                                | Values            | Default        |
+| --------- | -------------------------------------- | ----------------- | -------------- |
+| `enabled` | Controls whether the command is active | `true` or `false` | N/A (required) |
+
 - **Usage**: Quickly enable or disable commands without removing their configuration
 
-#### Permissions
+### Permissions
 
 ```json
 "permissions": ["BAN_MEMBERS"]
 ```
-- **Purpose**: Defines what Discord permissions users need to execute this command
-- **Values**: Any valid Discord permission (e.g., `"BAN_MEMBERS"`, `"KICK_MEMBERS"`, `"ADMINISTRATOR"`)
+
+| Property      | Purpose                              | Values                       | Default    |
+| ------------- | ------------------------------------ | ---------------------------- | ---------- |
+| `permissions` | Defines required Discord permissions | Any valid Discord permission | `["NONE"]` |
+
 - **Special Value**: `"NONE"` allows anyone to use the command
 - **Multiple Permissions**: Specify multiple permissions in the array if needed
 - **Behavior**: Users must have ALL listed permissions to use the command
-- **Default**: If the permissions section is omitted, it defaults to `"NONE"` (anyone can use the command)
 
-#### Cooldown System
+### Cooldown System
 
 ```json
 "cooldown": {
@@ -59,21 +64,25 @@ Each command in the bot is configured through a JSON structure that determines i
 }
 ```
 
-- **Purpose**: Prevents spam by limiting how often a command can be used
-- **Components**:
-  - `algorithm`: How the cooldown is calculated
-    - `fixed_window`: Resets after a fixed time period
-    - `sliding_window`: Continuously moves the time window
-  - `bucket`: What the cooldown applies to
-    - `user`: Individual users have separate cooldowns
-    - `channel`: Cooldown applies to all users in a channel
-    - `guild`: Cooldown applies to the entire server
-    - `global`: Cooldown applies across all servers
-  - `window_length`: Time period in seconds
-  - `allowed_invocations`: Number of uses allowed within the time period
-- **Default**: If the entire cooldown section is omitted, the command will have no cooldown restrictions
+| Property              | Purpose                    | Values                               | Default        |
+| --------------------- | -------------------------- | ------------------------------------ | -------------- |
+| `algorithm`           | How cooldown is calculated | `fixed_window`, `sliding_window`     | N/A (required) |
+| `bucket`              | What cooldown applies to   | `user`, `channel`, `guild`, `global` | N/A (required) |
+| `window_length`       | Time period in seconds     | Integer value                        | N/A (required) |
+| `allowed_invocations` | Uses allowed within period | Integer value                        | N/A (required) |
 
-#### Command Logging
+- **Algorithm Types**:
+
+  - `fixed_window`: Resets after a fixed time period
+  - `sliding_window`: Continuously moves the time window
+
+- **Bucket Types**:
+  - `user`: Individual users have separate cooldowns
+  - `channel`: Cooldown applies to all users in a channel
+  - `guild`: Cooldown applies to the entire server
+  - `global`: Cooldown applies across all servers
+
+### Command Logging
 
 ```json
 "log": {
@@ -82,22 +91,23 @@ Each command in the bot is configured through a JSON structure that determines i
 }
 ```
 
-- **Purpose**: Records command usage for moderation and audit purposes
-- **Components**:
-  - `enabled`: Whether logging is active for this command
-  - `channel`: The Discord channel ID where logs will be sent
-- **Note**: If `log.enabled` is set to `false`, the `channel` property becomes optional and can be removed
+| Property  | Purpose                            | Values                   | Default                   |
+| --------- | ---------------------------------- | ------------------------ | ------------------------- |
+| `enabled` | Controls whether logging is active | `true` or `false`        | `false`                   |
+| `channel` | Channel ID for logs                | Valid Discord channel ID | N/A (required if enabled) |
 
-## Real-World Example
+- **Note**: If `log.enabled` is `false`, the `channel` property becomes optional
+
+## 🔍 Real-World Example
 
 For the ban command shown above:
 
-1. **Status**: The command is active and available for use
-2. **Permissions**: Only users with the "Ban Members" permission can use this command
-3. **Cooldown**: Users can only use this command once every 60 seconds
-4. **Logging**: Every use of the ban command will be logged to the specified channel
+1. ✅ **Status**: The command is active and available for use
+2. 🔒 **Permissions**: Only users with the "Ban Members" permission can use this command
+3. ⏱️ **Cooldown**: Users can only use this command once every 60 seconds
+4. 📝 **Logging**: Every use of the ban command will be logged to the specified channel
 
-## Optional Configuration and Defaults
+## 🧰 Optional Configuration and Defaults
 
 You can simplify command configurations by omitting certain sections when default behavior is desired:
 
@@ -108,18 +118,42 @@ You can simplify command configurations by omitting certain sections when defaul
 ```
 
 This minimal configuration:
-- Enables the command
-- Sets permissions to `"NONE"` (anyone can use it)
-- Has no cooldown restrictions
-- Has logging disabled
 
-## Benefits of This Configuration System
+- ✅ Enables the command
+- 🔓 Sets permissions to `"NONE"` (anyone can use it)
+- 🕒 Has no cooldown restrictions
+- 📵 Has logging disabled
 
-- **Granular Control**: Each command can have its own unique settings
-- **Easy Maintenance**: Quickly adjust settings without modifying code
-- **Security**: Proper permission controls prevent unauthorized use
-- **Anti-Spam**: Cooldown system prevents command abuse
-- **Accountability**: Logging system creates an audit trail for moderation actions
-- **Flexibility**: Use only the configuration sections you need
+## 💡 Benefits of This Configuration System
 
-For administrators, this configuration can be modified in the settings.json file to adjust behavior according to your server's specific needs.
+| Benefit              | Description                                                  |
+| -------------------- | ------------------------------------------------------------ |
+| **Granular Control** | Each command can have its own unique settings                |
+| **Easy Maintenance** | Quickly adjust settings without modifying code               |
+| **Security**         | Proper permission controls prevent unauthorized use          |
+| **Anti-Spam**        | Cooldown system prevents command abuse                       |
+| **Accountability**   | Logging system creates an audit trail for moderation actions |
+| **Flexibility**      | Use only the configuration sections you need                 |
+
+For administrators, this configuration can be modified in the `settings.json` file to adjust behavior according to your server's specific needs.
+
+## 📚 Configuration Cheat Sheet
+
+```json
+{
+  "command-name": {
+    "enabled": true|false,                  // Required
+    "permissions": ["PERM1", "PERM2"],      // Optional, defaults to ["NONE"]
+    "cooldown": {                          // Optional, no cooldown if omitted
+      "algorithm": "fixed_window|sliding_window",
+      "bucket": "user|channel|guild|global",
+      "window_length": 60,                 // Time in seconds
+      "allowed_invocations": 5             // Number of allowed uses
+    },
+    "log": {                               // Optional, no logging if omitted
+      "enabled": true|false,
+      "channel": 1234567890123456789       // Discord channel ID
+    }
+  }
+}
+```
