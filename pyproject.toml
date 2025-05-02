@@ -1,7 +1,7 @@
 [project]
 name = "minebot"
 version = "1.1.0"
-description = "Add your description here"
+description = "A modern, all-in-one Discord bot with a Minecraft connector and a ton of useful features."
 requires-python = ">=3.10"
 dependencies = [
     "aiomysql==0.2.0",
