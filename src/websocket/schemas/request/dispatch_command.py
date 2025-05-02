@@ -4,6 +4,8 @@ from ..base import ServerBaseSchema
 
 
 class DispatchCommandSchema(ServerBaseSchema, action="dispatch-command"):
+    """Schema for the dispatch-command action."""
+
     commands: str | list[str]
 
     @field_validator("commands")

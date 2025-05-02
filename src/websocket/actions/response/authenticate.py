@@ -17,12 +17,16 @@ async def authenticate(websocket: ServerConnection, data: AuthenticateSchema) ->
     client_id = id(websocket)
     auth_password: str = Settings.get(WebSocketKeys.PASSWORD)
 
+    # Validate the provided password agains stored password
     if data.password != auth_password:
         logger.warning(f"Authentication failed for client [id={client_id}]: Invalid credentials")
         await websocket.close(1008, "Authentication failed: Invalid credentials provided")
         return
 
+    # Store the authenticated client
     authenticated_client[client_id] = (websocket, data)
+
+    # Update the Minecraft server list
     MINECRAFT_SERVERS.append("all")
     MINECRAFT_SERVERS.extend(data.server_list)
 

@@ -6,6 +6,8 @@ from ..base import BaseSchema, ResponseAwaitableSchema
 
 
 class SendPlayerMessageSchema(BaseSchema, ResponseAwaitableSchema, action="send-player-message"):
+    """Schema for the send-player-message action."""
+
     message_type: MessageType
     message: str
     username: str | None = Field(default=None, max_length=16)

@@ -16,8 +16,9 @@ async def player_status_check(websocket: ServerConnection, data: PlayerStatusChe
         f"Received player status check request: username={data.username}, uuid={data.uuid}, online={data.online}"
     )
 
+    # Validate the provided username or UUID
     if data.online:
         if data.username:
-            ONLINE_PLAYERS.add(data.username)
+            ONLINE_PLAYERS.add(data.username)  # Assign username to online players
         if data.uuid:
-            ONLINE_PLAYERS.add(data.uuid)
+            ONLINE_PLAYERS.add(data.uuid)  ## Assign UUID to online players

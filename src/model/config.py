@@ -9,10 +9,14 @@ class SecretKeys(Enum):
 
 
 class DatabaseKeys(Enum):
+    """Enum for database keys in the configuration."""
+
     URL = "database.url"
 
 
 class BotKeys(Enum):
+    """Enum for bot keys in the configuration."""
+
     STATUS = "bot.status"
     NAME = "bot.activity.name"
     STATE = "bot.activity.state"
@@ -21,6 +25,8 @@ class BotKeys(Enum):
 
 
 class WebSocketKeys(Enum):
+    """Enum for WebSocket keys in the configuration."""
+
     HOST = "server.websocket.host"
     PORT = "server.websocket.port"
     ALLOWED_IP = "server.websocket.auth.allowed_ip"
@@ -28,4 +34,6 @@ class WebSocketKeys(Enum):
 
 
 class CommandsKeys(Enum):
+    """Enum for command keys in the configuration."""
+
     BAN = "commands.ban"
