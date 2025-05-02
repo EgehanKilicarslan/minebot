@@ -106,9 +106,14 @@ class SettingsSchema(BaseModel):
             )
 
             class Auth(BaseModel):
-                allowed_ip: str = Field(..., title="Allowed IP", description="Allowed IP address")
+                allowed_ip: str = Field(
+                    default="127.0.0.1", title="Allowed IP", description="Allowed IP address"
+                )
                 password: str = Field(
-                    ..., title="Password", description="WebSocket authentication password"
+                    default="MineAcademy",
+                    title="Password",
+                    description="WebSocket authentication password",
+                    min_length=8,
                 )
 
             auth: Auth
