@@ -91,7 +91,7 @@ FALLBACK_CONFIG: Final[dict[str, Any]] = {
         },
     },
     "loggers": {
-        "minebot": {"level": "DEBUG", "handlers": ["console", "file"], "propagate": False},
+        "minebot": {"level": "INFO", "handlers": ["console", "file"], "propagate": False},
         "hikari": {"level": "INFO", "handlers": ["console", "file"], "propagate": False},
     },
     "root": {
