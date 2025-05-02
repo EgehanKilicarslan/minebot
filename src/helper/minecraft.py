@@ -73,14 +73,6 @@ class MinecraftHelper:
         return username or uuid or "", False
 
     @staticmethod
-    def _check_servers_available() -> bool:
-        """Check if any Minecraft servers are available."""
-        if not MINECRAFT_SERVERS:
-            logger.warning("No Minecraft servers available for the requested operation")
-            return False
-        return True
-
-    @staticmethod
     async def _get_player_websocket_response(
         schema: ResponseAwaitableSchema,
         response_timeout: float = 1.0,
@@ -97,6 +89,14 @@ class MinecraftHelper:
         await WebSocketManager.send_message(schema)
         logger.debug(f"Waiting {response_timeout}s for WebSocket response")
         await asyncio.sleep(response_timeout)
+
+    @staticmethod
+    def check_servers_available() -> bool:
+        """Check if any Minecraft servers are available."""
+        if not MINECRAFT_SERVERS:
+            logger.debug("No Minecraft servers available for the requested operation")
+            return False
+        return True
 
     @staticmethod
     async def fetch_player_status(
@@ -120,7 +120,7 @@ class MinecraftHelper:
         Raises:
             ValueError: If invalid parameter combination is provided
         """
-        if not MinecraftHelper._check_servers_available():
+        if not MinecraftHelper.check_servers_available():
             return False
 
         logger.debug(
@@ -173,7 +173,7 @@ class MinecraftHelper:
         Raises:
             ValueError: If invalid parameter combination is provided
         """
-        if not MinecraftHelper._check_servers_available():
+        if not MinecraftHelper.check_servers_available():
             return None
 
         logger.debug(
@@ -253,7 +253,7 @@ class MinecraftHelper:
         Raises:
             ValueError: If invalid parameter combination is provided
         """
-        if not MinecraftHelper._check_servers_available():
+        if not MinecraftHelper.check_servers_available():
             return False
 
         logger.debug(
@@ -300,7 +300,7 @@ class MinecraftHelper:
         Returns:
             Whether the message was sent successfully
         """
-        if not MinecraftHelper._check_servers_available():
+        if not MinecraftHelper.check_servers_available():
             return False
 
         logger.debug(f"Sending global message: {message}")
@@ -328,7 +328,7 @@ class MinecraftHelper:
         Returns:
             Whether the message was sent successfully
         """
-        if not MinecraftHelper._check_servers_available():
+        if not MinecraftHelper.check_servers_available():
             return False
 
         if server not in MINECRAFT_SERVERS:
@@ -363,7 +363,7 @@ class MinecraftHelper:
         Raises:
             ValueError: If the server is not found in available servers
         """
-        if not MinecraftHelper._check_servers_available():
+        if not MinecraftHelper.check_servers_available():
             return False
 
         if server not in MINECRAFT_SERVERS:
