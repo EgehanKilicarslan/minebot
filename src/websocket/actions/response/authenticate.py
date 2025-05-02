@@ -1,4 +1,3 @@
-import json
 from logging import Logger
 
 from websockets import ServerConnection
@@ -30,4 +29,3 @@ async def authenticate(websocket: ServerConnection, data: AuthenticateSchema) ->
     logger.info(
         f"Client [id={client_id}] authenticated successfully (server_list={data.server_list})"
     )
-    await websocket.send(json.dumps({"status": "success", "message": "Authentication successful"}))
