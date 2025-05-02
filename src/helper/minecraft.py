@@ -56,11 +56,11 @@ class MinecraftHelper:
 
             logger.debug(f"Looking up Minecraft UUID for Discord user {user.id}")
             schema: UserSchema | None = await UserService.get_user(user.id)
-            if not schema or not schema.minecraftUUID:
+            if not schema or not schema.minecraft_uuid:
                 logger.debug(f"No Minecraft UUID found for Discord user {user.id}")
                 return "", False
 
-            uuid = schema.minecraftUUID
+            uuid = schema.minecraft_uuid
             logger.debug(f"Found Minecraft UUID {uuid} for Discord user {user.id}")
             return uuid, True
 
