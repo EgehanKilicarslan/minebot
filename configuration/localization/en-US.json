@@ -1,36 +1,110 @@
 {
-    "ban": {
-        "command": {
-            "label": "ban",
-            "description": "Ban a user from the server.",
-            "options": {
-                "user": {
-                    "label": "user",
-                    "description": "The user to ban."
-                },
-                "duration": {
-                    "label": "duration",
-                    "description": "The duration of the ban."
-                },
-                "reason": {
-                    "label": "reason",
-                    "description": "The reason for the ban."
-                }
-            }
+  "ban": {
+    "command": {
+      "label": "ban",
+      "description": "Ban a user from the server.",
+      "options": {
+        "user": {
+          "label": "user",
+          "description": "The user to ban."
         },
-        "messages": {
-            "user": {
-                "success": {
-                    "message_type": "plain",
-                    "content": {
-                        "text": "User {user} has been banned successfully."
-                    }
-                }
-            }
+        "duration": {
+          "label": "duration",
+          "description": "The duration of the ban."
+        },
+        "reason": {
+          "label": "reason",
+          "description": "The reason for the ban."
         }
+      }
     },
-    "error": {
-        "title": "Error",
-        "unknown": "An unknown error occurred."
+    "messages": {
+      "user": {
+        "success": {
+          "message_type": "plain",
+          "content": {
+            "text": "User {discord_user_mention} has been banned successfully."
+          }
+        }
+      }
     }
+  },
+  "error": {
+    "command_execution_error": {
+      "message_type": "embed",
+      "content": {
+        "title": "Command Execution Error",
+        "description": "An error occurred while executing the command.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "Error",
+            "value": "{error_message}"
+          }
+        ]
+      }
+    },
+    "user_record_not_found": {
+      "message_type": "embed",
+      "content": {
+        "title": "User Record Not Found",
+        "description": "The user record was not found.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "Username",
+            "value": "{discord_username}"
+          },
+          {
+            "name": "User ID",
+            "value": "{discord_user_id}"
+          }
+        ]
+      }
+    },
+    "account_already_linked": {
+      "message_type": "embed",
+      "content": {
+        "title": "Account Already Linked",
+        "description": "The account has been already linked.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "Player Name",
+            "value": "{minecraft_username}"
+          },
+          {
+            "name": "Player UUID",
+            "value": "{minecraft_uuid}"
+          }
+        ]
+      }
+    },
+    "account_not_linked": {
+      "message_type": "embed",
+      "content": {
+        "title": "Account Not Linked",
+        "description": "The account is not linked.",
+        "color": "RED"
+      }
+    },
+    "player_not_online": {
+      "message_type": "embed",
+      "content": {
+        "title": "Player Not Online",
+        "description": "The minecraft player is not online.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "Player Name",
+            "value": "{minecraft_username}"
+          },
+          {
+            "name": "Player UUID",
+            "value": "{minecraft_uuid}"
+          }
+        ]
+      }
+    }
+  }
 }

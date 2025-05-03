@@ -11,6 +11,9 @@ import events
 import extensions
 from database import close_database, initialize_database
 from debug import get_logger, setup_logging
+from exceptions.command import CommandExecutionError
+from exceptions.utility import EmptyException
+from hooks.database import add_or_update_user
 from model import BotKeys, SecretKeys
 from settings import Localization, Settings
 from websocket import WebSocketServer
@@ -42,8 +45,17 @@ if __name__ == "__main__":
         )
 
         client: GatewayEnabledClient = lightbulb.client_from_app(
-            bot, localization_provider=Localization.serialize()
+            bot, localization_provider=Localization.serialize(), hooks=[add_or_update_user]
         )
+
+        @client.error_handler
+        async def handler(exc: lightbulb.exceptions.ExecutionPipelineFailedException) -> bool:
+            if not isinstance(exc, EmptyException):
+                return True
+            elif not isinstance(exc, CommandExecutionError):
+                await exc.context.respond(content=exc.causes[0], ephemeral=True)
+                return True
+            return False
 
         @bot.listen(hikari.StartingEvent)
         async def on_starting(_: hikari.StartingEvent) -> None:

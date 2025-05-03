@@ -36,12 +36,15 @@ class UserService:
             return None
 
     @staticmethod
-    async def create_or_update_user(user_data: UserSchema) -> UserSchema:
+    async def create_or_update_user(
+        user_data: UserSchema, preserve_existing: bool = True
+    ) -> UserSchema:
         """
         Create a new user or update if it already exists.
 
         Args:
             user_data: The user data to create or update
+            preserve_existing: If True (default), preserve existing non-null values when updating
 
         Returns:
             The created/updated user schema
@@ -51,16 +54,34 @@ class UserService:
             repository = UserRepository(session)
             existing_user: User | None = await repository.get_by_id(user_data.id)
 
-            if existing_user:
-                logger.debug(f"Updating existing user with ID: {user_data.id}")
-                updated_user: User | None = await repository.update(user_data.id, user_data)
-                logger.debug(f"Updated user: {updated_user}")
-                return UserSchema.model_validate(updated_user)
-            else:
+            if not existing_user:
                 logger.debug(f"Creating new user with ID: {user_data.id}")
                 new_user: User = await repository.create(user_data)
                 logger.debug(f"Created new user: {new_user}")
                 return UserSchema.model_validate(new_user)
+
+            # Handle existing user update
+            logger.debug(f"Updating existing user with ID: {user_data.id}")
+
+            # If preserving existing values, only update fields if they're null
+            if preserve_existing:
+                user_data = UserSchema(
+                    id=user_data.id,
+                    locale=user_data.locale,
+                    minecraft_username=user_data.minecraft_username
+                    or existing_user.minecraft_username,
+                    minecraft_uuid=user_data.minecraft_uuid or existing_user.minecraft_uuid,
+                    reward_inventory=user_data.reward_inventory or existing_user.reward_inventory,
+                )
+
+            updated_user: User | None = await repository.update(user_data.id, user_data)
+
+            if updated_user != existing_user:
+                logger.debug(f"Updated user: {updated_user}")
+            else:
+                logger.debug("No changes were made to the user")
+
+            return UserSchema.model_validate(updated_user)
 
     @staticmethod
     async def delete_user(user_id: int) -> bool:

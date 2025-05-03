@@ -404,7 +404,9 @@ class MinecraftHelper:
             return False
 
         # Check if user is online and get their server
-        server: str | None = await MinecraftHelper.fetch_player_server(user=user)
+        server: str | None = await MinecraftHelper.fetch_player_server(
+            uuid=user_data.minecraft_uuid
+        )
         if not server:
             logger.debug(f"User {actual_user_id} not online on any server")
             return False

@@ -1,36 +1,110 @@
 {
-    "ban": {
-        "command": {
-            "label": "yasakla",
-            "description": "Sunucudan bir kullanıcıyı yasakla.",
-            "options": {
-                "user": {
-                    "label": "kullanıcı",
-                    "description": "Yasaklanacak kullanıcı."
-                },
-                "duration": {
-                    "label": "süre",
-                    "description": "Yasak süresi."
-                },
-                "reason": {
-                    "label": "sebep",
-                    "description": "Yasaklama sebebi."
-                }
-            }
+  "ban": {
+    "command": {
+      "label": "yasakla",
+      "description": "Sunucudan bir kullanıcıyı yasakla.",
+      "options": {
+        "user": {
+          "label": "kullanıcı",
+          "description": "Yasaklanacak kullanıcı."
         },
-        "messages": {
-            "user": {
-                "success": {
-                    "message_type": "plain",
-                    "content": {
-                        "text": "{user} kullanıcısı başarıyla yasaklandı."
-                    }
-                }
-            }
+        "duration": {
+          "label": "süre",
+          "description": "Yasak süresi."
+        },
+        "reason": {
+          "label": "sebep",
+          "description": "Yasaklama sebebi."
         }
+      }
     },
-    "error": {
-        "title": "Hata",
-        "unknown": "Bilinmeyen bir hata oluştu."
+    "messages": {
+      "user": {
+        "success": {
+          "message_type": "plain",
+          "content": {
+            "text": "{discurd_user_mention} kullanıcısı başarıyla yasaklandı."
+          }
+        }
+      }
     }
+  },
+  "error": {
+    "command_execution_error": {
+      "message_type": "embed",
+      "content": {
+        "title": "Komut Çalıştırma Hatası",
+        "description": "Komut çalıştırılırken bir hata oluştu.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "Hata",
+            "value": "{error_message}"
+          }
+        ]
+      }
+    },
+    "user_record_not_found": {
+      "message_type": "embed",
+      "content": {
+        "title": "Kullanıcı Kaydı Bulunamadı",
+        "description": "Kullanıcı kaydı bulunamadı.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "Kullanıcı Adı",
+            "value": "{discord_username}"
+          },
+          {
+            "name": "Kullanıcı ID",
+            "value": "{discord_user_id}"
+          }
+        ]
+      }
+    },
+    "account_already_linked": {
+      "message_type": "embed",
+      "content": {
+        "title": "Hesap Zaten Bağlı",
+        "description": "Hesap zaten bağlanmış durumda.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "Oyuncu Adı",
+            "value": "{minecraft_username}"
+          },
+          {
+            "name": "Oyuncu UUID",
+            "value": "{minecraft_uuid}"
+          }
+        ]
+      }
+    },
+    "account_not_linked": {
+      "message_type": "embed",
+      "content": {
+        "title": "Hesap Bağlı Değil",
+        "description": "Hesap bağlı değil.",
+        "color": "RED"
+      }
+    },
+    "player_not_online": {
+      "message_type": "embed",
+      "content": {
+        "title": "Oyuncu Çevrimiçi Değil",
+        "description": "Minecraft oyuncusu çevrimiçi değil.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "Oyuncu Adı",
+            "value": "{minecraft_username}"
+          },
+          {
+            "name": "Oyuncu UUID",
+            "value": "{minecraft_uuid}"
+          }
+        ]
+      }
+    }
+  }
 }

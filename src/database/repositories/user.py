@@ -57,6 +57,18 @@ class UserRepository:
             logger.debug(f"User with ID {user_id} not found for update")
             return None
 
+        # Check if there are any changes
+        has_changes: bool = (
+            user.locale != user_schema.locale
+            or user.minecraft_username != user_schema.minecraft_username
+            or user.minecraft_uuid != user_schema.minecraft_uuid
+            or user.reward_inventory != user_schema.reward_inventory
+        )
+
+        if not has_changes:
+            logger.debug(f"No changes detected for user with ID: {user_id}")
+            return user
+
         # Update fields
         user.locale = user_schema.locale
         user.minecraft_username = user_schema.minecraft_username
@@ -103,7 +115,7 @@ class UserRepository:
         item_list: list[str] = [items] if isinstance(items, str) else items
 
         # Initialize inventory if None or get existing
-        data: dict[str, list[str]] = user.reward_inventory or {}
+        data: dict[str, list] = user.reward_inventory or {}
 
         # Get username and UUID once for all replacements
         username: str = user.minecraft_username or ""
@@ -111,7 +123,7 @@ class UserRepository:
 
         # Process all items in one pass with more efficient replacement
         processed_items: list[str] = [
-            item.replace("{username}", username).replace("{uuid}", uuid)
+            item.replace("{minecraft_username}", username).replace("{minecraft_uuid}", uuid)
             if isinstance(item, str)
             else item
             for item in item_list

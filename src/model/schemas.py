@@ -332,8 +332,21 @@ class LocalizationSchema(BaseModel):
         messages: Messages
 
     class Error(BaseModel):
-        title: str = Field(..., title="Title", description="Error title")
-        unknown: str = Field(..., title="Unknown", description="Unknown error message")
+        command_execution_error: MessageSchema = Field(
+            ..., title="Command Execution Error", description="Command execution error message"
+        )
+        user_record_not_found: MessageSchema = Field(
+            ..., title="User Record Not Found", description="User record not found error message"
+        )
+        account_already_linked: MessageSchema = Field(
+            ..., title="Account Already Linked", description="Account already linked error message"
+        )
+        account_not_linked: MessageSchema = Field(
+            ..., title="Account Not Linked", description="Account not linked error message"
+        )
+        player_not_online: MessageSchema = Field(
+            ..., title="Player Not Online", description="Player not online error message"
+        )
 
     ban: Ban
     error: Error
