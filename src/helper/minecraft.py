@@ -376,3 +376,55 @@ class MinecraftHelper:
         logger.debug(f"Dispatching command(s) to server {server}")
         await WebSocketManager.send_message(DispatchCommandSchema(server=server, commands=commands))
         return True
+
+    @staticmethod
+    async def give_rewards(user: hikari.User | None = None, user_id: int | None = None) -> bool:
+        """
+        Give rewards to a user.
+
+        Args:
+            user: Discord user (their UUID will be retrieved from database)
+            user_id: Discord user ID (alternative to user)
+
+        Returns:
+            Whether the rewards were given successfully
+        """
+        # Validate input parameters
+        if not bool(user) ^ bool(user_id):  # XOR: exactly one must be True
+            logger.error("Exactly one of 'user' or 'user_id' must be provided")
+            return False
+
+        # Get the user ID
+        actual_user_id: hikari.Snowflake | int = user.id if user else user_id  # type: ignore
+
+        # Get user data and validate rewards exist
+        user_data: UserSchema | None = await UserService.get_user(int(actual_user_id))
+        if not user_data or not user_data.reward_inventory:
+            logger.debug(f"User {actual_user_id} not found or has no rewards")
+            return False
+
+        # Check if user is online and get their server
+        server: str | None = await MinecraftHelper.fetch_player_server(user=user)
+        if not server:
+            logger.debug(f"User {actual_user_id} not online on any server")
+            return False
+
+        # Check if user has rewards for current server
+        rewards: list[str] | None = user_data.reward_inventory.get(server)
+        if not rewards or len(rewards) == 0:
+            logger.debug(f"No rewards found for user {actual_user_id} on server {server}")
+            return False
+
+        # Dispatch commands and update user data
+        try:
+            if await MinecraftHelper.dispatch_command(server=server, commands=rewards):
+                # Clear the rewards immediately after successful dispatch
+                user_data.reward_inventory[server] = []
+                await UserService.create_or_update_user(user_data)
+                logger.debug(f"Rewards dispatched successfully for user {actual_user_id}")
+                return True
+        except ValueError as e:
+            logger.error(f"Failed to dispatch commands: {e}")
+
+        logger.debug(f"Failed to dispatch rewards for user {actual_user_id}")
+        return False
