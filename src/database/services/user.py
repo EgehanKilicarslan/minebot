@@ -79,3 +79,23 @@ class UserService:
             result = await repository.delete(user_id)
             logger.debug(f"Deletion result for user {user_id}: {result}")
             return result
+
+    @staticmethod
+    async def add_item(user_id: int, server: str, items: str | list[str]) -> bool:
+        """
+        Add an item to the user's inventory.
+
+        Args:
+            user_id: The Discord user ID
+            server: The server name
+            items: The item(s) to add
+
+        Returns:
+            True if the item was added, False otherwise
+        """
+        logger.debug(f"Adding item(s) to inventory for user {user_id}: {items}")
+        async with get_db_session() as session:
+            repository = UserRepository(session)
+            result: bool = await repository.add_item(user_id, server, items)
+            logger.debug(f"Add item result for user {user_id}: {result}")
+            return result

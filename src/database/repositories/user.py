@@ -79,3 +79,54 @@ class UserRepository:
         await self.session.flush()
         logger.debug(f"Successfully deleted user with ID: {user_id}")
         return True
+
+    async def add_item(self, user_id: int, server: str, items: str | list[str]) -> bool:
+        """
+        Add one or more items to the user's inventory for a specific server.
+
+        Args:
+            user_id: The Discord user ID
+            server: The server name
+            items: The item(s) to add (can be a string or a list of strings)
+
+        Returns:
+            True if the item(s) were added successfully, False otherwise
+        """
+        logger.debug(f"Adding item(s) to user {user_id} on server {server}: {items}")
+
+        user: User | None = await self.get_by_id(user_id)
+        if not user:
+            logger.debug(f"User with ID {user_id} not found for adding items")
+            return False
+
+        # Normalize input to always be a list
+        item_list: list[str] = [items] if isinstance(items, str) else items
+
+        # Initialize inventory if None or get existing
+        data: dict[str, list[str]] = user.reward_inventory or {}
+
+        # Get username and UUID once for all replacements
+        username: str = user.minecraft_username or ""
+        uuid: str = user.minecraft_uuid or ""
+
+        # Process all items in one pass with more efficient replacement
+        processed_items: list[str] = [
+            item.replace("{username}", username).replace("{uuid}", uuid)
+            if isinstance(item, str)
+            else item
+            for item in item_list
+        ]
+
+        # Update inventory efficiently
+        if server not in data:
+            data[server] = processed_items
+        else:
+            data[server].extend(processed_items)
+
+        user.reward_inventory = data
+        await self.session.flush()
+
+        logger.debug(
+            f"Added items to user {user_id} inventory on server {server}: {processed_items}"
+        )
+        return True
