@@ -592,16 +592,16 @@ speedups = [
 
 [[package]]
 name = "hikari-lightbulb"
-version = "3.0.0a20"
+version = "3.0.0a21"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "async-timeout" },
     { name = "hikari" },
     { name = "linkd" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/af/43/6d59cc7f7ede040589f19f2221cc7b76aa4036d61d9ad56d672edf0cde32/hikari_lightbulb-3.0.0a20.tar.gz", hash = "sha256:124e804b1951034da3c0516aa626fd0e54cafb5ade55901671f185b83a0d193f", size = 129068, upload-time = "2025-05-03T18:30:03.998Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/90/41/e4732ddd90f7180fd2608921a70fa92496df8799726c44e9a2344fd5030c/hikari_lightbulb-3.0.0a21.tar.gz", hash = "sha256:a0b28ee99b5bd1fd0add4804984a667096bef4da8c49774638e19a929890bf35", size = 132282, upload-time = "2025-05-05T17:47:37.197Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/52/82/43630e528fa9acbec5667824fb9f2f8f2b9b7932413b7501729c9fe3ee56/hikari_lightbulb-3.0.0a20-py3-none-any.whl", hash = "sha256:e4e2429751e9b4c1cfe83ee78413bbfd036004eeb405e03fead1fdbb821317da", size = 97085, upload-time = "2025-05-03T18:30:02.042Z" },
+    { url = "https://files.pythonhosted.org/packages/56/38/0b391ed982ed1d3a8505d67a6d119d551dfd160834b92b0292443a067734/hikari_lightbulb-3.0.0a21-py3-none-any.whl", hash = "sha256:34b03830516f5d4b58df4f75f9e239ff1c310286afac30438316b389eff509f1", size = 100264, upload-time = "2025-05-05T17:47:35.424Z" },
 ]
 
 [[package]]
@@ -659,7 +659,7 @@ requires-dist = [
     { name = "aiosqlite", specifier = "==0.21.0" },
     { name = "asyncpg", specifier = "==0.30.0" },
     { name = "hikari", extras = ["speedups"], specifier = "==2.3.1" },
-    { name = "hikari-lightbulb", specifier = "==3.0.0a20" },
+    { name = "hikari-lightbulb", specifier = "==3.0.0a21" },
     { name = "hikari-toolbox", specifier = "==0.1.7" },
     { name = "pydantic", specifier = "==2.11.4" },
     { name = "pydantic-extra-types", specifier = "==2.10.4" },
