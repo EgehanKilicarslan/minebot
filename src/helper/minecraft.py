@@ -65,7 +65,7 @@ class MinecraftHelper:
             return uuid, True
 
         # Validate we have exactly one identifier
-        if not bool(username) ^ bool(uuid):  # XOR operation
+        if (username is None) == (uuid is None):  # Check if both are None or both are not None
             logger.error(f"Invalid parameter combination: username={username}, uuid={uuid}")
             raise ValueError("Exactly one of 'username' or 'uuid' must be provided")
 
@@ -390,7 +390,7 @@ class MinecraftHelper:
             Whether the rewards were given successfully
         """
         # Validate input parameters
-        if not bool(user) ^ bool(user_id):  # XOR: exactly one must be True
+        if (user is None) == (user_id is None):
             logger.error("Exactly one of 'user' or 'user_id' must be provided")
             return False
 
