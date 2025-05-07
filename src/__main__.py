@@ -7,8 +7,6 @@ import hikari
 import lightbulb
 from lightbulb import GatewayEnabledClient
 
-import events
-import extensions
 from database import close_database, initialize_database
 from debug import get_logger, setup_logging
 from exceptions.command import CommandExecutionError
@@ -70,6 +68,11 @@ if __name__ == "__main__":
         async def on_starting(_: hikari.StartingEvent) -> None:
             logger.info("Starting bot")
             await initialize_database()
+
+            # Import extensions and events
+            import events
+            import extensions
+
             await client.load_extensions_from_package(events)
             await client.load_extensions_from_package(extensions, recursive=True)
             await client.start()
