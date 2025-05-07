@@ -6,7 +6,9 @@ import websockets
 from debug import get_logger
 from model import WebSocketKeys
 from settings import Settings
-from websocket import action_handlers, handle_connection
+
+from .action_registry import action_handlers
+from .listener import handle_connection
 
 logger: Logger = get_logger(__name__)
 

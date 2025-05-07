@@ -4,8 +4,9 @@ from websockets import ServerConnection
 
 from debug import get_logger
 from helper import PLAYER_SERVERS
-from websocket import websocket_action
-from websocket.schemas.response import PlayerServerCheckSchema
+
+from ...action_registry import websocket_action
+from ...schemas.response import PlayerServerCheckSchema
 
 logger: Logger = get_logger(__name__)
 

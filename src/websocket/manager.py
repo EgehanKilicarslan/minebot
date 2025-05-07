@@ -6,7 +6,8 @@ from pydantic import BaseModel
 from websockets import ConnectionClosed
 
 from debug import get_logger
-from websocket import authenticated_client
+
+from .listener import authenticated_client
 
 logger: Logger = get_logger(__name__)
 

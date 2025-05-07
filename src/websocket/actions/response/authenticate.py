@@ -6,8 +6,10 @@ from debug import get_logger
 from helper.minecraft import MINECRAFT_SERVERS
 from model import WebSocketKeys
 from settings import Settings
-from websocket import authenticated_client, websocket_action
-from websocket.schemas.response import AuthenticateSchema
+
+from ...action_registry import websocket_action
+from ...listener import authenticated_client
+from ...schemas.response import AuthenticateSchema
 
 logger: Logger = get_logger(__name__)
 
