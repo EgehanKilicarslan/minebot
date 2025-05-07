@@ -332,6 +332,9 @@ class LocalizationSchema(BaseModel):
         messages: Messages
 
     class Error(BaseModel):
+        unknown_error: MessageSchema = Field(
+            ..., title="Unknown Error", description="Unknown error message"
+        )
         command_execution_error: MessageSchema = Field(
             ..., title="Command Execution Error", description="Command execution error message"
         )

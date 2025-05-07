@@ -384,7 +384,7 @@ class Localization:
     def get(
         cls,
         key: LocalizationType,
-        locale: str | hikari.Locale = _guild_lang,
+        locale: str | hikari.Locale | None = None,
         default: Any = "Unknown",
     ) -> Any:
         """
@@ -398,33 +398,32 @@ class Localization:
         Returns:
             Any: The localized value for the specified key, or the default value if not found.
         """
+        # Load data if needed
         if cls._data is None:
             logger.debug("Localization data not loaded, attempting to load now.")
             cls.load()
-
-        try:
-            # Convert hikari.Locale enum to string if needed
-            locale_key = locale.value if isinstance(locale, hikari.Locale) else locale
-
-            localization_data = cls._data.get(locale_key) if cls._data else None
-            if not localization_data:
-                logger.warning(
-                    f"Localization data for locale '{locale}' not found. Returning default."
-                )
+            if cls._data is None:
                 return default
 
-            parts: list[LiteralString] = key.value.split(".")
+        # Resolve locale
+        locale_key = locale
+        if locale_key is None:
+            locale_key = cls._guild_lang
+        if isinstance(locale_key, hikari.Locale):
+            locale_key = locale_key.value
+
+        # Get localization data
+        localization_data = cls._data.get(locale_key)
+        if not localization_data:
+            logger.warning(f"Localization data for locale '{locale_key}' not found.")
+            return default
+
+        # Navigate through the object hierarchy
+        try:
             value = localization_data
-
-            for part in parts:
+            for part in key.value.split("."):
                 value = getattr(value, part)
-
-            logger.debug(
-                f"Successfully retrieved localization value for key '{key}' in locale '{locale}'."
-            )
-            return value  # Return as-is, could be a string or MessageSchema
-        except AttributeError as e:
-            logger.error(
-                f"Failed to retrieve localization value for key '{key}' in locale '{locale}'. Returning default. Error: {str(e)}"
-            )
+            return value
+        except AttributeError:
+            logger.error(f"Key '{key.value}' not found in locale '{locale_key}'.")
             return default

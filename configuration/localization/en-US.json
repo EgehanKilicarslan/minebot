@@ -30,6 +30,14 @@
     }
   },
   "error": {
+    "unknown_error": {
+      "message_type": "embed",
+      "content": {
+        "title": "Unknown Error",
+        "description": "An unknown error occurred. Please report this to the developers.",
+        "color": "RED"
+      }
+    },
     "command_execution_error": {
       "message_type": "embed",
       "content": {

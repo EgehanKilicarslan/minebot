@@ -30,6 +30,14 @@
     }
   },
   "error": {
+    "unknown_error": {
+      "message_type": "embed",
+      "content": {
+        "title": "Bilinmeyen Hata",
+        "description": "Bilinmeyen bir hata oluştu. Lütfen bunu geliştiricilere bildirin.",
+        "color": "RED"
+      }
+    },
     "command_execution_error": {
       "message_type": "embed",
       "content": {

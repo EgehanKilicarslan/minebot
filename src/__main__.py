@@ -50,12 +50,21 @@ if __name__ == "__main__":
 
         @client.error_handler
         async def handler(exc: lightbulb.exceptions.ExecutionPipelineFailedException) -> bool:
-            if not isinstance(exc, EmptyException):
+            from helper import MessageHelper
+            from model import MessageKeys
+
+            if isinstance(exc.causes[0], EmptyException):
                 return True
-            elif not isinstance(exc, CommandExecutionError):
-                await exc.context.respond(content=exc.causes[0], ephemeral=True)
+            elif isinstance(exc.causes[0], CommandExecutionError):
+                await exc.context.respond(
+                    MessageHelper(
+                        key=MessageKeys.COMMAND_EXECUTION_ERROR, error_message=exc.causes[0]
+                    ).decode()
+                )
                 return True
-            return False
+            else:
+                await exc.context.respond(MessageHelper(key=MessageKeys.UNKNOWN_ERROR).decode())
+                return True
 
         @bot.listen(hikari.StartingEvent)
         async def on_starting(_: hikari.StartingEvent) -> None:
