@@ -19,12 +19,16 @@ class UserSchema(BaseModel):
         # Check if each key in the inventory is a valid Minecraft server
         from helper import MINECRAFT_SERVERS
 
+        # If MINECRAFT_SERVERS is empty or None, skip validation
+        if not MINECRAFT_SERVERS:
+            return v
+
         invalid_keys: list[str] = [key for key in v.keys() if key not in MINECRAFT_SERVERS]
         if invalid_keys:
             raise ValueError(
                 f"Invalid server keys: {invalid_keys}. Allowed keys are: {MINECRAFT_SERVERS}"
             )
 
-        return v  # Add missing return statement for valid data
+        return v
 
     model_config = ConfigDict(from_attributes=True)

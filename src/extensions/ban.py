@@ -1,11 +1,8 @@
-from datetime import datetime
-
 import hikari
 import lightbulb
 
 from helper import CommandHelper, MessageHelper
 from model import CommandsKeys, MessageKeys
-from websocket import WebSocketManager
 
 helper = CommandHelper(CommandsKeys.BAN)
 loader: lightbulb.Loader = helper.get_loader()
@@ -46,23 +43,11 @@ class Ban(
         await MessageHelper(
             key=MessageKeys.BAN_COMMAND_USER_SUCCESS,
             locale=ctx.interaction.locale,
-            user=self.user.mention,
+            discord_user_mention=self.user.mention,
         ).send_to_log_channel(client, helper)
 
         await MessageHelper(
             key=MessageKeys.BAN_COMMAND_USER_SUCCESS,
             locale=ctx.interaction.locale,
-            user=self.user.mention,
+            discord_user_mention=self.user.mention,
         ).send_response(ctx)
-
-        await WebSocketManager.send_message(
-            {
-                "action": "status_update",
-                "status": "success",
-                "details": {
-                    "user": str(ctx.interaction.user),
-                    "command": "ban",
-                    "timestamp": datetime.now().isoformat(),
-                },
-            }
-        )
