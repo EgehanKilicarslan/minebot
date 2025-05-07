@@ -14,7 +14,7 @@ class Ban(
     name="extensions.ban.label",
     description="extensions.ban.description",
     default_member_permissions=helper.get_permissions(),
-    hooks=[].append(helper.get_cooldown()),
+    hooks=helper.generate_hooks(),
     contexts=[hikari.ApplicationContextType.GUILD],
     localize=True,
 ):

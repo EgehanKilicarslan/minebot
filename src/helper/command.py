@@ -3,7 +3,8 @@ from typing import Literal, LiteralString, cast
 
 import hikari
 import lightbulb
-import lightbulb.prefab.cooldowns
+from lightbulb import ExecutionHook
+from lightbulb.prefab import cooldowns
 from pydantic import PositiveInt
 
 from debug import get_logger
@@ -106,7 +107,54 @@ class CommandHelper:
         )
         return combined_permissions
 
-    def get_cooldown(self) -> lightbulb.ExecutionHook | None:
+    def generate_hooks(
+        self,
+        additional_hooks: ExecutionHook | list[ExecutionHook] | None = None,
+    ) -> list[ExecutionHook]:
+        """
+        Generate a list of execution hooks for the command.
+
+        Args:
+            additional_hooks: Optional hook(s) to include with command hooks.
+
+        Returns:
+            list[lb.ExecutionHook]: A list of execution hooks, including cooldowns if configured.
+        """
+        logger.debug(f"[Command: {self.command_name}] Generating execution hooks")
+        hooks = []
+
+        # Add cooldown if configured
+        if cooldown_hook := self._get_cooldown():
+            hooks.append(cooldown_hook)
+
+        # Add additional hooks if provided
+        if additional_hooks:
+            if isinstance(additional_hooks, list):
+                hooks.extend(additional_hooks)
+            else:
+                hooks.append(additional_hooks)
+
+        return hooks
+
+    def has_logging_enabled(self) -> bool:
+        """
+        Check if logging is enabled for the command.
+
+        Returns:
+            bool: True if logging is enabled, False otherwise.
+        """
+        return self.command_log_enabled
+
+    def get_log_channel_id(self) -> PositiveInt | None:
+        """
+        Get the ID of the channel where command logs should be sent.
+
+        Returns:
+            PositiveInt | None: The channel ID if logging is enabled, None otherwise.
+        """
+        return self.command_log_channel
+
+    def _get_cooldown(self) -> ExecutionHook | None:
         """
         Get the configured cooldown as a lightbulb execution hook.
 
@@ -134,14 +182,14 @@ class CommandHelper:
 
             match algorithm:
                 case "fixed_window":
-                    return lightbulb.prefab.cooldowns.fixed_window(
+                    return cooldowns.fixed_window(
                         window_length=window_length,
                         allowed_invocations=allowed_invocations,
                         bucket=bucket_literal,
                     )
 
                 case "sliding_window":
-                    return lightbulb.prefab.cooldowns.sliding_window(
+                    return cooldowns.sliding_window(
                         window_length=window_length,
                         allowed_invocations=allowed_invocations,
                         bucket=bucket_literal,
@@ -161,21 +209,3 @@ class CommandHelper:
             raise ValueError(
                 f"Failed to configure cooldown for {self.command_name}: {str(e)}"
             ) from e
-
-    def has_logging_enabled(self) -> bool:
-        """
-        Check if logging is enabled for the command.
-
-        Returns:
-            bool: True if logging is enabled, False otherwise.
-        """
-        return self.command_log_enabled
-
-    def get_log_channel_id(self) -> PositiveInt | None:
-        """
-        Get the ID of the channel where command logs should be sent.
-
-        Returns:
-            PositiveInt | None: The channel ID if logging is enabled, None otherwise.
-        """
-        return self.command_log_channel
