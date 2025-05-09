@@ -570,7 +570,7 @@ wheels = [
 
 [[package]]
 name = "hikari"
-version = "2.3.1"
+version = "2.3.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -578,9 +578,9 @@ dependencies = [
     { name = "colorlog" },
     { name = "multidict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c6/87/7d6ae4bd18b9a93227c93f90f0259d7828a1d351b74c74d93429ab698dee/hikari-2.3.1.tar.gz", hash = "sha256:870d75424cdade5f3944d182d9fad6ae0e55016e7ce58713f24f30b557b36678", size = 1045335, upload-time = "2025-04-27T20:15:10.086Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8c/f6/b01226d433dfae3cabf7dbabd7cd8326d6c186bb03b7f4bd2125bec46176/hikari-2.3.2.tar.gz", hash = "sha256:1de322a84d402edb264d9e054d3a3e72ffbe3ccffea2f3f1476370ccf5b8609a", size = 1882598, upload-time = "2025-05-09T15:17:43.065Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1d/94/b80eb68d697000e789575f9e652f494809041f8bd73ac10c240b47e8a133/hikari-2.3.1-py3-none-any.whl", hash = "sha256:9f6283c8d6562d69523b97074a7a2747cc9c022c535389d7f031eb436337c1b7", size = 565669, upload-time = "2025-04-27T20:15:07.79Z" },
+    { url = "https://files.pythonhosted.org/packages/fc/41/976f02fb6c00358f73a2108c5468b3ca0d61bb250b8ec0d01203d5f49bb4/hikari-2.3.2-py3-none-any.whl", hash = "sha256:4a52d24be8dc9ecf094e4119058971c03c5109dc5c406231003fe7ce8d3863c1", size = 573776, upload-time = "2025-05-09T15:17:40.935Z" },
 ]
 
 [package.optional-dependencies]
@@ -658,7 +658,7 @@ requires-dist = [
     { name = "aiomysql", specifier = "==0.2.0" },
     { name = "aiosqlite", specifier = "==0.21.0" },
     { name = "asyncpg", specifier = "==0.30.0" },
-    { name = "hikari", extras = ["speedups"], specifier = "==2.3.1" },
+    { name = "hikari", extras = ["speedups"], specifier = "==2.3.2" },
     { name = "hikari-lightbulb", specifier = "==3.0.0a22" },
     { name = "hikari-toolbox", specifier = "==0.1.7" },
     { name = "pydantic", specifier = "==2.11.4" },
