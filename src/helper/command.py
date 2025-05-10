@@ -8,15 +8,12 @@ from lightbulb.prefab import cooldowns
 from pydantic import PositiveInt
 
 from debug import get_logger
-from model import CommandsKeys, SettingsSchema
+from model import CommandsKeys
+from model.schemas import Cooldown, LoggedCommand, SimpleCommand
 from settings import Settings
 
 # Get logger but with a reduced verbosity for debug messages
 logger: Logger = get_logger(__name__)
-
-SimpleCommand = SettingsSchema.Commands.SimpleCommand
-LoggedCommand = SettingsSchema.Commands.LoggedCommand
-Cooldown = SettingsSchema.Commands.SimpleCommand.Cooldown
 
 
 class CommandHelper:

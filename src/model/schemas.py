@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Any
 
 import hikari
 from pydantic import (
@@ -14,342 +13,247 @@ from pydantic import (
 from pydantic_extra_types.color import Color
 
 
-class SettingsSchema(BaseModel):
-    """Settings model with validation."""
+# ==== Shared Base Models ====
+class LabeledItem(BaseModel):
+    """Base model for labeled items."""
 
-    class Secret(BaseModel):
-        token: str = Field(..., title="Bot Token", description="Discord bot token")
-        default_guild: PositiveInt = Field(
-            ..., title="Default Guild ID", description="Default guild ID for the bot"
-        )
-
-        @field_validator("token")
-        @classmethod
-        def validate_token(cls, v: str) -> str:
-            if not v.strip():
-                raise ValueError("Token cannot be empty or whitespace")
-            return v
-
-    class Bot(BaseModel):
-        status: str | None = Field(
-            default=None,
-            title="Status",
-            description="Bot status",
-            pattern=r"^(ONLINE|IDLE|DO_NOT_DISTURB|OFFLINE)$",
-        )
-
-        class Activity(BaseModel):
-            name: str = Field(..., title="Name", description="Activity name")
-            state: str | None = Field(default=None, title="State", description="Activity state")
-            url: str | None = Field(
-                default=None,
-                title="URL",
-                description="Activity URL (optional)",
-                pattern=r"^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$",
-            )
-            type: str = Field(
-                default="PLAYING",
-                title="Type",
-                description="Activity type (e.g., 'PLAYING', 'WATCHING')",
-                pattern=r"^(PLAYING|STREAMING|LISTENING|WATCHING|COMPETING)$",
-            )
-
-            @model_validator(mode="after")
-            def validate_streaming_url(self) -> Any:
-                is_streaming: bool = self.type == "STREAMING"
-                has_url: bool = self.url is not None
-
-                if is_streaming and not has_url:
-                    raise ValueError("URL must be provided if type is 'STREAMING'")
-                elif has_url and not is_streaming:
-                    raise ValueError("URL must be None if type is not 'STREAMING'")
-
-                return self
-
-        activity: Activity
-
-    class Database(BaseModel):
-        url: str = Field(..., title="Database URL", description="Database connection URL")
-
-        @field_validator("url")
-        @classmethod
-        def validate_url(cls, v: str) -> str:
-            import re
-
-            if not v.strip():
-                raise ValueError("Database URL cannot be empty or whitespace")
-
-            patterns: dict[str, str] = {
-                "sqlite+aiosqlite://": r"sqlite\+aiosqlite:///.*",
-                "mysql+aiomysql://": r"mysql\+aiomysql://[^:]+:.*@[^:]+:[0-9]+/[^/]+",
-                "postgresql+asyncpg://": r"postgresql\+asyncpg://[^:]+:.*@[^:]+:[0-9]+/[^/]+",
-            }
-
-            for prefix, pattern in patterns.items():
-                if v.startswith(prefix):
-                    if not re.match(pattern, v):
-                        raise ValueError(f"{prefix} URL must follow the correct format.")
-                    return v
-
-            raise ValueError(
-                "Invalid database URL format. Supported formats are: "
-                "sqlite+aiosqlite:///, mysql+aiomysql://, postgresql+asyncpg://"
-            )
-
-    class Server(BaseModel):
-        class WebSocket(BaseModel):
-            host: str = Field(
-                default="localhost", title="Host", description="WebSocket server host"
-            )
-            port: PositiveInt = Field(
-                default=8080, title="Port", description="WebSocket server port", ge=1, le=65535
-            )
-
-            class Auth(BaseModel):
-                allowed_ip: str = Field(
-                    default="127.0.0.1", title="Allowed IP", description="Allowed IP address"
-                )
-                password: str = Field(
-                    default="MineAcademy",
-                    title="Password",
-                    description="WebSocket authentication password",
-                    min_length=8,
-                )
-
-            auth: Auth
-
-        websocket: WebSocket
-
-    class Commands(BaseModel):
-        class SimpleCommand(BaseModel):
-            enabled: bool = Field(..., title="Enabled", description="Is the command enabled")
-            permissions: list[str] = Field(
-                default=["NONE"],
-                title="Permissions",
-                description="Command permissions",
-            )
-
-            class Cooldown(BaseModel):
-                algorithm: str = Field(
-                    ...,
-                    title="Algorithm",
-                    description="Cooldown algorithm",
-                    pattern=r"^(fixed_window|sliding_window)$",
-                )
-                bucket: str = Field(
-                    ...,
-                    title="Bucket",
-                    description="Cooldown bucket",
-                    pattern=r"^(global|user|channel|guild)$",
-                )
-                window_length: PositiveInt = Field(
-                    ..., title="Window Length", description="Cooldown window length"
-                )
-                allowed_invocations: PositiveInt = Field(
-                    ..., title="Allowed Invocations", description="Allowed invocations"
-                )
-
-            cooldown: Cooldown | None = Field(
-                default=None, title="Cooldown", description="Command cooldown"
-            )
-
-            @model_validator(mode="after")
-            def validate_permissions(self) -> Any:
-                if self.enabled and isinstance(self.permissions, list):
-                    # Validate string permissions
-                    valid_permissions = hikari.Permissions.__members__
-                    for permission in self.permissions:
-                        if permission not in valid_permissions and permission != "NONE":
-                            raise ValueError(
-                                f"Invalid permission: {permission}. Valid permissions are: {', '.join(valid_permissions)}"
-                            )
-                return self
-
-        class LoggedCommand(SimpleCommand):
-            class Log(BaseModel):
-                enabled: bool = Field(..., title="Enabled", description="Is logging enabled")
-                channel: PositiveInt | None = Field(
-                    ..., title="Channel ID", description="Log channel ID"
-                )
-
-                @model_validator(mode="after")
-                def validate_channel(self) -> Any:
-                    if self.enabled and self.channel is None:
-                        raise ValueError("Channel ID must be provided when logging is enabled.")
-                    return self
-
-            log: Log
-
-        ban: LoggedCommand
-
-    secret: Secret
-    database: Database
-    bot: Bot
-    server: Server | None = Field(default=None, title="Server", description="Server settings")
-    commands: Commands
+    label: str
+    description: str
 
 
+# ==== Message Schemas ====
 class PlainMessage(BaseModel):
-    """Plain message model with validation."""
+    text: str = Field(..., min_length=1, max_length=2000)
 
-    text: str = Field(
-        ..., title="Text", description="Plain text message", min_length=1, max_length=2000
-    )
+
+class EmbedField(BaseModel):
+    name: str = Field(..., max_length=256)
+    value: str = Field(..., max_length=1024)
+    inline: bool = Field(default=False)
+
+
+class EmbedFooter(BaseModel):
+    text: str = Field(..., max_length=2048)
+    icon: HttpUrl | None = None
+
+
+class EmbedAuthor(BaseModel):
+    name: str | None = Field(default=None, max_length=256)
+    url: HttpUrl | None = None
+    icon: HttpUrl | None = None
 
 
 class EmbedMessage(BaseModel):
-    """Embed message model with validation."""
-
-    title: str | None = Field(
-        default=None, title="Title", description="Embed title", max_length=256
-    )
-    description: str | None = Field(
-        default=None, title="Description", description="Embed description", max_length=4096
-    )
-    url: HttpUrl | None = Field(default=None, title="URL", description="Embed URL")
-    color: Color | None = Field(default=None, title="Color", description="Embed color")
-    timestamp: datetime | None = Field(
-        default=None, title="Timestamp", description="Embed timestamp"
-    )
-
-    class EmbedField(BaseModel):
-        """Model for individual fields in an embed."""
-
-        name: str = Field(..., title="Name", description="Field name", max_length=256)
-        value: str = Field(..., title="Value", description="Field value", max_length=1024)
-        inline: bool = Field(default=False, title="Inline", description="Inline field")
-
-    fields: list[EmbedField] | None = Field(
-        default=None, title="Fields", description="Embed fields"
-    )
-
-    class EmbedFooter(BaseModel):
-        """Model for the footer of an embed."""
-
-        text: str = Field(..., title="Text", description="Footer text", max_length=2048)
-        icon: HttpUrl | None = Field(default=None, title="Icon URL", description="Footer icon URL")
-
-    footer: EmbedFooter | None = Field(default=None, title="Footer", description="Embed footer")
-
-    image: HttpUrl | None = Field(default=None, title="Image", description="Embed image URL")
-
-    thumbnail: HttpUrl | None = Field(
-        default=None, title="Thumbnail", description="Embed thumbnail URL"
-    )
-
-    class EmbedAuthor(BaseModel):
-        """Model for the author section of an embed."""
-
-        name: str | None = Field(
-            default=None, title="Name", description="Author name", max_length=256
-        )
-        url: HttpUrl | None = Field(default=None, title="URL", description="Author URL")
-        icon: HttpUrl | None = Field(default=None, title="Icon URL", description="Author icon URL")
-
-    author: EmbedAuthor | None = Field(default=None, title="Author", description="Embed author")
+    title: str | None = Field(default=None, max_length=256)
+    description: str | None = Field(default=None, max_length=4096)
+    url: HttpUrl | None = None
+    color: Color | None = None
+    timestamp: datetime | None = None
+    fields: list[EmbedField] | None = None
+    footer: EmbedFooter | None = None
+    image: HttpUrl | None = None
+    thumbnail: HttpUrl | None = None
+    author: EmbedAuthor | None = None
 
     @field_validator("fields", mode="before")
     @classmethod
     def ensure_fields_are_list(cls, v: list[EmbedField] | EmbedField) -> list[EmbedField]:
-        """Ensure that fields are always a list."""
-        if isinstance(v, EmbedMessage.EmbedField):
-            return [v]
-        return v
+        return [v] if isinstance(v, EmbedField) else v
 
     @model_validator(mode="after")
     def validate_title_or_description(self) -> "EmbedMessage":
-        """Ensure that either title or description is provided."""
         if not self.title and not self.description:
             raise ValueError("Either title or description must be provided.")
-
         return self
 
 
 class MessageSchema(BaseModel):
-    """Message schema with validation."""
-
-    message_type: str = Field(
-        ..., title="Message Type", description="Type of the message", pattern=r"^(plain|embed)$"
-    )
-    content: PlainMessage | EmbedMessage = Field(...)
+    message_type: str = Field(..., pattern=r"^(plain|embed)$")
+    content: PlainMessage | EmbedMessage
 
     @field_validator("content")
     @classmethod
     def validate_content_by_type(
         cls, v: PlainMessage | EmbedMessage, info: ValidationInfo
     ) -> PlainMessage | EmbedMessage:
-        """Validate content based on the message_type."""
-        message_type = info.data.get("message_type")
-        if message_type == "plain" and not isinstance(v, PlainMessage):
-            raise ValueError("Content must be of type PlainMessage when message_type is 'plain'.")
-        if message_type == "embed" and not isinstance(v, EmbedMessage):
-            raise ValueError("Content must be of type EmbedMessage when message_type is 'embed'.")
+        expected = PlainMessage if info.data.get("message_type") == "plain" else EmbedMessage
+        if not isinstance(v, expected):
+            raise ValueError(
+                f"Content must be of type {expected.__name__} for message_type '{info.data.get('message_type')}'."
+            )
         return v
 
 
+# ==== Settings Schema ====
+class Secret(BaseModel):
+    token: str
+    default_guild: PositiveInt
+
+    @field_validator("token")
+    @classmethod
+    def validate_token(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Token cannot be empty or whitespace")
+        return v
+
+
+class Activity(BaseModel):
+    name: str
+    state: str | None = None
+    url: str | None = Field(
+        default=None,
+        pattern=r"^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$",
+    )
+    type: str = Field(
+        default="PLAYING",
+        pattern=r"^(PLAYING|STREAMING|LISTENING|WATCHING|COMPETING)$",
+    )
+
+    @model_validator(mode="after")
+    def validate_streaming_url(self) -> "Activity":
+        is_streaming = self.type == "STREAMING"
+        has_url = self.url is not None
+        if is_streaming and not has_url:
+            raise ValueError("URL must be provided if type is 'STREAMING'")
+        elif has_url and not is_streaming:
+            raise ValueError("URL must be None if type is not 'STREAMING'")
+        return self
+
+
+class Bot(BaseModel):
+    status: str | None = Field(default=None, pattern=r"^(ONLINE|IDLE|DO_NOT_DISTURB|OFFLINE)$")
+    activity: Activity
+
+
+class Database(BaseModel):
+    url: str
+
+    @field_validator("url")
+    @classmethod
+    def validate_url(cls, v: str) -> str:
+        import re
+
+        if not v.strip():
+            raise ValueError("Database URL cannot be empty or whitespace")
+
+        patterns = {
+            "sqlite+aiosqlite://": r"sqlite\+aiosqlite:///.*",
+            "mysql+aiomysql://": r"mysql\+aiomysql://[^:]+:.*@[^:]+:[0-9]+/[^/]+",
+            "postgresql+asyncpg://": r"postgresql\+asyncpg://[^:]+:.*@[^:]+:[0-9]+/[^/]+",
+        }
+
+        for prefix, pattern in patterns.items():
+            if v.startswith(prefix) and re.match(pattern, v):
+                return v
+
+        raise ValueError(
+            "Invalid database URL format. Supported formats: sqlite+aiosqlite:///, mysql+aiomysql://, postgresql+asyncpg://"
+        )
+
+
+class WebSocketAuth(BaseModel):
+    allowed_ip: str = "127.0.0.1"
+    password: str = Field(default="MineAcademy", min_length=8)
+
+
+class WebSocket(BaseModel):
+    host: str = "localhost"
+    port: PositiveInt = Field(default=8080, ge=1, le=65535)
+    auth: WebSocketAuth
+
+
+class Server(BaseModel):
+    websocket: WebSocket
+
+
+class Cooldown(BaseModel):
+    algorithm: str = Field(..., pattern=r"^(fixed_window|sliding_window)$")
+    bucket: str = Field(..., pattern=r"^(global|user|channel|guild)$")
+    window_length: PositiveInt
+    allowed_invocations: PositiveInt
+
+
+class SimpleCommand(BaseModel):
+    enabled: bool
+    permissions: list[str] = Field(default=["NONE"])
+    cooldown: Cooldown | None = None
+
+    @model_validator(mode="after")
+    def validate_permissions(self) -> "SimpleCommand":
+        if self.enabled and isinstance(self.permissions, list):
+            valid = hikari.Permissions.__members__
+            for perm in self.permissions:
+                if perm not in valid and perm != "NONE":
+                    raise ValueError(f"Invalid permission: {perm}. Valid: {', '.join(valid)}")
+        return self
+
+
+class Log(BaseModel):
+    enabled: bool
+    channel: PositiveInt | None
+
+    @model_validator(mode="after")
+    def validate_channel(self) -> "Log":
+        if self.enabled and self.channel is None:
+            raise ValueError("Channel ID must be provided when logging is enabled.")
+        return self
+
+
+class LoggedCommand(SimpleCommand):
+    log: Log
+
+
+class Commands(BaseModel):
+    ban: LoggedCommand
+
+
+class SettingsSchema(BaseModel):
+    secret: Secret
+    database: Database
+    bot: Bot
+    server: Server | None = None
+    commands: Commands
+
+
+# ==== Localization Schema ====
+class BanOptions(BaseModel):
+    class User(LabeledItem): ...
+
+    class Duration(LabeledItem): ...
+
+    class Reason(LabeledItem): ...
+
+    user: User
+    duration: Duration
+    reason: Reason
+
+
+class BanCommand(LabeledItem):
+    options: BanOptions
+
+
+class BanMessages(BaseModel):
+    class User(BaseModel):
+        success: MessageSchema
+
+    user: User
+
+
+class Ban(BaseModel):
+    command: BanCommand
+    messages: BanMessages
+
+
+class ErrorMessages(BaseModel):
+    unknown_error: MessageSchema
+    command_execution_error: MessageSchema
+    user_record_not_found: MessageSchema
+    account_already_linked: MessageSchema
+    account_not_linked: MessageSchema
+    player_not_online: MessageSchema
+
+
 class LocalizationSchema(BaseModel):
-    """Localization model with validation."""
-
-    locale: str = Field(..., title="Locale", description="Language locale")
-
-    class Ban(BaseModel):
-        class Command(BaseModel):
-            label: str = Field(..., title="Label", description="Command label")
-            description: str = Field(..., title="Description", description="Command description")
-
-            class Options(BaseModel):
-                class User(BaseModel):
-                    label: str = Field(..., title="Label", description="User label")
-                    description: str = Field(
-                        ..., title="Description", description="User description"
-                    )
-
-                class Duration(BaseModel):
-                    label: str = Field(..., title="Label", description="Duration label")
-                    description: str = Field(
-                        ..., title="Description", description="Duration description"
-                    )
-
-                class Reason(BaseModel):
-                    label: str = Field(..., title="Label", description="Reason label")
-                    description: str = Field(
-                        ..., title="Description", description="Reason description"
-                    )
-
-                user: User
-                duration: Duration
-                reason: Reason
-
-            options: Options
-
-        class Messages(BaseModel):
-            class User(BaseModel):
-                success: MessageSchema = Field(..., title="Success", description="Success message")
-
-            user: User
-
-        command: Command
-        messages: Messages
-
-    class Error(BaseModel):
-        unknown_error: MessageSchema = Field(
-            ..., title="Unknown Error", description="Unknown error message"
-        )
-        command_execution_error: MessageSchema = Field(
-            ..., title="Command Execution Error", description="Command execution error message"
-        )
-        user_record_not_found: MessageSchema = Field(
-            ..., title="User Record Not Found", description="User record not found error message"
-        )
-        account_already_linked: MessageSchema = Field(
-            ..., title="Account Already Linked", description="Account already linked error message"
-        )
-        account_not_linked: MessageSchema = Field(
-            ..., title="Account Not Linked", description="Account not linked error message"
-        )
-        player_not_online: MessageSchema = Field(
-            ..., title="Player Not Online", description="Player not online error message"
-        )
-
+    locale: str
     ban: Ban
-    error: Error
+    error: ErrorMessages
