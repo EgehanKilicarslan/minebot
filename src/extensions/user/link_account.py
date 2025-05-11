@@ -74,7 +74,6 @@ class LinkAccount(
             code=code,
             user_locale=ctx.interaction.locale,
             helper=helper,
-            client=client,
         )
 
         # Display the modal and wait for user input

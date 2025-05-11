@@ -39,3 +39,9 @@ class ModalKeys(Enum):
     """Modal keys for the bot"""
 
     LINK_ACCOUNT_CONFIRMATION = "link_account.modal.confirmation"
+
+
+class ViewKeys(Enum):
+    """View keys for the bot"""
+
+    pass

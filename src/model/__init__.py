@@ -6,9 +6,9 @@ application, ensuring consistency and reusability of key components.
 """
 
 from .config import BotKeys, CommandsKeys, DatabaseKeys, SecretKeys, WebSocketKeys
-from .message import CommandKeys, MessageKeys, ModalKeys
+from .message import CommandKeys, MessageKeys, ModalKeys, ViewKeys
 from .ready import LogStyle, MessageType
-from .schemas import EmbedMessage, LocalizationSchema, MessageSchema, PlainMessage, SettingsSchema
+from .schemas import BotSettings, DiscordEmbed, DiscordMessage, LocalizationData, TextMessage
 
 __all__: list[str] = [
     "BotKeys",
@@ -19,11 +19,12 @@ __all__: list[str] = [
     "CommandKeys",
     "MessageKeys",
     "ModalKeys",
+    "ViewKeys",
     "LogStyle",
     "MessageType",
-    "EmbedMessage",
-    "LocalizationSchema",
-    "MessageSchema",
-    "PlainMessage",
-    "SettingsSchema",
+    "BotSettings",
+    "DiscordEmbed",
+    "DiscordMessage",
+    "LocalizationData",
+    "TextMessage",
 ]

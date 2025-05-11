@@ -14,69 +14,71 @@ from pydantic_extra_types.color import Color
 
 
 # ==== Shared Base Models ====
-class LabeledItem(BaseModel):
-    """Base model for labeled items."""
+class DescriptiveElement(BaseModel):
+    """Base model for labeled descriptive elements."""
 
     label: str
     description: str
 
 
-# ==== Message Schemas ====
-class PlainMessage(BaseModel):
+# ==== Message Schema ====
+class TextMessage(BaseModel):
     text: str = Field(..., min_length=1, max_length=2000)
 
 
-class EmbedField(BaseModel):
+class EmbedFieldData(BaseModel):
     name: str = Field(..., max_length=256)
     value: str = Field(..., max_length=1024)
     inline: bool = Field(default=False)
 
 
-class EmbedFooter(BaseModel):
+class EmbedFooterData(BaseModel):
     text: str = Field(..., max_length=2048)
     icon: HttpUrl | None = None
 
 
-class EmbedAuthor(BaseModel):
+class EmbedAuthorData(BaseModel):
     name: str | None = Field(default=None, max_length=256)
     url: HttpUrl | None = None
     icon: HttpUrl | None = None
 
 
-class EmbedMessage(BaseModel):
+class DiscordEmbed(BaseModel):
     title: str | None = Field(default=None, max_length=256)
     description: str | None = Field(default=None, max_length=4096)
     url: HttpUrl | None = None
     color: Color | None = None
     timestamp: datetime | None = None
-    fields: list[EmbedField] | None = None
-    footer: EmbedFooter | None = None
+    fields: list[EmbedFieldData] | None = None
+    footer: EmbedFooterData | None = None
     image: HttpUrl | None = None
     thumbnail: HttpUrl | None = None
-    author: EmbedAuthor | None = None
+    author: EmbedAuthorData | None = None
 
     @field_validator("fields", mode="before")
     @classmethod
-    def ensure_fields_are_list(cls, v: list[EmbedField] | EmbedField) -> list[EmbedField]:
-        return [v] if isinstance(v, EmbedField) else v
+    def ensure_fields_are_list(
+        cls, v: list[EmbedFieldData] | EmbedFieldData
+    ) -> list[EmbedFieldData]:
+        return [v] if isinstance(v, EmbedFieldData) else v
 
     @model_validator(mode="after")
-    def validate_title_or_description(self) -> "EmbedMessage":
+    def validate_title_or_description(self) -> "DiscordEmbed":
         if not self.title and not self.description:
             raise ValueError("Either title or description must be provided.")
         return self
 
 
-class MessageSchema(BaseModel):
+class DiscordMessage(BaseModel):
     message_type: str = Field(..., pattern=r"^(plain|embed)$")
-    content: PlainMessage | EmbedMessage
+    content: TextMessage | DiscordEmbed
 
     @field_validator("content")
     @classmethod
     def validate_content_by_type(
-        cls, v: PlainMessage | EmbedMessage, info: ValidationInfo
-    ) -> PlainMessage | EmbedMessage:
-        expected = PlainMessage if info.data.get("message_type") == "plain" else EmbedMessage
+        cls, v: TextMessage | DiscordEmbed, info: ValidationInfo
+    ) -> TextMessage | DiscordEmbed:
+        expected = TextMessage if info.data.get("message_type") == "plain" else DiscordEmbed
         if not isinstance(v, expected):
             raise ValueError(
                 f"Content must be of type {expected.__name__} for message_type '{info.data.get('message_type')}'."
@@ -84,53 +86,80 @@ class MessageSchema(BaseModel):
         return v
 
 
-class StatusMessages(BaseModel):
-    """Base model for success/failure message pairs."""
+class StatusMessagePair(BaseModel):
+    """Model for success/failure message pairs."""
 
-    success: MessageSchema
-    failure: MessageSchema
+    success: DiscordMessage
+    failure: DiscordMessage
 
 
 # ==== Menu Schema =====
-class BaseButton(BaseModel):
+class ButtonBase(BaseModel):
     label: str | None = Field(..., max_length=80)
     emoji: str | None = Field(default=None, max_length=1)
     disabled: bool | None = False
 
     @model_validator(mode="after")
-    def validate_label_nor_emoji(self) -> "BaseButton":
+    def validate_label_nor_emoji(self) -> "ButtonBase":
         if not self.label and not self.emoji:
             raise ValueError("Either label or emoji must be provided.")
         return self
 
 
-class BaseSelect(BaseModel):
+class SelectBase(BaseModel):
     placeholder: str | None = Field(default=None, max_length=150)
     disabled: bool | None = False
 
 
-class InteractiveButton(BaseButton):
-    style: str = Field(..., pattern=r"^(PRIMARY|SECONDARY|SUCCESS|DANGER|LINK)$")
+class ActionButton(ButtonBase):
+    style: str = Field(..., pattern=r"^(PRIMARY|SECONDARY|SUCCESS|DANGER)$")
 
 
-class LinkButton(BaseButton):
+class HyperlinkButton(ButtonBase):
     url: HttpUrl
 
 
 # ==== Modal Schema ====
-class BaseModal(BaseModel):
+class ModalBase(BaseModel):
     title: str = Field(..., max_length=80)
 
 
-class BaseTextInput(BaseModel):
+class TextInputField(BaseModel):
     style: str = Field(..., pattern=r"^(SHORT|PARAGRAPH)$")
     label: str = Field(..., max_length=80)
     placeholder: str | None = Field(default=None, max_length=150)
     value: str | None = Field(default=None, max_length=4000)
 
 
+# ==== Reward Schema =====
+class UserReward(BaseModel):
+    mode: str = Field(..., pattern=r"^(ROLE|ITEM|BOTH)$")
+    role: PositiveInt | list[PositiveInt] | None = None
+    item: dict[str, str | list[str]] | None = None
+
+    @field_validator("role")
+    @classmethod
+    def ensure_role_id_is_list(cls, v: PositiveInt | list[PositiveInt]) -> list[PositiveInt]:
+        return [v] if isinstance(v, int) else v
+
+    @field_validator("item")
+    @classmethod
+    def ensure_command_is_list(cls, v: str | list[str]) -> list[str]:
+        return [v] if isinstance(v, str) else v
+
+    @model_validator(mode="after")
+    def validate_reward(self) -> "UserReward":
+        if self.mode == "ROLE" and not self.role:
+            raise ValueError("Role reward must be provided when mode is 'ROLE'.")
+        elif self.mode == "ITEM" and not self.item:
+            raise ValueError("Item reward must be provided when mode is 'ITEM'.")
+        elif self.mode == "BOTH" and (not self.role or not self.item):
+            raise ValueError("Both role and item rewards must be provided when mode is 'BOTH'.")
+        return self
+
+
 # ==== Settings Schema ====
-class Secret(BaseModel):
+class BotCredentials(BaseModel):
     token: str
     default_guild: PositiveInt
 
@@ -142,7 +171,7 @@ class Secret(BaseModel):
         return v
 
 
-class Activity(BaseModel):
+class BotActivity(BaseModel):
     name: str
     state: str | None = None
     url: str | None = Field(
@@ -155,7 +184,7 @@ class Activity(BaseModel):
     )
 
     @model_validator(mode="after")
-    def validate_streaming_url(self) -> "Activity":
+    def validate_streaming_url(self) -> "BotActivity":
         is_streaming = self.type == "STREAMING"
         has_url = self.url is not None
         if is_streaming and not has_url:
@@ -165,12 +194,12 @@ class Activity(BaseModel):
         return self
 
 
-class Bot(BaseModel):
+class BotConfiguration(BaseModel):
     status: str | None = Field(default=None, pattern=r"^(ONLINE|IDLE|DO_NOT_DISTURB|OFFLINE)$")
-    activity: Activity
+    activity: BotActivity
 
 
-class Database(BaseModel):
+class DatabaseConnection(BaseModel):
     url: str
 
     @field_validator("url")
@@ -196,35 +225,35 @@ class Database(BaseModel):
         )
 
 
-class WebSocketAuth(BaseModel):
+class WebSocketAuthentication(BaseModel):
     allowed_ip: str = "127.0.0.1"
     password: str = Field(default="MineAcademy", min_length=8)
 
 
-class WebSocket(BaseModel):
+class WebSocketConfig(BaseModel):
     host: str = "localhost"
     port: PositiveInt = Field(default=8080, ge=1, le=65535)
-    auth: WebSocketAuth
+    auth: WebSocketAuthentication
 
 
-class Server(BaseModel):
-    websocket: WebSocket
+class ServerConfiguration(BaseModel):
+    websocket: WebSocketConfig
 
 
-class Cooldown(BaseModel):
+class CommandCooldown(BaseModel):
     algorithm: str = Field(..., pattern=r"^(fixed_window|sliding_window)$")
     bucket: str = Field(..., pattern=r"^(global|user|channel|guild)$")
     window_length: PositiveInt
     allowed_invocations: PositiveInt
 
 
-class SimpleCommand(BaseModel):
+class BasicCommand(BaseModel):
     enabled: bool
     permissions: list[str] = Field(default=["NONE"])
-    cooldown: Cooldown | None = None
+    cooldown: CommandCooldown | None = None
 
     @model_validator(mode="after")
-    def validate_permissions(self) -> "SimpleCommand":
+    def validate_permissions(self) -> "BasicCommand":
         if self.enabled and isinstance(self.permissions, list):
             valid = hikari.Permissions.__members__
             for perm in self.permissions:
@@ -233,106 +262,110 @@ class SimpleCommand(BaseModel):
         return self
 
 
-class Log(BaseModel):
+class LoggingConfig(BaseModel):
     enabled: bool
     channel: PositiveInt | None
 
     @model_validator(mode="after")
-    def validate_channel(self) -> "Log":
+    def validate_channel(self) -> "LoggingConfig":
         if self.enabled and self.channel is None:
             raise ValueError("Channel ID must be provided when logging is enabled.")
         return self
 
 
-class LoggedCommand(SimpleCommand):
-    log: Log
+class LoggedCommandConfig(BasicCommand):
+    log: LoggingConfig
 
 
-class Commands(BaseModel):
-    link_account: LoggedCommand
-    ban: LoggedCommand
+class LinkAccountCommandConfig(LoggedCommandConfig):
+    reward: UserReward | None = None
 
 
-class SettingsSchema(BaseModel):
-    secret: Secret
-    database: Database
-    bot: Bot
-    server: Server | None = None
-    commands: Commands
+class CommandConfiguration(BaseModel):
+    link_account: LinkAccountCommandConfig
+    ban: LoggedCommandConfig
+
+
+class BotSettings(BaseModel):
+    secret: BotCredentials
+    database: DatabaseConnection
+    bot: BotConfiguration
+    server: ServerConfiguration | None = None
+    commands: CommandConfiguration
 
 
 # ==== Localization Schema ====
-class LinkAccountOptions(BaseModel):
-    username: LabeledItem
+class LinkAccountParameters(BaseModel):
+    username: DescriptiveElement
 
 
-class LinkAccountCommand(LabeledItem):
-    options: LinkAccountOptions
+class LinkAccountCommandInfo(DescriptiveElement):
+    options: LinkAccountParameters
 
 
 class LinkAccountMessages(BaseModel):
     class Minecraft(BaseModel):
-        confirmation_code: PlainMessage
-        success: PlainMessage
-        failure: PlainMessage
+        confirmation_code: TextMessage
+        success: TextMessage
+        failure: TextMessage
 
     minecraft: Minecraft
-    user: StatusMessages
-    log: StatusMessages
+    user: StatusMessagePair
+    log: StatusMessagePair
 
 
-class LinkAccountConfirmationModalFields(BaseModel):
-    code: BaseTextInput
+class LinkAccountConfirmationFields(BaseModel):
+    code: TextInputField
 
 
-class LinkAccountConfirmationModal(BaseModal):
-    fields: LinkAccountConfirmationModalFields
+class LinkAccountConfirmationModal(ModalBase):
+    fields: LinkAccountConfirmationFields
 
 
 class LinkAccountModals(BaseModel):
     confirmation: LinkAccountConfirmationModal
 
 
-class LinkAccount(BaseModel):
-    command: LinkAccountCommand
+class LinkAccountLocalization(BaseModel):
+    command: LinkAccountCommandInfo
     messages: LinkAccountMessages
     modal: LinkAccountModals
 
 
-class BanOptions(BaseModel):
-    user: LabeledItem
-    duration: LabeledItem
-    reason: LabeledItem
+class BanParameters(BaseModel):
+    user: DescriptiveElement
+    duration: DescriptiveElement
+    reason: DescriptiveElement
 
 
-class BanCommand(LabeledItem):
-    options: BanOptions
+class BanCommandInfo(DescriptiveElement):
+    options: BanParameters
 
 
 class BanMessages(BaseModel):
     class User(BaseModel):
-        success: MessageSchema
+        success: DiscordMessage
 
     user: User
 
 
-class Ban(BaseModel):
-    command: BanCommand
+class BanLocalization(BaseModel):
+    command: BanCommandInfo
     messages: BanMessages
 
 
 class ErrorMessages(BaseModel):
-    unknown_error: MessageSchema
-    timeout_error: MessageSchema
-    command_execution_error: MessageSchema
-    user_record_not_found: MessageSchema
-    account_already_linked: MessageSchema
-    account_not_linked: MessageSchema
-    player_not_online: MessageSchema
+    unknown_error: DiscordMessage
+    timeout_error: DiscordMessage
+    command_execution_error: DiscordMessage
+    user_record_not_found: DiscordMessage
+    account_already_linked: DiscordMessage
+    account_not_linked: DiscordMessage
+    player_not_online: DiscordMessage
 
 
-class LocalizationSchema(BaseModel):
+class LocalizationData(BaseModel):
     locale: str
-    link_account: LinkAccount
-    ban: Ban
+    link_account: LinkAccountLocalization
+    ban: BanLocalization
     error: ErrorMessages

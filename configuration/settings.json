@@ -38,6 +38,14 @@
             "log": {
                 "enabled": null,
                 "channel": null
+            },
+            "reward": {
+                "mode": "",
+                "role": [],
+                "item": {
+                    "test1": [],
+                    "default": []
+                }
             }
         },
         "ban": {

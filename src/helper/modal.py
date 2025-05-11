@@ -5,7 +5,7 @@ import hikari
 from lightbulb.components.modals import Modal, TextInput
 
 from debug import get_logger
-from model.schemas import BaseTextInput
+from model.schemas import TextInputField
 
 logger: Logger = get_logger(__name__)
 
@@ -20,13 +20,13 @@ class ModalHelper:
 
     @staticmethod
     def get_field(
-        instance: Modal, key: BaseTextInput, min_lenght: int = 0, max_length: int = 4000
+        instance: Modal, key: TextInputField, min_lenght: int = 0, max_length: int = 4000
     ) -> TextInput:
         """
         Creates a text input field for a modal based on the provided configuration.
 
         This method dynamically selects the appropriate input type (short text or paragraph)
-        based on the style specified in the BaseTextInput key.
+        based on the style specified in the TextInputField key.
 
         Args:
             instance: The Modal instance to add the field to
@@ -38,7 +38,7 @@ class ModalHelper:
             The created TextInput field that was added to the modal
 
         Raises:
-            KeyError: If an invalid style is provided in the BaseTextInput
+            KeyError: If an invalid style is provided in the TextInputField
         """
         logger.debug(f"Creating field with label '{key.label}' and style '{key.style}'")
 

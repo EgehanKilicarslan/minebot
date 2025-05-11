@@ -6,7 +6,7 @@ import lightbulb
 
 from debug import get_logger
 from helper import ChannelHelper, CommandHelper
-from model import EmbedMessage, MessageKeys, MessageSchema, PlainMessage
+from model import DiscordEmbed, DiscordMessage, MessageKeys, TextMessage
 from settings import Localization
 
 # Set up logger for this module
@@ -59,16 +59,16 @@ class MessageHelper:
         self.kwargs: dict[str, Any] = kwargs
         logger.debug(f"[Message: {key.name}] Initialized with locale: {locale}, params: {kwargs}")
 
-    def _decode_plain(self, content: PlainMessage | None = None) -> str:
+    def _decode_plain(self, content: TextMessage | None = None) -> str:
         """
         Decode a plain message into a formatted string.
 
-        This method takes a PlainMessage object, formats its text with the provided keyword arguments,
+        This method takes a TextMessage object, formats its text with the provided keyword arguments,
         and returns the resulting string. If no content is provided, it retrieves the message from
         the localization system using the current key and locale.
 
         Parameters:
-            content (PlainMessage | None): The message to decode. If None, retrieves message from localization.
+            content (TextMessage | None): The message to decode. If None, retrieves message from localization.
 
         Returns:
             str: The formatted message text.
@@ -77,34 +77,34 @@ class MessageHelper:
             The method also logs a debug message with a truncated version of the result.
         """
         if content is None:
-            content = cast(PlainMessage, Localization.get(key=self.key, locale=self.locale))
+            content = cast(TextMessage, Localization.get(key=self.key, locale=self.locale))
 
         result: str = content.text.format(**self.kwargs) if content.text else ""
         truncated: str = result[:50] + ("..." if len(result) > 50 else "")
         logger.debug(f"[Message: {self.key.name}] Plain content: {truncated}")
         return result
 
-    def _decode_embed(self, content: EmbedMessage | None = None) -> hikari.Embed:
+    def _decode_embed(self, content: DiscordEmbed | None = None) -> hikari.Embed:
         """
-        Decodes an EmbedMessage object into a hikari.Embed.
+        Decodes an DiscordEmbed object into a hikari.Embed.
 
-        This method constructs a hikari.Embed object from the given EmbedMessage,
+        This method constructs a hikari.Embed object from the given DiscordEmbed,
         applying any format arguments from self.kwargs. If no content is provided,
         it fetches the content from localization using self.key and self.locale.
 
         Args:
-            content (EmbedMessage | None): The EmbedMessage object to decode.
+            content (DiscordEmbed | None): The DiscordEmbed object to decode.
                 If None, content will be fetched from localization. Defaults to None.
 
         Returns:
             hikari.Embed: A fully constructed hikari.Embed object with all relevant
-                fields populated from the EmbedMessage.
+                fields populated from the DiscordEmbed.
 
         Note:
             The method formats all string fields using self.kwargs if they exist.
         """
         if content is None:
-            content = cast(EmbedMessage, Localization.get(key=self.key, locale=self.locale))
+            content = cast(DiscordEmbed, Localization.get(key=self.key, locale=self.locale))
 
         embed = hikari.Embed(
             title=content.title.format(**self.kwargs) if content.title else None,
@@ -167,16 +167,16 @@ class MessageHelper:
             Debug information about the decoding process.
         """
         logger.debug(f"[Message: {self.key.name}] Decoding {self.locale} message")
-        message: MessageSchema = Localization.get(key=self.key, locale=self.locale)
-        content: PlainMessage | EmbedMessage = message.content
+        message: DiscordMessage = Localization.get(key=self.key, locale=self.locale)
+        content: TextMessage | DiscordEmbed = message.content
 
         if message.message_type == "plain":
-            content = cast(PlainMessage, content)
+            content = cast(TextMessage, content)
             return self._decode_plain(content)
 
         # Must be an embed message
         logger.debug(f"[Message: {self.key.name}] Building embed message")
-        content = cast(EmbedMessage, content)
+        content = cast(DiscordEmbed, content)
         return self._decode_embed(content)
 
     async def send_response(self, ctx: ContextType, ephemeral: bool = False) -> None:

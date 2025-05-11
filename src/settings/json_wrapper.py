@@ -12,12 +12,12 @@ import lightbulb
 from pydantic import ValidationError
 
 from debug import get_logger
-from model import LocalizationSchema, SettingsSchema, config, message
+from model import BotSettings, LocalizationData, config, message
 
 logger: logging.Logger = get_logger(__name__)
 
 SettingsType = config.SecretKeys | config.DatabaseKeys | config.CommandsKeys | config.WebSocketKeys
-LocalizationType = message.CommandKeys | message.MessageKeys
+LocalizationType = message.CommandKeys | message.MessageKeys | message.ModalKeys | message.ViewKeys
 
 DEFAULT_CONFIG_PATH: Final[Path] = Path("configuration/settings.json").resolve()
 DEFAULT_LOCALIZATION_PATH: Final[Path] = Path("configuration/localization").resolve()
@@ -27,7 +27,7 @@ class Settings:
     """Settings manager with caching and validation."""
 
     _instance: Settings | None = None
-    _data: SettingsSchema | None = None
+    _data: BotSettings | None = None
     _config_path: Path = DEFAULT_CONFIG_PATH
 
     def __new__(cls) -> Settings:
@@ -81,7 +81,7 @@ class Settings:
 
             with cls._config_path.open("r", encoding="utf-8") as file:
                 data = json.load(file)
-                cls._data = SettingsSchema(**data)
+                cls._data = BotSettings(**data)
                 cls._validate_required_settings()
                 logger.info("Settings loaded successfully")
 
@@ -169,7 +169,7 @@ class Localization:
     """Localization manager with caching and validation."""
 
     _instance: Localization | None = None
-    _data: dict[str, LocalizationSchema] | None = None
+    _data: dict[str, LocalizationData] | None = None
     _localization_path: Path = DEFAULT_LOCALIZATION_PATH
     _guild_lang: hikari.Locale = hikari.Locale.EN_US
 
@@ -202,7 +202,7 @@ class Localization:
         Load localization data from JSON files in the localization directory.
 
         This method reads all JSON files in the specified localization directory,
-        validates them against the LocalizationSchema model, and stores them in
+        validates them against the LocalizationData model, and stores them in
         the _data dictionary keyed by locale.
 
         The method performs the following steps:
@@ -211,7 +211,7 @@ class Localization:
         3. For each file, attempt to:
            - Parse the JSON content
            - Match the filename to a hikari.Locale
-           - Validate against the LocalizationSchema model
+           - Validate against the LocalizationData model
            - Store in the _data dictionary
 
         Raises:
@@ -263,7 +263,7 @@ class Localization:
                         data["locale"] = locale_name
 
                         # Validate and create model instance
-                        loader = LocalizationSchema(**data)
+                        loader = LocalizationData(**data)
 
                         # Store in the data dictionary
                         cls._data[locale] = loader

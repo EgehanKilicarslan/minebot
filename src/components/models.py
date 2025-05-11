@@ -1,14 +1,16 @@
 from typing import Any
 
-import lightbulb
+from hikari import RESTGuild
 from lightbulb.components.modals import Modal, ModalContext, TextInput
+from pydantic import PositiveInt
 
 from database.schemas import UserSchema
 from database.services import UserService
-from helper import CommandHelper, MessageHelper, ModalHelper
-from model import MessageKeys, ModalKeys
-from model.schemas import LinkAccountConfirmationModal
-from settings import Localization
+from exceptions.command import CommandExecutionError
+from helper import MINECRAFT_SERVERS, CommandHelper, MessageHelper, ModalHelper
+from model import CommandsKeys, MessageKeys, ModalKeys, SecretKeys
+from model.schemas import LinkAccountCommandConfig, LinkAccountConfirmationModal, UserReward
+from settings import Localization, Settings
 
 
 class LinkAccountConfirmModal(Modal):
@@ -27,7 +29,6 @@ class LinkAccountConfirmModal(Modal):
         code: str,
         user_locale: str,
         helper: CommandHelper,
-        client: lightbulb.Client,
     ) -> None:
         # Get localized modal data based on user's locale
         modal_data: LinkAccountConfirmationModal = Localization.get(
@@ -46,7 +47,6 @@ class LinkAccountConfirmModal(Modal):
         self._code: str = code  # Store the expected confirmation code
         self._user_locale: str = user_locale
         self._helper: CommandHelper = helper
-        self._client: lightbulb.Client = client
 
     async def _send_messages(self, ctx: ModalContext, success: bool) -> None:
         """
@@ -86,9 +86,86 @@ class LinkAccountConfirmModal(Modal):
             "discord_user_mention": ctx.user.mention,
             **common_params,
         }
-        await MessageHelper(key=log_key, **log_params).send_to_log_channel(
-            self._client, self._helper
-        )
+        await MessageHelper(key=log_key, **log_params).send_to_log_channel(ctx.client, self._helper)
+
+    def _process_items(self, items: list[str], username: str, uuid: str) -> list[str]:
+        return [
+            item.replace("{minecraft_username}", username).replace("{minecraft_uuid}", uuid)
+            if isinstance(item, str)
+            else item
+            for item in items
+        ]
+
+    async def _give_rewards(
+        self, ctx: ModalContext, username: str, uuid: str
+    ) -> dict[str, list[str]] | None:
+        """
+        Award configured rewards to a user upon successful account linking.
+
+        This method handles two types of rewards:
+        1. Discord role rewards - Assigns roles to the user in the Discord guild
+        2. Minecraft item rewards - Records items to be granted in different Minecraft servers
+
+        Args:
+            ctx: Modal context containing user information and client
+
+        Returns:
+            A dictionary mapping Minecraft server names to lists of item rewards,
+            or None if no rewards are configured
+        """
+        # Fetch reward configuration from settings
+        data: LinkAccountCommandConfig = Settings.get(CommandsKeys.LINK_ACCOUNT)
+        rewards: UserReward | None = data.reward
+
+        if rewards is None:
+            return None
+
+        # Extract role and item rewards from the configuration
+        role_reward: list[PositiveInt] | None = rewards.role  # type: ignore
+        item_reward: dict[str, list[str]] | None = rewards.item  # type: ignore
+        final_item_reward: dict[str, list[str]] = {}
+
+        # Process Discord role rewards
+        if role_reward:
+            try:
+                guild: RESTGuild = await ctx.client.rest.fetch_guild(
+                    Settings.get(SecretKeys.DEFAULT_GUILD)
+                )
+
+                # Assign each configured role to the user
+                for role_id in role_reward:
+                    try:
+                        await ctx.client.rest.add_role_to_member(
+                            guild=guild, user=ctx.user, role=role_id
+                        )
+                    except Exception as e:
+                        # Log error and raise a command execution error
+                        raise CommandExecutionError(f"Failed to assign role {role_id}: {e}")
+            except Exception as e:
+                # Log error and raise a command execution error
+                raise CommandExecutionError(f"Failed to assign roles: {e}")
+
+        # Process Minecraft item rewards
+        if item_reward:
+            default_reward: list[str] | None = item_reward.get("default", None)
+
+            # Map server names to their specific rewards or default rewards
+            for server_name, items in item_reward.items():
+                if server_name in MINECRAFT_SERVERS:
+                    # Use server-specific rewards
+                    final_item_reward[server_name] = self._process_items(items, username, uuid)
+                elif server_name != "default":  # Skip the default key itself
+                    # Use default rewards for non-server keys
+                    final_item_reward[server_name] = (
+                        self._process_items(default_reward, username, uuid)
+                        if default_reward
+                        else []
+                    )
+
+            return final_item_reward
+
+        # Return None if there are no item rewards
+        return None
 
     async def on_submit(self, ctx: ModalContext) -> None:
         """
@@ -111,7 +188,9 @@ class LinkAccountConfirmModal(Modal):
                 locale=self._user_locale,
                 minecraft_username=self._username,
                 minecraft_uuid=self._uuid,
-            )
+                reward_inventory=await self._give_rewards(ctx, self._username, self._uuid),
+            ),
+            preserve_existing=False,
         )
 
         # Send success messages to both user and log channel

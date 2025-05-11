@@ -9,7 +9,7 @@ from pydantic import PositiveInt
 
 from debug import get_logger
 from model import CommandsKeys
-from model.schemas import Cooldown, LoggedCommand, SimpleCommand
+from model.schemas import BasicCommand, CommandCooldown, LoggedCommandConfig
 from settings import Settings
 
 # Get logger but with a reduced verbosity for debug messages
@@ -35,7 +35,7 @@ class CommandHelper:
         self.command_name: LiteralString = command.name.lower()
 
         try:
-            command_info: SimpleCommand = Settings.get(command)
+            command_info: BasicCommand = Settings.get(command)
 
             # Basic command properties
             self.command_enabled: bool = command_info.enabled
@@ -47,7 +47,7 @@ class CommandHelper:
             ]
 
             # Cooldown properties
-            self.command_cooldown: Cooldown | None = command_info.cooldown
+            self.command_cooldown: CommandCooldown | None = command_info.cooldown
 
             # Log command initialization with basic details
             logger.debug(
@@ -55,8 +55,8 @@ class CommandHelper:
                 f"Permissions: {[p.name for p in self.command_permissions]}"
             )
 
-            # Optional logging properties - only log if it's a LoggedCommand
-            if isinstance(command_info, LoggedCommand):
+            # Optional logging properties - only log if it's a LoggedCommandConfig
+            if isinstance(command_info, LoggedCommandConfig):
                 self.command_log_enabled: bool = command_info.log.enabled
                 self.command_log_channel: PositiveInt | None = command_info.log.channel
                 logger.debug(
