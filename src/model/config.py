@@ -36,4 +36,5 @@ class WebSocketKeys(Enum):
 class CommandsKeys(Enum):
     """Enum for command keys in the configuration."""
 
+    LINK_ACCOUNT = "commands.link_account"
     BAN = "commands.ban"

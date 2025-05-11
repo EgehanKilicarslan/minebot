@@ -26,6 +26,20 @@
         }
     },
     "commands": {
+        "link_account": {
+            "enabled": null,
+            "permissions": [],
+            "cooldown": {
+                "algorithm": "",
+                "bucket": "",
+                "window_length": null,
+                "allowed_invocations": null
+            },
+            "log": {
+                "enabled": null,
+                "channel": null
+            }
+        },
         "ban": {
             "enabled": null,
             "permissions": [],

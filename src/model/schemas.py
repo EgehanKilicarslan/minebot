@@ -84,6 +84,51 @@ class MessageSchema(BaseModel):
         return v
 
 
+class StatusMessages(BaseModel):
+    """Base model for success/failure message pairs."""
+
+    success: MessageSchema
+    failure: MessageSchema
+
+
+# ==== Menu Schema =====
+class BaseButton(BaseModel):
+    label: str | None = Field(..., max_length=80)
+    emoji: str | None = Field(default=None, max_length=1)
+    disabled: bool | None = False
+
+    @model_validator(mode="after")
+    def validate_label_nor_emoji(self) -> "BaseButton":
+        if not self.label and not self.emoji:
+            raise ValueError("Either label or emoji must be provided.")
+        return self
+
+
+class BaseSelect(BaseModel):
+    placeholder: str | None = Field(default=None, max_length=150)
+    disabled: bool | None = False
+
+
+class InteractiveButton(BaseButton):
+    style: str = Field(..., pattern=r"^(PRIMARY|SECONDARY|SUCCESS|DANGER|LINK)$")
+
+
+class LinkButton(BaseButton):
+    url: HttpUrl
+
+
+# ==== Modal Schema ====
+class BaseModal(BaseModel):
+    title: str = Field(..., max_length=80)
+
+
+class BaseTextInput(BaseModel):
+    style: str = Field(..., pattern=r"^(SHORT|PARAGRAPH)$")
+    label: str = Field(..., max_length=80)
+    placeholder: str | None = Field(default=None, max_length=150)
+    value: str | None = Field(default=None, max_length=4000)
+
+
 # ==== Settings Schema ====
 class Secret(BaseModel):
     token: str
@@ -204,6 +249,7 @@ class LoggedCommand(SimpleCommand):
 
 
 class Commands(BaseModel):
+    link_account: LoggedCommand
     ban: LoggedCommand
 
 
@@ -216,16 +262,47 @@ class SettingsSchema(BaseModel):
 
 
 # ==== Localization Schema ====
+class LinkAccountOptions(BaseModel):
+    username: LabeledItem
+
+
+class LinkAccountCommand(LabeledItem):
+    options: LinkAccountOptions
+
+
+class LinkAccountMessages(BaseModel):
+    class Minecraft(BaseModel):
+        confirmation_code: PlainMessage
+        success: PlainMessage
+        failure: PlainMessage
+
+    minecraft: Minecraft
+    user: StatusMessages
+    log: StatusMessages
+
+
+class LinkAccountConfirmationModalFields(BaseModel):
+    code: BaseTextInput
+
+
+class LinkAccountConfirmationModal(BaseModal):
+    fields: LinkAccountConfirmationModalFields
+
+
+class LinkAccountModals(BaseModel):
+    confirmation: LinkAccountConfirmationModal
+
+
+class LinkAccount(BaseModel):
+    command: LinkAccountCommand
+    messages: LinkAccountMessages
+    modal: LinkAccountModals
+
+
 class BanOptions(BaseModel):
-    class User(LabeledItem): ...
-
-    class Duration(LabeledItem): ...
-
-    class Reason(LabeledItem): ...
-
-    user: User
-    duration: Duration
-    reason: Reason
+    user: LabeledItem
+    duration: LabeledItem
+    reason: LabeledItem
 
 
 class BanCommand(LabeledItem):
@@ -255,5 +332,6 @@ class ErrorMessages(BaseModel):
 
 class LocalizationSchema(BaseModel):
     locale: str
+    link_account: LinkAccount
     ban: Ban
     error: ErrorMessages

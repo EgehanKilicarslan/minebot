@@ -22,6 +22,7 @@ logger: Logger = get_logger(__name__)
 # Global state
 MINECRAFT_SERVERS: list[str] = []
 ONLINE_PLAYERS: TimedSet[str] = TimedSet[str](10)
+PLAYER_UUIDS: TimedDict[str, str] = TimedDict[str, str](10)
 PLAYER_SERVERS: TimedDict[str, str] = TimedDict[str, str](10)
 
 
@@ -150,6 +151,15 @@ class MinecraftHelper:
         is_online = ONLINE_PLAYERS.contains(identifier)
         logger.debug(f"Player {identifier} is {'online' if is_online else 'offline'}")
         return is_online
+
+    @staticmethod
+    async def fetch_player_uuid(username: str, response_timeout: float = 1.0) -> str | None:
+        if await MinecraftHelper.fetch_player_status(
+            username=username, response_timeout=response_timeout
+        ):
+            if username in PLAYER_UUIDS:
+                logger.debug(f"UUID for {username} found: {PLAYER_UUIDS[username]}")
+                return PLAYER_UUIDS[username]
 
     @staticmethod
     async def fetch_player_server(
@@ -285,7 +295,10 @@ class MinecraftHelper:
                 message=message,
             )
         )
-        logger.debug(f"Message sent to player {identifier}: {message}")
+        # Truncate message for logging if too long
+        logger.debug(
+            f"Message sent to player {identifier}: {message if len(message) <= 50 else message[:47] + '...'}"
+        )
         return True
 
     @staticmethod
@@ -335,7 +348,9 @@ class MinecraftHelper:
             logger.warning(f"Server '{server}' not found in available servers")
             return False
 
-        logger.debug(f"Sending server message to {server}: {message}")
+        logger.debug(
+            f"Sending server message to {server}: {message if len(message) <= 50 else message[:47] + '...'}"
+        )
 
         from websocket import WebSocketManager
 

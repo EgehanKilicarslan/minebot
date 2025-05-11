@@ -59,38 +59,19 @@ class MessageHelper:
         self.kwargs: dict[str, Any] = kwargs
         logger.debug(f"[Message: {key.name}] Initialized with locale: {locale}, params: {kwargs}")
 
-    def decode(self) -> str | hikari.Embed:
-        """
-        Decodes a message into either a plain string or a hikari.Embed object.
+    def _decode_plain(self, content: PlainMessage | None = None) -> str:
+        if content is None:
+            content = cast(PlainMessage, Localization.get(key=self.key, locale=self.locale))
 
-        This method retrieves a message schema from the localization system using the key and locale
-        specified in the instance. It then formats the message content with the provided kwargs.
+        result: str = content.text.format(**self.kwargs) if content.text else ""
+        truncated: str = result[:50] + ("..." if len(result) > 50 else "")
+        logger.debug(f"[Message: {self.key.name}] Plain content: {truncated}")
+        return result
 
-        If the message type is "plain", it returns a formatted string.
-        If the message type is "embed", it constructs and returns a hikari.Embed object with all
-        the specified properties (title, description, fields, footer, image, thumbnail, author).
+    def _decode_embed(self, content: EmbedMessage | None = None) -> hikari.Embed:
+        if content is None:
+            content = cast(EmbedMessage, Localization.get(key=self.key, locale=self.locale))
 
-        Returns:
-            str | hikari.Embed: A formatted string for plain messages or a fully constructed
-                               hikari.Embed object for embed messages.
-
-        Logs:
-            Debug information about the decoding process.
-        """
-        logger.debug(f"[Message: {self.key.name}] Decoding {self.locale} message")
-        message: MessageSchema = Localization.get(key=self.key, locale=self.locale)
-        content: PlainMessage | EmbedMessage = message.content
-
-        if message.message_type == "plain":
-            content = cast(PlainMessage, content)
-            result: str = content.text.format(**self.kwargs) if content.text else ""
-            truncated = result[:50] + ("..." if len(result) > 50 else "")
-            logger.debug(f"[Message: {self.key.name}] Plain content: {truncated}")
-            return result
-
-        # Must be an embed message
-        logger.debug(f"[Message: {self.key.name}] Building embed message")
-        content = cast(EmbedMessage, content)
         embed = hikari.Embed(
             title=content.title.format(**self.kwargs) if content.title else None,
             description=content.description.format(**self.kwargs) if content.description else None,
@@ -132,6 +113,37 @@ class MessageHelper:
 
         logger.debug(f"[Message: {self.key.name}] Embed message construction completed")
         return embed
+
+    def decode(self) -> str | hikari.Embed:
+        """
+        Decodes a message into either a plain string or a hikari.Embed object.
+
+        This method retrieves a message schema from the localization system using the key and locale
+        specified in the instance. It then formats the message content with the provided kwargs.
+
+        If the message type is "plain", it returns a formatted string.
+        If the message type is "embed", it constructs and returns a hikari.Embed object with all
+        the specified properties (title, description, fields, footer, image, thumbnail, author).
+
+        Returns:
+            str | hikari.Embed: A formatted string for plain messages or a fully constructed
+                               hikari.Embed object for embed messages.
+
+        Logs:
+            Debug information about the decoding process.
+        """
+        logger.debug(f"[Message: {self.key.name}] Decoding {self.locale} message")
+        message: MessageSchema = Localization.get(key=self.key, locale=self.locale)
+        content: PlainMessage | EmbedMessage = message.content
+
+        if message.message_type == "plain":
+            content = cast(PlainMessage, content)
+            return self._decode_plain(content)
+
+        # Must be an embed message
+        logger.debug(f"[Message: {self.key.name}] Building embed message")
+        content = cast(EmbedMessage, content)
+        return self._decode_embed(content)
 
     async def send_response(self, ctx: ContextType, ephemeral: bool = False) -> None:
         """

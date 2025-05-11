@@ -1,4 +1,87 @@
 {
+  "link_account": {
+    "command": {
+      "label": "link_account",
+      "description": "Link your Minecraft account to your Discord account.",
+      "options": {
+        "username": {
+          "label": "username",
+          "description": "The Minecraft username to link."
+        }
+      }
+    },
+    "messages": {
+      "minecraft": {
+        "confirmation_code": {
+          "text": "Your confirmation code is <white><bold><hover:show_text:'Click to copy the code'><click:suggest_command:'{confirmation_code}'>{confirmation_code}</click></hover></bold></white>. Please enter this code in Discord to complete the linking process."
+        },
+        "success": {
+          "text": "Your Minecraft account has been successfully linked to your Discord account."
+        },
+        "failure": {
+          "text": "Failed to link your Minecraft account. Please try again later."
+        }
+      },
+      "user": {
+        "success": {
+          "message_type": "embed",
+          "content": {
+            "title": "Account Successfully Linked",
+            "description": "Your Minecraft account has been successfully linked to your Discord account.",
+            "color": "GREEN"
+          }
+        },
+        "failure": {
+          "message_type": "embed",
+          "content": {
+            "title": "Account Linking Failed",
+            "description": "Failed to link your Minecraft account. Please try again later.",
+            "color": "RED"
+          }
+        }
+      },
+      "log": {
+        "success": {
+          "message_type": "embed",
+          "content": {
+            "title": "Account Linked",
+            "description": "{discord_user_mention} has linked their Minecraft account.",
+            "color": "GREEN",
+            "fields": [
+              {
+                "name": "Minecraft Username",
+                "value": "{minecraft_username}"
+              },
+              {
+                "name": "Minecraft UUID",
+                "value": "{minecraft_uuid}"
+              }
+            ]
+          }
+        },
+        "failure": {
+          "message_type": "embed",
+          "content": {
+            "title": "Account Linking Failed",
+            "description": "{discord_user_mention} failed to link their Minecraft account.",
+            "color": "RED"
+          }
+        }
+      }
+    },
+    "modal": {
+      "confirmation": {
+        "title": "Account Linking Confirmation",
+        "fields": {
+          "code": {
+            "style": "SHORT",
+            "label": "Confirmation Code",
+            "placeholder": "Enter the confirmation code sent to your Minecraft account."
+          }
+        }
+      }
+    }
+  },
   "ban": {
     "command": {
       "label": "ban",

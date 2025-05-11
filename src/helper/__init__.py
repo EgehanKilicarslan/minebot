@@ -9,6 +9,7 @@ from .channel import ChannelHelper
 from .command import CommandHelper
 from .message import MessageHelper
 from .minecraft import MINECRAFT_SERVERS, ONLINE_PLAYERS, PLAYER_SERVERS, MinecraftHelper
+from .modal import ModalHelper
 
 __all__: list[str] = [
     "ChannelHelper",
@@ -18,4 +19,5 @@ __all__: list[str] = [
     "ONLINE_PLAYERS",
     "PLAYER_SERVERS",
     "MINECRAFT_SERVERS",
+    "ModalHelper",
 ]

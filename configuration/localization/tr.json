@@ -1,4 +1,93 @@
 {
+  "link_account": {
+    "command": {
+      "label": "hesap_bagla",
+      "description": "Hesap bağlama işlemi.",
+      "options": {
+        "username": {
+          "label": "kullanıcı_adı",
+          "description": "Bağlanacak Minecraft kullanıcı adı."
+        }
+      }
+    },
+    "messages": {
+      "minecraft": {
+        "confirmation_code": {
+          "text": "Doğrulama kodunuz <white><bold><hover:show_text:'Kodu kopyalamak için tıklayın'><click:suggest_command:'{confirmation_code}'>{confirmation_code}</click></hover></bold></white>. Lütfen bağlantı işlemini tamamlamak için bu kodu Discord'a girin."
+        },
+        "success": {
+          "text": "Minecraft hesabınız başarıyla Discord hesabınıza bağlandı"
+        },
+        "failure": {
+          "text": "Minecraft hesabınızı bağlarken bir hata oluştu. Lütfen daha sonra tekrar deneyin."
+        }
+      },
+      "user": {
+        "success": {
+          "message_type": "embed",
+          "content": {
+            "title": "Hesap Başarıyla Bağlandı",
+            "description": "Minecraft hesabınız başarıyla Discord hesabınıza bağlandı.",
+            "color": "GREEN"
+          }
+        },
+        "failure": {
+          "message_type": "embed",
+          "content": {
+            "title": "Hesap Bağlama Başarısız",
+            "description": "Minecraft hesabınızı bağlarken bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+            "color": "RED"
+          }
+        }
+      },
+      "log": {
+        "success": {
+          "message_type": "embed",
+          "content": {
+            "title": "Account Linked",
+            "description": "{discord_user_mention} kullanıcısı Minecraft hesabını bağladı.",
+            "color": "GREEN",
+            "fields": [
+              {
+                "name": "Minecraft Kullanıcı Adı",
+                "value": "{minecraft_username}"
+              },
+              {
+                "name": "Minecraft UUID",
+                "value": "{minecraft_uuid}"
+              }
+            ]
+          }
+        },
+        "failure": {
+          "message_type": "embed",
+          "content": {
+            "title": "Hesap Bağlama Başarısız",
+            "description": "{discord_user_mention} kullanıcısı Minecraft hesabını bağlarken hata oluştu.",
+            "color": "RED",
+            "fields": [
+              {
+                "name": "Hata",
+                "value": "{error_message}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "modal": {
+      "confirmation": {
+        "title": "Hesap Bağlama Doğrulaması",
+        "fields": {
+          "code": {
+            "style": "SHORT",
+            "label": "Doğrulama Kodu",
+            "placeholder": "Minecraft hesabınıza gönderilen doğrulama kodunu girin."
+          }
+        }
+      }
+    }
+  },
   "ban": {
     "command": {
       "label": "yasakla",

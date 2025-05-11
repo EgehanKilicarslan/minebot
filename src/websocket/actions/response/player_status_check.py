@@ -4,6 +4,7 @@ from websockets import ServerConnection
 
 from debug import get_logger
 from helper import ONLINE_PLAYERS
+from helper.minecraft import PLAYER_UUIDS
 
 from ...action_registry import websocket_action
 from ...schemas.response import PlayerStatusCheckSchema
@@ -18,8 +19,7 @@ async def player_status_check(websocket: ServerConnection, data: PlayerStatusChe
     )
 
     # Validate the provided username or UUID
-    if data.online:
-        if data.username:
-            ONLINE_PLAYERS.add(data.username)  # Assign username to online players
-        if data.uuid:
-            ONLINE_PLAYERS.add(data.uuid)  ## Assign UUID to online players
+    if data.online and data.username and data.uuid:
+        ONLINE_PLAYERS.add(data.username)  # Assign username to online players
+        ONLINE_PLAYERS.add(data.uuid)  # Assign UUID to online players
+        PLAYER_UUIDS[data.username] = data.uuid  # Map username to UUID
