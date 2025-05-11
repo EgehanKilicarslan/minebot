@@ -60,6 +60,22 @@ class MessageHelper:
         logger.debug(f"[Message: {key.name}] Initialized with locale: {locale}, params: {kwargs}")
 
     def _decode_plain(self, content: PlainMessage | None = None) -> str:
+        """
+        Decode a plain message into a formatted string.
+
+        This method takes a PlainMessage object, formats its text with the provided keyword arguments,
+        and returns the resulting string. If no content is provided, it retrieves the message from
+        the localization system using the current key and locale.
+
+        Parameters:
+            content (PlainMessage | None): The message to decode. If None, retrieves message from localization.
+
+        Returns:
+            str: The formatted message text.
+
+        Note:
+            The method also logs a debug message with a truncated version of the result.
+        """
         if content is None:
             content = cast(PlainMessage, Localization.get(key=self.key, locale=self.locale))
 
@@ -69,6 +85,24 @@ class MessageHelper:
         return result
 
     def _decode_embed(self, content: EmbedMessage | None = None) -> hikari.Embed:
+        """
+        Decodes an EmbedMessage object into a hikari.Embed.
+
+        This method constructs a hikari.Embed object from the given EmbedMessage,
+        applying any format arguments from self.kwargs. If no content is provided,
+        it fetches the content from localization using self.key and self.locale.
+
+        Args:
+            content (EmbedMessage | None): The EmbedMessage object to decode.
+                If None, content will be fetched from localization. Defaults to None.
+
+        Returns:
+            hikari.Embed: A fully constructed hikari.Embed object with all relevant
+                fields populated from the EmbedMessage.
+
+        Note:
+            The method formats all string fields using self.kwargs if they exist.
+        """
         if content is None:
             content = cast(EmbedMessage, Localization.get(key=self.key, locale=self.locale))
 

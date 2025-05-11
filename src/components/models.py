@@ -12,6 +12,14 @@ from settings import Localization
 
 
 class LinkAccountConfirmModal(Modal):
+    """
+    A modal dialog for confirming the link between a Discord account and a Minecraft account.
+
+    This modal presents a confirmation code input field to the user. If the code entered
+    matches the expected code, the user's Discord account will be linked to their Minecraft
+    account in the database. Success or failure messages are sent to both the user and a log channel.
+    """
+
     def __init__(
         self,
         username: str,
@@ -21,31 +29,39 @@ class LinkAccountConfirmModal(Modal):
         helper: CommandHelper,
         client: lightbulb.Client,
     ) -> None:
+        # Get localized modal data based on user's locale
         modal_data: LinkAccountConfirmationModal = Localization.get(
             ModalKeys.LINK_ACCOUNT_CONFIRMATION, locale=user_locale
         )
 
         self.title: str = modal_data.title
+        # Create the code input field with appropriate constraints
         self.input: TextInput = ModalHelper.get_field(
             instance=self, key=modal_data.fields.code, min_lenght=10, max_length=10
         )
 
-        # Store data as private attributes
+        # Store data as private attributes for later use
         self._username: str = username
         self._uuid: str = uuid
-        self._code: str = code
+        self._code: str = code  # Store the expected confirmation code
         self._user_locale: str = user_locale
         self._helper: CommandHelper = helper
         self._client: lightbulb.Client = client
 
     async def _send_messages(self, ctx: ModalContext, success: bool) -> None:
-        """Helper method to send both user and log messages."""
-        user_key: MessageKeys | MessageKeys = (
+        """
+        Helper method to send both user and log messages about account linking.
+
+        Sends appropriate localized messages to both the user and the log channel
+        based on whether the account linking was successful.
+        """
+        # Select appropriate message keys based on success/failure
+        user_key: MessageKeys = (
             MessageKeys.LINK_ACCOUNT_USER_SUCCESS
             if success
             else MessageKeys.LINK_ACCOUNT_USER_FAILURE
         )
-        log_key: MessageKeys | MessageKeys = (
+        log_key: MessageKeys = (
             MessageKeys.LINK_ACCOUNT_LOG_SUCCESS
             if success
             else MessageKeys.LINK_ACCOUNT_LOG_FAILURE
@@ -57,12 +73,13 @@ class LinkAccountConfirmModal(Modal):
             "minecraft_uuid": self._uuid,
         }
 
-        # User message
+        # Send message to the user who submitted the modal
         await MessageHelper(key=user_key, locale=self._user_locale, **common_params).send_response(
-            ctx, ephemeral=True
+            ctx,
+            ephemeral=True,  # Make message only visible to the user
         )
 
-        # Log message
+        # Send message to the bot's log channel with additional Discord user details
         log_params: dict[str, Any] = {
             "discord_username": ctx.user.username,
             "discord_user_id": ctx.user.id,
@@ -74,12 +91,20 @@ class LinkAccountConfirmModal(Modal):
         )
 
     async def on_submit(self, ctx: ModalContext) -> None:
-        # Validate code input
+        """
+        Handle modal submission.
+
+        Validates the confirmation code entered by the user. If valid, links the
+        Discord account to the Minecraft account in the database and sends success
+        messages. If invalid, sends failure messages.
+        """
+        # Validate that the entered code matches the expected code
         if self._code != ctx.value_for(self.input):
+            # If codes don't match, send failure messages and exit
             await self._send_messages(ctx, success=False)
             return
 
-        # Create or update user
+        # Create or update user record in the database with Minecraft account details
         await UserService.create_or_update_user(
             UserSchema(
                 id=ctx.user.id,
@@ -89,5 +114,5 @@ class LinkAccountConfirmModal(Modal):
             )
         )
 
-        # Send success messages
+        # Send success messages to both user and log channel
         await self._send_messages(ctx, success=True)

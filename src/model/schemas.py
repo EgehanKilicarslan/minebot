@@ -323,6 +323,7 @@ class Ban(BaseModel):
 
 class ErrorMessages(BaseModel):
     unknown_error: MessageSchema
+    timeout_error: MessageSchema
     command_execution_error: MessageSchema
     user_record_not_found: MessageSchema
     account_already_linked: MessageSchema

@@ -121,6 +121,14 @@
         "color": "RED"
       }
     },
+    "timeout_error": {
+      "message_type": "embed",
+      "content": {
+        "title": "Timeout Error",
+        "description": "The request timed out. Please try again later.",
+        "color": "RED"
+      }
+    },
     "command_execution_error": {
       "message_type": "embed",
       "content": {

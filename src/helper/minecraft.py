@@ -154,6 +154,20 @@ class MinecraftHelper:
 
     @staticmethod
     async def fetch_player_uuid(username: str, response_timeout: float = 1.0) -> str | None:
+        """
+        Fetches the UUID for a given Minecraft player username.
+
+        This function checks if the player exists by calling fetch_player_status, and if the
+        player exists, retrieves the UUID from the PLAYER_UUIDS cache.
+
+        Args:
+            username (str): The Minecraft player username to get the UUID for.
+            response_timeout (float, optional): Maximum time to wait for a response from
+                the Minecraft API, in seconds. Defaults to 1.0.
+
+        Returns:
+            str | None: The player's UUID if found, None otherwise.
+        """
         if await MinecraftHelper.fetch_player_status(
             username=username, response_timeout=response_timeout
         ):

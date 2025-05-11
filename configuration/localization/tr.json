@@ -127,6 +127,14 @@
         "color": "RED"
       }
     },
+    "timeout_error": {
+      "message_type": "embed",
+      "content": {
+        "title": "Zaman Aşımı Hatası",
+        "description": "İşlem zaman aşımına uğradı. Lütfen daha sonra tekrar deneyin.",
+        "color": "RED"
+      }
+    },
     "command_execution_error": {
       "message_type": "embed",
       "content": {

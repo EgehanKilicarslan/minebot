@@ -7,8 +7,10 @@ import lightbulb
 
 from components.models import LinkAccountConfirmModal
 from helper import CommandHelper, MessageHelper, MinecraftHelper
+from hooks.minecraft import verify_minecraft_account_link
 from model import CommandsKeys, MessageKeys, MessageType
 
+# Helper that manages command configuration and localization
 helper: CommandHelper = CommandHelper(CommandsKeys.LINK_ACCOUNT)
 loader: lightbulb.Loader = helper.get_loader()
 
@@ -19,10 +21,11 @@ class LinkAccount(
     name="extensions.link_account.label",
     description="extensions.link_account.description",
     default_member_permissions=helper.get_permissions(),
-    hooks=helper.generate_hooks(),
+    hooks=helper.generate_hooks(verify_minecraft_account_link(False)),
     contexts=[hikari.ApplicationContextType.GUILD],
     localize=True,
 ):
+    # Command parameter: Minecraft username to link with Discord account
     username: str = lightbulb.string(
         "extensions.link_account.options.username.label",
         "extensions.link_account.options.username.description",
@@ -31,10 +34,15 @@ class LinkAccount(
 
     @lightbulb.invoke
     async def invoke(self, ctx: lightbulb.Context, client: lightbulb.Client) -> None:
+        # Get user's locale for localized responses
         user_locale: str = ctx.interaction.locale
+        # Generate a random uppercase hex code for verification
         code: str = secrets.token_hex(5).upper()  # 10 characters
 
+        # Check if the player is online in Minecraft
         if not await MinecraftHelper.fetch_player_status(username=self.username):
+            # Send error message if player isn't online
+            # NOTE: Missing return statement here - code continues execution even if player is offline
             await MessageHelper(
                 key=MessageKeys.PLAYER_NOT_ONLINE,
                 locale=user_locale,
@@ -45,6 +53,7 @@ class LinkAccount(
                 minecraft_uuid="None",
             ).send_response(ctx, ephemeral=True)
 
+        # Send verification code to the Minecraft player in-game
         await MinecraftHelper.send_player_message(
             message_type=MessageType.INFO,
             username=self.username,
@@ -55,8 +64,10 @@ class LinkAccount(
             )._decode_plain(),
         )
 
-        player_uuid = await MinecraftHelper.fetch_player_uuid(self.username)
+        # Get the player's Minecraft UUID for storing in the account link
+        player_uuid: str | None = await MinecraftHelper.fetch_player_uuid(self.username)
 
+        # Create the modal dialog for the user to enter the verification code
         modal = LinkAccountConfirmModal(
             username=self.username,
             uuid=player_uuid or "N/A",
@@ -66,8 +77,12 @@ class LinkAccount(
             client=client,
         )
 
+        # Display the modal and wait for user input
+        # Generate a random ID for this specific modal instance
         await ctx.respond_with_modal(modal.title, c_id := str(uuid.uuid4()), components=modal)
         try:
+            # Wait for the user to submit the modal
             await modal.attach(client, c_id)
         except asyncio.TimeoutError:
-            await ctx.respond("Modal timed out")
+            # Handle case when user doesn't complete the modal in time
+            await MessageHelper(MessageKeys.TIMEOUT_ERROR).send_response(ctx, ephemeral=True)
