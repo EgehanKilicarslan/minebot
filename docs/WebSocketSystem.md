@@ -78,6 +78,3 @@ The WebSocket server settings are defined in the `settings.json` file under the 
 
 - 📌 **Tips**:
   - Restart your bot after changing WebSocket configuration
-  - Consider using a reverse proxy for additional security
-  - Test connection settings with a simple client before deployment
-  - IP and password authentication provide sufficient security for most use cases
