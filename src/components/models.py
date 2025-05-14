@@ -1,5 +1,3 @@
-from typing import Any
-
 from hikari import RESTGuild
 from lightbulb.components.modals import Modal, ModalContext, TextInput
 from pydantic import PositiveInt
@@ -68,25 +66,24 @@ class LinkAccountConfirmModal(Modal):
         )
 
         # Common parameters for both messages
-        common_params: dict[str, str] = {
+        default_params: dict[str, str] = {
+            "discord_username": ctx.user.username,
+            "discord_user_id": str(ctx.user.id),
+            "discord_user_mention": ctx.user.mention,
             "minecraft_username": self._username,
             "minecraft_uuid": self._uuid,
         }
 
         # Send message to the user who submitted the modal
-        await MessageHelper(key=user_key, locale=self._user_locale, **common_params).send_response(
+        await MessageHelper(key=user_key, locale=self._user_locale, **default_params).send_response(
             ctx,
             ephemeral=True,  # Make message only visible to the user
         )
 
         # Send message to the bot's log channel with additional Discord user details
-        log_params: dict[str, Any] = {
-            "discord_username": ctx.user.username,
-            "discord_user_id": ctx.user.id,
-            "discord_user_mention": ctx.user.mention,
-            **common_params,
-        }
-        await MessageHelper(key=log_key, **log_params).send_to_log_channel(ctx.client, self._helper)
+        await MessageHelper(key=log_key, **default_params).send_to_log_channel(
+            ctx.client, self._helper
+        )
 
     def _process_items(self, items: list[str], username: str, uuid: str) -> list[str]:
         return [
