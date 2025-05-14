@@ -37,4 +37,5 @@ class CommandsKeys(Enum):
     """Enum for command keys in the configuration."""
 
     LINK_ACCOUNT = "commands.link_account"
+    WITHDRAW_REWARDS = "commands.withdraw_rewards"
     BAN = "commands.ban"

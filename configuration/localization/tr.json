@@ -88,6 +88,50 @@
       }
     }
   },
+  "withdraw_rewards": {
+    "command": {
+      "label": "ödül_çek",
+      "description": "Ödüllerinizi çekin."
+    },
+    "messages": {
+      "user": {
+        "success": {
+          "message_type": "embed",
+          "content": {
+            "title": "Ödül Çekme Başarılı",
+            "description": "Ödülleriniz başarıyla çekildi.",
+            "color": "GREEN"
+          }
+        },
+        "failure": {
+          "message_type": "embed",
+          "content": {
+            "title": "Ödül Çekme Başarısız",
+            "description": "Ödüllerinizi çekerken bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+            "color": "RED"
+          }
+        }
+      },
+      "log": {
+        "success": {
+          "message_type": "embed",
+          "content": {
+            "title": "Ödül Çekme Başarılı",
+            "description": "{discord_user_mention} kullanıcısı ödüllerini başarıyla çekti.",
+            "color": "GREEN"
+          }
+        },
+        "failure": {
+          "message_type": "embed",
+          "content": {
+            "title": "Ödül Çekme Başarısız",
+            "description": "{discord_user_mention} kullanıcısı ödüllerini çekerken hata oluştu.",
+            "color": "RED"
+          }
+        }
+      }
+    }
+  },
   "ban": {
     "command": {
       "label": "yasakla",

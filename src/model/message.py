@@ -8,6 +8,9 @@ class CommandKeys(Enum):
     LINK_ACCOUNT_DESCRIPTION = "link_account.command.description"
     LINK_ACCOUNT_OPTIONS = "link_account.command.options"
 
+    WITHDRAW_REWARDS_LABEL = "withdraw_rewards.command.label"
+    WITHDRAW_REWARDS_DESCRIPTION = "withdraw_rewards.command.description"
+
     BAN_LABEL = "ban.command.label"
     BAN_DESCRIPTION = "ban.command.description"
     BAN_OPTIONS = "ban.command.options"
@@ -23,6 +26,11 @@ class MessageKeys(Enum):
     LINK_ACCOUNT_USER_FAILURE = "link_account.messages.user.failure"
     LINK_ACCOUNT_LOG_SUCCESS = "link_account.messages.log.success"
     LINK_ACCOUNT_LOG_FAILURE = "link_account.messages.log.failure"
+
+    WITHDRAW_REWARDS_USER_SUCCESS = "withdraw_rewards.messages.user.success"
+    WITHDRAW_REWARDS_USER_FAILURE = "withdraw_rewards.messages.user.failure"
+    WITHDRAW_REWARDS_LOG_SUCCESS = "withdraw_rewards.messages.log.success"
+    WITHDRAW_REWARDS_LOG_FAILURE = "withdraw_rewards.messages.log.failure"
 
     BAN_COMMAND_USER_SUCCESS = "ban.messages.user.success"
 

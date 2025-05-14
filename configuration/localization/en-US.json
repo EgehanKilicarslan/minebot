@@ -82,6 +82,50 @@
       }
     }
   },
+  "withdraw_rewards": {
+    "command": {
+      "label": "withdraw_rewards",
+      "description": "Withdraw your rewards."
+    },
+    "messages": {
+      "user": {
+        "success": {
+          "message_type": "embed",
+          "content": {
+            "title": "Rewards Withdrawn",
+            "description": "Your rewards have been successfully withdrawn.",
+            "color": "GREEN"
+          }
+        },
+        "failure": {
+          "message_type": "embed",
+          "content": {
+            "title": "Withdrawal Failed",
+            "description": "Failed to withdraw your rewards. Please try again later.",
+            "color": "RED"
+          }
+        }
+      },
+      "log": {
+        "success": {
+          "message_type": "embed",
+          "content": {
+            "title": "Rewards Withdrawn",
+            "description": "{discord_user_mention} has withdrawn their rewards.",
+            "color": "GREEN"
+          }
+        },
+        "failure": {
+          "message_type": "embed",
+          "content": {
+            "title": "Withdrawal Failed",
+            "description": "{discord_user_mention} failed to withdraw their rewards.",
+            "color": "RED"
+          }
+        }
+      }
+    }
+  },
   "ban": {
     "command": {
       "label": "ban",

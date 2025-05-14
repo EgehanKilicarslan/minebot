@@ -283,6 +283,7 @@ class LinkAccountCommandConfig(LoggedCommandConfig):
 
 class CommandConfiguration(BaseModel):
     link_account: LinkAccountCommandConfig
+    withdraw_rewards: LoggedCommandConfig
     ban: LoggedCommandConfig
 
 
@@ -332,13 +333,23 @@ class LinkAccountLocalization(BaseModel):
     modal: LinkAccountModals
 
 
+class WithdrawRewardsMessages(BaseModel):
+    user: StatusMessagePair
+    log: StatusMessagePair
+
+
+class WithdrawRewardsLocalization(BaseModel):
+    command: DescriptiveElement
+    messages: WithdrawRewardsMessages
+
+
 class BanParameters(BaseModel):
     user: DescriptiveElement
     duration: DescriptiveElement
     reason: DescriptiveElement
 
 
-class BanCommandInfo(DescriptiveElement):
+class BanCommandParameters(DescriptiveElement):
     options: BanParameters
 
 
@@ -350,7 +361,7 @@ class BanMessages(BaseModel):
 
 
 class BanLocalization(BaseModel):
-    command: BanCommandInfo
+    command: BanCommandParameters
     messages: BanMessages
 
 
@@ -367,5 +378,6 @@ class ErrorMessages(BaseModel):
 class LocalizationData(BaseModel):
     locale: str
     link_account: LinkAccountLocalization
+    withdraw_rewards: WithdrawRewardsLocalization
     ban: BanLocalization
     error: ErrorMessages
