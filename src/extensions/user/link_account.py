@@ -42,7 +42,6 @@ class LinkAccount(
         # Check if the player is online in Minecraft
         if not await MinecraftHelper.fetch_player_status(username=self.username):
             # Send error message if player isn't online
-            # NOTE: Missing return statement here - code continues execution even if player is offline
             await MessageHelper(
                 key=MessageKeys.PLAYER_NOT_ONLINE,
                 locale=user_locale,
@@ -52,6 +51,7 @@ class LinkAccount(
                 minecraft_username=self.username,
                 minecraft_uuid="None",
             ).send_response(ctx, ephemeral=True)
+            return  # Exit if player is not online
 
         # Send verification code to the Minecraft player in-game
         await MinecraftHelper.send_player_message(
