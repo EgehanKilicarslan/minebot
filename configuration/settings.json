@@ -75,6 +75,16 @@
                 "enabled": null,
                 "channel": null
             }
+        },
+        "wiki": {
+            "enabled": null,
+            "permissions": [],
+            "cooldown": {
+                "algorithm": "",
+                "bucket": "",
+                "window_length": null,
+                "allowed_invocations": null
+            }
         }
     }
 }

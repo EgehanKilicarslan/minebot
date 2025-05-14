@@ -156,6 +156,38 @@
       }
     }
   },
+  "wiki": {
+    "command": {
+      "label": "wiki",
+      "description": "Get information from the wiki.",
+      "options": {
+        "query": {
+          "label": "query",
+          "description": "The query to search for."
+        }
+      }
+    },
+    "messages": {
+      "user": {
+        "success": {
+          "message_type": "embed",
+          "content": {
+            "title": "{query} - Wiki Search Result",
+            "description": "{result}",
+            "color": "BLUE"
+          }
+        },
+        "failure": {
+          "message_type": "embed",
+          "content": {
+            "title": "Wiki Search Failed",
+            "description": "Failed to retrieve the wiki information. Please try again later.",
+            "color": "RED"
+          }
+        }
+      }
+    }
+  },
   "error": {
     "unknown_error": {
       "message_type": "embed",

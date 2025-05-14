@@ -380,6 +380,16 @@ class Localization:
         logger.info(f"Guild language set to {guild_lang}")
 
     @classmethod
+    def get_guild_language(cls) -> hikari.Locale:
+        """
+        Get the current guild language.
+
+        Returns:
+            hikari.Locale: The current guild language.
+        """
+        return cls._guild_lang
+
+    @classmethod
     @lru_cache(maxsize=128)
     def get(
         cls,

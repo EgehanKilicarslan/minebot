@@ -73,6 +73,10 @@ if __name__ == "__main__":
             import events
             import extensions
 
+            # Import helper for wiki data loading
+            from helper import WikiHelper
+
+            WikiHelper.load_wiki_data()
             await client.load_extensions_from_package(events)
             await client.load_extensions_from_package(extensions, recursive=True)
             await client.start()

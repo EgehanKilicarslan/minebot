@@ -162,6 +162,38 @@
       }
     }
   },
+  "wiki": {
+    "command": {
+      "label": "wiki",
+      "description": "Wiki'de arama yapın.",
+      "options": {
+        "query": {
+          "label": "sorgu",
+          "description": "Aranacak sorgu."
+        }
+      }
+    },
+    "messages": {
+      "user": {
+        "success": {
+          "message_type": "embed",
+          "content": {
+            "title": "{query} - Wiki Arama Sonucu",
+            "description": "{result}",
+            "color": "BLUE"
+          }
+        },
+        "failure": {
+          "message_type": "embed",
+          "content": {
+            "title": "Wiki Bilgisi Alınamadı",
+            "description": "Aradığınız bilgi bulunamadı.",
+            "color": "RED"
+          }
+        }
+      }
+    }
+  },
   "error": {
     "unknown_error": {
       "message_type": "embed",

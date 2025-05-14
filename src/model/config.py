@@ -39,3 +39,4 @@ class CommandsKeys(Enum):
     LINK_ACCOUNT = "commands.link_account"
     WITHDRAW_REWARDS = "commands.withdraw_rewards"
     BAN = "commands.ban"
+    WIKI = "commands.wiki"

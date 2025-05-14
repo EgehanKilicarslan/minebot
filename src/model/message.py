@@ -15,6 +15,10 @@ class CommandKeys(Enum):
     BAN_DESCRIPTION = "ban.command.description"
     BAN_OPTIONS = "ban.command.options"
 
+    WIKI_LABEL = "wiki.command.label"
+    WIKI_DESCRIPTION = "wiki.command.description"
+    WIKI_OPTIONS = "wiki.command.options"
+
 
 class MessageKeys(Enum):
     """Message keys for the bot"""
@@ -33,6 +37,9 @@ class MessageKeys(Enum):
     WITHDRAW_REWARDS_LOG_FAILURE = "withdraw_rewards.messages.log.failure"
 
     BAN_COMMAND_USER_SUCCESS = "ban.messages.user.success"
+
+    WIKI_COMMAND_USER_SUCCESS = "wiki.messages.user.success"
+    WIKI_COMMAND_USER_FAILURE = "wiki.messages.user.failure"
 
     UNKNOWN_ERROR = "error.unknown_error"
     TIMEOUT_ERROR = "error.timeout_error"

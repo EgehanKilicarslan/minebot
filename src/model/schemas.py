@@ -285,6 +285,7 @@ class CommandConfiguration(BaseModel):
     link_account: LinkAccountCommandConfig
     withdraw_rewards: LoggedCommandConfig
     ban: LoggedCommandConfig
+    wiki: BasicCommand
 
 
 class BotSettings(BaseModel):
@@ -365,6 +366,23 @@ class BanLocalization(BaseModel):
     messages: BanMessages
 
 
+class WikiParameters(BaseModel):
+    query: DescriptiveElement
+
+
+class WikiCommandParameters(DescriptiveElement):
+    options: WikiParameters
+
+
+class WikiMessages(BaseModel):
+    user: StatusMessagePair
+
+
+class WikiLocalization(BaseModel):
+    command: WikiCommandParameters
+    messages: WikiMessages
+
+
 class ErrorMessages(BaseModel):
     unknown_error: DiscordMessage
     timeout_error: DiscordMessage
@@ -380,4 +398,5 @@ class LocalizationData(BaseModel):
     link_account: LinkAccountLocalization
     withdraw_rewards: WithdrawRewardsLocalization
     ban: BanLocalization
+    wiki: WikiLocalization
     error: ErrorMessages
