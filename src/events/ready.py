@@ -5,6 +5,7 @@ import lightbulb
 import toolbox
 
 from debug import get_logger
+from helper import WikiHelper
 from model import SecretKeys
 from settings import Localization, Settings
 
@@ -29,6 +30,7 @@ async def on_ready(event: hikari.ShardReadyEvent) -> None:
         # Set guild language
         preferred_locale = hikari.Locale(guild.preferred_locale)
         Localization.set_guild_language(preferred_locale)
+        WikiHelper.set_guild_language(preferred_locale)
         logger.info(f"Guild language set to: {preferred_locale}")
 
         # Verify bot member

@@ -7,7 +7,7 @@ import hikari
 from debug import debugger
 from model import CommandsKeys
 from model.schemas import BasicCommand
-from settings import Localization, Settings
+from settings import Settings
 from utils import fetch_available_locales, fetch_files_with_extension
 
 # Set up logging
@@ -19,7 +19,7 @@ class WikiHelper:
     # Format: {locale: {filename: (path, content)}}
     _data: dict[str, dict[str, tuple[Path, str | None]]] = {}
     MAX_CONTENT_LENGTH: Final[int] = 4000
-    GUILD_LANGUAGE: Final[hikari.Locale] = Localization.get_guild_language()
+    GUILD_LANGUAGE: hikari.Locale
 
     @classmethod
     def load_wiki_data(cls) -> None:
@@ -59,6 +59,11 @@ class WikiHelper:
 
             except FileNotFoundError:
                 logger.info(f"No wiki files found for locale: {locale_str}")
+
+    @classmethod
+    def set_guild_language(cls, guild_locale: hikari.Locale) -> None:
+        """Set the guild language for fallback purposes."""
+        cls.GUILD_LANGUAGE = guild_locale
 
     @classmethod
     def get_wiki_files(cls, locale: str) -> dict[str, Path] | None:
