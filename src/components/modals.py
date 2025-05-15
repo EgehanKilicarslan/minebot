@@ -3,13 +3,10 @@ from hikari import RESTGuild
 from lightbulb.components.modals import Modal, ModalContext, TextInput
 from pydantic import PositiveInt
 
-from database.schemas import UserSchema
-from database.schemas.suggestion import SuggestionSchema
-from database.services import UserService
-from database.services.suggestion import SuggestionService
+from database.schemas import SuggestionSchema, UserSchema
+from database.services import SuggestionService, UserService
 from exceptions.command import CommandExecutionError
-from helper import MINECRAFT_SERVERS, CommandHelper, MessageHelper, ModalHelper
-from helper.channel import ChannelHelper
+from helper import MINECRAFT_SERVERS, ChannelHelper, CommandHelper, MessageHelper, ModalHelper
 from model import CommandsKeys, MessageKeys, ModalKeys, SecretKeys
 from model.schemas import (
     LinkAccountCommandConfig,

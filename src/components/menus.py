@@ -4,12 +4,10 @@ import uuid
 from lightbulb.components.menus import Menu, MenuContext
 
 from components.modals import SuggestResponseModal
-from helper import CommandHelper
-from helper.menu import MenuHelper
-from helper.message import MessageHelper
-from model.message import MenuKeys, MessageKeys
+from helper import CommandHelper, MenuHelper, MessageHelper
+from model import MenuKeys, MessageKeys
 from model.schemas import SuggestConfirmationButtons
-from settings.json_wrapper import Localization
+from settings import Localization
 
 
 class SuggestConfirmMenu(Menu):
