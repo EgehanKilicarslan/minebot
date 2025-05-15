@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Any, cast
+from typing import Any, Sequence, cast
 
 import hikari
 import lightbulb
@@ -179,7 +179,12 @@ class MessageHelper:
         content = cast(DiscordEmbed, content)
         return self._decode_embed(content)
 
-    async def send_response(self, ctx: ContextType, ephemeral: bool = False) -> None:
+    async def send_response(
+        self,
+        ctx: ContextType,
+        ephemeral: bool = False,
+        components: Sequence[hikari.api.ComponentBuilder] | None = None,
+    ) -> hikari.Message:
         """
         Responds to a context with a message.
 
@@ -201,10 +206,22 @@ class MessageHelper:
             f"[Message: {self.key.name}] Responding with {message_type} message (ephemeral: {ephemeral})"
         )
 
-        await ctx.respond(content=message, ephemeral=ephemeral)
+        response_message: hikari.Message = cast(
+            hikari.Message,
+            await ctx.respond(
+                content=message, ephemeral=ephemeral, components=components or hikari.UNDEFINED
+            ),
+        )
         logger.debug(f"[Message: {self.key.name}] Response sent successfully")
 
-    async def send_to_log_channel(self, client: lightbulb.Client, helper: CommandHelper) -> None:
+        return response_message
+
+    async def send_to_log_channel(
+        self,
+        client: lightbulb.Client,
+        helper: CommandHelper,
+        components: Sequence[hikari.api.ComponentBuilder] | None = None,
+    ) -> hikari.Message | None:
         """
         Sends the message to the configured log channel.
 
@@ -221,13 +238,13 @@ class MessageHelper:
         logger.debug(f"[Message: {self.key.name}] Checking if logging is enabled")
         if not helper.has_logging_enabled():
             logger.debug(f"[Message: {self.key.name}] Logging is disabled, skipping")
-            return
+            return None
 
         logger.debug(f"[Message: {self.key.name}] Getting log channel ID")
         channel_id = helper.get_log_channel_id()
         if not channel_id:
             logger.debug(f"[Message: {self.key.name}] No log channel configured, skipping")
-            return
+            return None
 
         logger.debug(f"[Message: {self.key.name}] Fetching channel {channel_id}")
         channel: hikari.TextableGuildChannel = await ChannelHelper.fetch_channel(
@@ -238,5 +255,9 @@ class MessageHelper:
         message_type = "embed" if isinstance(message, hikari.Embed) else "plain"
         logger.debug(f"[Message: {self.key.name}] Sending {message_type} message to log channel")
 
-        await channel.send(content=message)
+        response_message: hikari.Message = await channel.send(
+            content=message, components=components or hikari.UNDEFINED
+        )
         logger.debug(f"[Message: {self.key.name}] Log message sent successfully")
+
+        return response_message

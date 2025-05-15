@@ -97,7 +97,7 @@ class StatusMessagePair(BaseModel):
 class ButtonBase(BaseModel):
     label: str | None = Field(..., max_length=80)
     emoji: str | None = Field(default=None, max_length=1)
-    disabled: bool | None = False
+    disabled: bool = False
 
     @model_validator(mode="after")
     def validate_label_nor_emoji(self) -> "ButtonBase":
@@ -281,10 +281,16 @@ class LinkAccountCommandConfig(LoggedCommandConfig):
     reward: UserReward | None = None
 
 
+class SuggestCommandConfig(LoggedCommandConfig):
+    result_channel: PositiveInt
+    reward: UserReward | None = None
+
+
 class CommandConfiguration(BaseModel):
     link_account: LinkAccountCommandConfig
     withdraw_rewards: LoggedCommandConfig
     ban: LoggedCommandConfig
+    suggest: SuggestCommandConfig
     wiki: BasicCommand
 
 
@@ -366,6 +372,57 @@ class BanLocalization(BaseModel):
     messages: BanMessages
 
 
+class SuggestMessages(BaseModel):
+    class Minecraft(BaseModel):
+        approve: TextMessage
+        reject: TextMessage
+
+    class Log(StatusMessagePair):
+        approve: DiscordMessage
+        reject: DiscordMessage
+
+    minecraft: Minecraft
+    user: StatusMessagePair
+    log: Log
+
+
+class SuggestConfirmationButtons(BaseModel):
+    approve: ActionButton
+    reject: ActionButton
+
+
+class SuggestMenus(BaseModel):
+    confirmation: SuggestConfirmationButtons
+
+
+class SuggestSendModalFields(BaseModel):
+    suggestion: TextInputField
+
+
+class SuggestSendModal(ModalBase):
+    fields: SuggestSendModalFields
+
+
+class SuggestRespondModalFields(BaseModel):
+    response: TextInputField
+
+
+class SuggestRespondModal(ModalBase):
+    fields: SuggestRespondModalFields
+
+
+class SuggestModals(BaseModel):
+    send: SuggestSendModal
+    respond: SuggestRespondModal
+
+
+class SuggestLocalization(BaseModel):
+    command: DescriptiveElement
+    messages: SuggestMessages
+    menu: SuggestMenus
+    modal: SuggestModals
+
+
 class WikiParameters(BaseModel):
     query: DescriptiveElement
 
@@ -383,9 +440,15 @@ class WikiLocalization(BaseModel):
     messages: WikiMessages
 
 
+class GeneralMessages(BaseModel):
+    success: DiscordMessage
+    failure: DiscordMessage
+
+
 class ErrorMessages(BaseModel):
     unknown_error: DiscordMessage
     timeout_error: DiscordMessage
+    channel_not_found_error: DiscordMessage
     command_execution_error: DiscordMessage
     user_record_not_found: DiscordMessage
     account_already_linked: DiscordMessage
@@ -398,5 +461,7 @@ class LocalizationData(BaseModel):
     link_account: LinkAccountLocalization
     withdraw_rewards: WithdrawRewardsLocalization
     ban: BanLocalization
+    suggest: SuggestLocalization
     wiki: WikiLocalization
+    general: GeneralMessages
     error: ErrorMessages

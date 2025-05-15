@@ -13,6 +13,7 @@ from exceptions.command import CommandExecutionError
 from exceptions.utility import EmptyException
 from hooks.database import add_or_update_user
 from model import BotKeys, SecretKeys
+from model.config import CommandsKeys
 from settings import Localization, Settings
 from websocket import WebSocketServer
 
@@ -74,9 +75,20 @@ if __name__ == "__main__":
             import extensions
 
             # Import helper for wiki data loading
-            from helper import WikiHelper
+            # Import helper for getting command data
+            from helper import CommandHelper, WikiHelper
 
             WikiHelper.load_wiki_data()
+
+            # Import menu for suggest command
+            if (suggest_helper := CommandHelper(CommandsKeys.SUGGEST)).command_enabled:
+                from components.menus import SuggestConfirmMenu
+
+                menu = SuggestConfirmMenu(helper=suggest_helper)
+
+                await menu.attach(client, wait=False, timeout=None)
+
+            # Load extensions and events
             await client.load_extensions_from_package(events)
             await client.load_extensions_from_package(extensions, recursive=True)
             await client.start()

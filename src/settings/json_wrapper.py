@@ -17,7 +17,7 @@ from model import BotSettings, LocalizationData, config, message
 logger: logging.Logger = get_logger(__name__)
 
 SettingsType = config.SecretKeys | config.DatabaseKeys | config.CommandsKeys | config.WebSocketKeys
-LocalizationType = message.CommandKeys | message.MessageKeys | message.ModalKeys | message.ViewKeys
+LocalizationType = message.CommandKeys | message.MessageKeys | message.ModalKeys | message.MenuKeys
 
 DEFAULT_CONFIG_PATH: Final[Path] = Path("configuration/settings.json").resolve()
 DEFAULT_LOCALIZATION_PATH: Final[Path] = Path("configuration/localization").resolve()

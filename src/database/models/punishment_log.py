@@ -13,7 +13,7 @@ class PunishmentLog(Base):
     user_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     punishment_type: Mapped[str] = mapped_column(String(50), nullable=False)
     reason: Mapped[str] = mapped_column(Text, nullable=False)
-    moderator_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    staff_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     duration: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.now(timezone.utc)

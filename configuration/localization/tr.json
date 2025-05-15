@@ -162,6 +162,144 @@
       }
     }
   },
+  "suggest": {
+    "command": {
+      "label": "öneri",
+      "description": "Öneri gönderin."
+    },
+    "messages": {
+      "minecraft": {
+        "approve": {
+          "text": "Öneriniz {discord_staff_username} tarafından onaylandı."
+        },
+        "reject": {
+          "text": "Öneriniz {discord_staff_username} tarafından reddedildi."
+        }
+      },
+      "user": {
+        "success": {
+          "message_type": "embed",
+          "content": {
+            "title": "Öneri Gönderildi",
+            "description": "Öneriniz başarıyla gönderildi.",
+            "color": "GREEN"
+          }
+        },
+        "failure": {
+          "message_type": "embed",
+          "content": {
+            "title": "Öneri Gönderme Başarısız",
+            "description": "Önerinizi gönderirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+            "color": "RED"
+          }
+        }
+      },
+      "log": {
+        "success": {
+          "message_type": "embed",
+          "content": {
+            "title": "Öneri Gönderildi",
+            "description": "{discord_user_mention} kullanıcısı öneri gönderdi.",
+            "color": "GREEN",
+            "fields": [
+              {
+                "name": "Öneri",
+                "value": "{suggestion}"
+              }
+            ]
+          }
+        },
+        "failure": {
+          "message_type": "embed",
+          "content": {
+            "title": "Öneri Gönderme Başarısız",
+            "description": "{discord_user_mention} kullanıcısı öneri gönderirken hata oluştu.",
+            "color": "RED"
+          }
+        },
+        "approve": {
+          "message_type": "embed",
+          "content": {
+            "title": "Öneri Kabul Edildi",
+            "description": "{discord_user_mention}'ın önerisi kabul edildi.",
+            "color": "GREEN",
+            "fields": [
+              {
+                "name": "Yetkili",
+                "value": "{discord_staff_user_mention}"
+              },
+              {
+                "name": "Sebep",
+                "value": "{reason}"
+              },
+              {
+                "name": "Öneri",
+                "value": "{suggestion}"
+              }
+            ]
+          }
+        },
+        "reject": {
+          "message_type": "embed",
+          "content": {
+            "title": "Öneri Reddedildi",
+            "description": "{discord_user_mention}'ın önerisi reddedildi.",
+            "color": "RED",
+            "fields": [
+              {
+                "name": "Yetkili",
+                "value": "{discord_staff_user_mention}"
+              },
+              {
+                "name": "Sebep",
+                "value": "{reason}"
+              },
+              {
+                "name": "Öneri",
+                "value": "{suggestion}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "menu": {
+      "confirmation": {
+        "approve": {
+          "label": "Approve",
+          "emoji": "✅",
+          "style": "SUCCESS"
+        },
+        "reject": {
+          "label": "Reject",
+          "emoji": "❌",
+          "style": "DANGER"
+        }
+      }
+    },
+    "modal": {
+      "send": {
+        "title": "Give a Suggestion",
+        "fields": {
+          "suggestion": {
+            "style": "PARAGRAPH",
+            "label": "Suggestion",
+            "placeholder": "Enter your suggestion here."
+          }
+        }
+      },
+      "respond": {
+        "title": "Respond to Suggestion",
+        "fields": {
+          "response": {
+            "style": "PARAGRAPH",
+            "label": "Response",
+            "placeholder": "Enter your response here."
+          }
+        }
+      }
+    }
+  },
   "wiki": {
     "command": {
       "label": "wiki",
@@ -194,6 +332,24 @@
       }
     }
   },
+  "general": {
+    "success": {
+      "message_type": "embed",
+      "content": {
+        "title": "Başarılı",
+        "description": "İşlem başarıyla tamamlandı.",
+        "color": "GREEN"
+      }
+    },
+    "failure": {
+      "message_type": "embed",
+      "content": {
+        "title": "Başarısız",
+        "description": "İşlem başarısız oldu. Lütfen daha sonra tekrar deneyin.",
+        "color": "RED"
+      }
+    }
+  },
   "error": {
     "unknown_error": {
       "message_type": "embed",
@@ -208,6 +364,14 @@
       "content": {
         "title": "Zaman Aşımı Hatası",
         "description": "İşlem zaman aşımına uğradı. Lütfen daha sonra tekrar deneyin.",
+        "color": "RED"
+      }
+    },
+    "channel_not_found_error": {
+      "message_type": "embed",
+      "content": {
+        "title": "Kanal Bulunamadı",
+        "description": "Belirtilen kanal bulunamadı.",
         "color": "RED"
       }
     },

@@ -76,6 +76,29 @@
                 "channel": null
             }
         },
+        "suggest": {
+            "enabled": null,
+            "permissions": [],
+            "cooldown": {
+                "algorithm": "",
+                "bucket": "",
+                "window_length": null,
+                "allowed_invocations": null
+            },
+            "log": {
+                "enabled": null,
+                "channel": null
+            },
+            "result_channel": null,
+            "reward": {
+                "mode": "",
+                "role": [],
+                "item": {
+                    "test1": [],
+                    "default": []
+                }
+            }
+        },
         "wiki": {
             "enabled": null,
             "permissions": [],

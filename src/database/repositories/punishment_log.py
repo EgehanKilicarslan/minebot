@@ -40,14 +40,14 @@ class PunishmentLogRepository:
         logger.debug(f"Found {len(logs)} punishment logs for user ID: {user_id}")
         return logs
 
-    async def get_by_moderator_id(self, moderator_id: int) -> list[PunishmentLog]:
-        """Get all punishment logs issued by a specific moderator."""
-        logger.debug(f"Fetching punishment logs by moderator ID: {moderator_id}")
+    async def get_by_staff_id(self, staff_id: int) -> list[PunishmentLog]:
+        """Get all punishment logs issued by a specific staff."""
+        logger.debug(f"Fetching punishment logs by staff ID: {staff_id}")
         result: Result[tuple[PunishmentLog]] = await self.session.execute(
-            select(PunishmentLog).where(PunishmentLog.moderator_id == moderator_id)
+            select(PunishmentLog).where(PunishmentLog.staff_id == staff_id)
         )
         logs = list(result.scalars().all())
-        logger.debug(f"Found {len(logs)} punishment logs by moderator ID: {moderator_id}")
+        logger.debug(f"Found {len(logs)} punishment logs by staff ID: {staff_id}")
         return logs
 
     async def get_by_punishment_type(self, punishment_type: str) -> list[PunishmentLog]:
@@ -71,7 +71,7 @@ class PunishmentLogRepository:
             user_id=log_schema.user_id,
             punishment_type=log_schema.punishment_type,
             reason=log_schema.reason,
-            moderator_id=log_schema.moderator_id,
+            staff_id=log_schema.staff_id,
             duration=log_schema.duration,
             created_at=log_schema.created_at,
             expires_at=log_schema.expires_at,
@@ -95,7 +95,7 @@ class PunishmentLogRepository:
         punishment_log.user_id = log_schema.user_id
         punishment_log.punishment_type = log_schema.punishment_type
         punishment_log.reason = log_schema.reason
-        punishment_log.moderator_id = log_schema.moderator_id
+        punishment_log.staff_id = log_schema.staff_id
         punishment_log.duration = log_schema.duration
         punishment_log.created_at = log_schema.created_at
         punishment_log.expires_at = log_schema.expires_at

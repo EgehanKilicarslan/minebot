@@ -1,3 +1,3 @@
-from . import models, views
+from . import menus, modals
 
-__all__: list[str] = ["models", "views"]
+__all__: list[str] = ["menus", "modals"]

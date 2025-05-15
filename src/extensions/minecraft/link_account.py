@@ -5,7 +5,7 @@ import uuid
 import hikari
 import lightbulb
 
-from components.models import LinkAccountConfirmModal
+from components.modals import LinkAccountConfirmModal
 from helper import CommandHelper, MessageHelper, MinecraftHelper
 from hooks.minecraft import verify_minecraft_account_link
 from model import CommandsKeys, MessageKeys, MessageType

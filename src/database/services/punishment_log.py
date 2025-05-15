@@ -54,21 +54,21 @@ class PunishmentLogService:
             return [PunishmentLogSchema.model_validate(log) for log in logs]
 
     @staticmethod
-    async def get_punishment_logs_by_moderator(moderator_id: int) -> list[PunishmentLogSchema]:
+    async def get_punishment_logs_by_staff(staff_id: int) -> list[PunishmentLogSchema]:
         """
-        Get all punishment logs issued by a specific moderator.
+        Get all punishment logs issued by a specific staff.
 
         Args:
-            moderator_id: The Discord moderator ID
+            staff_id: The Discord moderator ID
 
         Returns:
             List of PunishmentLogSchema objects
         """
-        logger.debug(f"Getting punishment logs for moderator with ID: {moderator_id}")
+        logger.debug(f"Getting punishment logs for staff with ID: {staff_id}")
         async with get_db_session() as session:
             repository = PunishmentLogRepository(session)
-            logs: list[PunishmentLog] = await repository.get_by_moderator_id(moderator_id)
-            logger.debug(f"Found {len(logs)} punishment logs for moderator {moderator_id}")
+            logs: list[PunishmentLog] = await repository.get_by_staff_id(staff_id)
+            logger.debug(f"Found {len(logs)} punishment logs for staff {staff_id}")
             return [PunishmentLogSchema.model_validate(log) for log in logs]
 
     @staticmethod

@@ -156,6 +156,144 @@
       }
     }
   },
+  "suggest": {
+    "command": {
+      "label": "suggest",
+      "description": "Suggest a feature."
+    },
+    "messages": {
+      "minecraft": {
+        "approve": {
+          "text": "Your suggestion has been approved by {discord_staff_username}."
+        },
+        "reject": {
+          "text": "Your suggestion has been rejected by {discord_staff_username}."
+        }
+      },
+      "user": {
+        "success": {
+          "message_type": "embed",
+          "content": {
+            "title": "Suggestion Submitted",
+            "description": "Your suggestion has been submitted successfully.",
+            "color": "GREEN"
+          }
+        },
+        "failure": {
+          "message_type": "embed",
+          "content": {
+            "title": "Suggestion Submission Failed",
+            "description": "Failed to submit your suggestion. Please try again later.",
+            "color": "RED"
+          }
+        }
+      },
+      "log": {
+        "success": {
+          "message_type": "embed",
+          "content": {
+            "title": "Suggestion Submitted",
+            "description": "{discord_user_mention} has submitted a suggestion.",
+            "color": "GREEN",
+            "fields": [
+              {
+                "name": "Suggestion",
+                "value": "{suggestion}"
+              }
+            ]
+          }
+        },
+        "failure": {
+          "message_type": "embed",
+          "content": {
+            "title": "Suggestion Submission Failed",
+            "description": "{discord_user_mention} failed to submit a suggestion.",
+            "color": "RED"
+          }
+        },
+        "approve": {
+          "message_type": "embed",
+          "content": {
+            "title": "Suggestion Approved",
+            "description": "{discord_user_mention}'s suggestion has been approved.",
+            "color": "GREEN",
+            "fields": [
+              {
+                "name": "Moderator",
+                "value": "{discord_staff_user_mention}"
+              },
+              {
+                "name": "Reason",
+                "value": "{reason}"
+              },
+              {
+                "name": "Suggestion",
+                "value": "{suggestion}"
+              }
+            ]
+          }
+        },
+        "reject": {
+          "message_type": "embed",
+          "content": {
+            "title": "Suggestion Rejected",
+            "description": "{discord_user_mention}'s suggestion has been rejected.",
+            "color": "RED",
+            "fields": [
+              {
+                "name": "Moderator",
+                "value": "{discord_staff_user_mention}"
+              },
+              {
+                "name": "Reason",
+                "value": "{reason}"
+              },
+              {
+                "name": "Suggestion",
+                "value": "{suggestion}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "menu": {
+      "confirmation": {
+        "approve": {
+          "label": "Approve",
+          "emoji": "✅",
+          "style": "SUCCESS"
+        },
+        "reject": {
+          "label": "Reject",
+          "emoji": "❌",
+          "style": "DANGER"
+        }
+      }
+    },
+    "modal": {
+      "send": {
+        "title": "Give a Suggestion",
+        "fields": {
+          "suggestion": {
+            "style": "PARAGRAPH",
+            "label": "Suggestion",
+            "placeholder": "Enter your suggestion here."
+          }
+        }
+      },
+      "respond": {
+        "title": "Respond to Suggestion",
+        "fields": {
+          "response": {
+            "style": "PARAGRAPH",
+            "label": "Response",
+            "placeholder": "Enter your response here."
+          }
+        }
+      }
+    }
+  },
   "wiki": {
     "command": {
       "label": "wiki",
@@ -188,6 +326,30 @@
       }
     }
   },
+  "general": {
+    "success": {
+      "message_type": "embed",
+      "content": {
+        "title": "Success",
+        "description": "The operation was successful.",
+        "color": "GREEN"
+      }
+    },
+    "failure": {
+      "message_type": "embed",
+      "content": {
+        "title": "Failure",
+        "description": "The operation failed. Please try again later.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "Error",
+            "value": "{error_message}"
+          }
+        ]
+      }
+    }
+  },
   "error": {
     "unknown_error": {
       "message_type": "embed",
@@ -202,6 +364,14 @@
       "content": {
         "title": "Timeout Error",
         "description": "The request timed out. Please try again later.",
+        "color": "RED"
+      }
+    },
+    "channel_not_found_error": {
+      "message_type": "embed",
+      "content": {
+        "title": "Channel Not Found",
+        "description": "The specified channel was not found.",
         "color": "RED"
       }
     },
