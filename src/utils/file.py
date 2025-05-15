@@ -58,7 +58,7 @@ def fetch_files_with_extension(folder_path: Path, file_extension: str) -> dict[s
             for file_path in folder_path.iterdir()
             if file_path.suffix == f".{file_extension}"
         }
-        logger.info(
+        logger.debug(
             f"Found {len(file_paths_dict)} files with extension '.{file_extension}' in {folder_path}"
         )
         return file_paths_dict
@@ -109,7 +109,7 @@ def fetch_available_locales() -> list[hikari.Locale]:
             if locale_name in locale_value_map:
                 supported_locales.append(locale_value_map[locale_name])
 
-        logger.info(f"Found {len(supported_locales)} supported locales: {supported_locales}")
+        logger.debug(f"Found {len(supported_locales)} supported locales: {supported_locales}")
         return supported_locales
 
     except Exception as e:
