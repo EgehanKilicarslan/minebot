@@ -2,6 +2,7 @@ from logging import Logger
 
 from sqlalchemy import Result, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.attributes import flag_modified
 
 from database.models import User
 from database.schemas import UserSchema
@@ -136,6 +137,7 @@ class UserRepository:
             data[server].extend(processed_items)
 
         user.reward_inventory = data
+        flag_modified(user, "reward_inventory")
         await self.session.flush()
 
         logger.debug(
