@@ -1,3 +1,3 @@
-from . import moderation, user
+from . import minecraft, moderation, user
 
-__all__: list[str] = ["moderation", "user"]
+__all__: list[str] = ["minecraft", "moderation", "user"]
