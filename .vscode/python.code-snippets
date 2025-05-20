@@ -25,7 +25,7 @@
         "    # ${4:Command arguments}",
         "",
         "    @lightbulb.invoke",
-        "    async def invoke(self, ctx: lightbulb.Context, client: lightbulb.Client) -> None:",
+        "    async def invoke(self, ctx: lightbulb.Context) -> None:",
         "        \"\"\"Handle command invocation\"\"\"",
         "        ${0:# Command implementation}",
         "        await ctx.respond(\"${5:Response message}\")",

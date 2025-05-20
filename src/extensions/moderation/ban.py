@@ -39,12 +39,12 @@ class Ban(
     )
 
     @lightbulb.invoke
-    async def invoke(self, ctx: lightbulb.Context, client: lightbulb.Client) -> None:
+    async def invoke(self, ctx: lightbulb.Context) -> None:
         await MessageHelper(
             key=MessageKeys.BAN_COMMAND_USER_SUCCESS,
             locale=ctx.interaction.locale,
             discord_user_mention=self.user.mention,
-        ).send_to_log_channel(client, helper)
+        ).send_to_log_channel(ctx.client, helper)
 
         await MessageHelper(
             key=MessageKeys.BAN_COMMAND_USER_SUCCESS,

@@ -46,7 +46,7 @@ class Wiki(
     )
 
     @lightbulb.invoke
-    async def invoke(self, ctx: lightbulb.Context, client: lightbulb.Client) -> None:
+    async def invoke(self, ctx: lightbulb.Context) -> None:
         user_locale: str = ctx.interaction.locale
 
         wiki_data: dict[str, Path] | None = WikiHelper.get_wiki_files(user_locale)

@@ -33,7 +33,7 @@ class LinkAccount(
     )
 
     @lightbulb.invoke
-    async def invoke(self, ctx: lightbulb.Context, client: lightbulb.Client) -> None:
+    async def invoke(self, ctx: lightbulb.Context) -> None:
         # Get user's locale for localized responses
         user_locale: str = ctx.interaction.locale
         # Generate a random uppercase hex code for verification
@@ -81,7 +81,7 @@ class LinkAccount(
         await ctx.respond_with_modal(modal.title, c_id := str(uuid.uuid4()), components=modal)
         try:
             # Wait for the user to submit the modal
-            await modal.attach(client, c_id)
+            await modal.attach(ctx.client, c_id)
         except asyncio.TimeoutError:
             # Handle case when user doesn't complete the modal in time
             await MessageHelper(MessageKeys.TIMEOUT_ERROR).send_response(ctx, ephemeral=True)

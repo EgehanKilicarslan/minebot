@@ -23,7 +23,7 @@ class WithdrawRewards(
     localize=True,
 ):
     @lightbulb.invoke
-    async def invoke(self, ctx: lightbulb.Context, client: lightbulb.Client) -> None:
+    async def invoke(self, ctx: lightbulb.Context) -> None:
         # Prepare default parameters with Discord user information
         default_params: dict[str, str] = {
             "discord_user_id": str(ctx.user.id),
@@ -52,7 +52,7 @@ class WithdrawRewards(
             # Log successful reward withdrawal in log channel
             await MessageHelper(
                 MessageKeys.WITHDRAW_REWARDS_LOG_SUCCESS, **default_params, **minecraft_params
-            ).send_to_log_channel(client, helper)
+            ).send_to_log_channel(ctx.client, helper)
         else:
             # Rewards could not be given - notify user of failure
             await MessageHelper(
@@ -61,4 +61,4 @@ class WithdrawRewards(
             # Log failed reward withdrawal attempt in log channel
             await MessageHelper(
                 MessageKeys.WITHDRAW_REWARDS_LOG_FAILURE, **default_params
-            ).send_to_log_channel(client, helper)
+            ).send_to_log_channel(ctx.client, helper)
