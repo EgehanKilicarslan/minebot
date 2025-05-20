@@ -601,7 +601,7 @@ speedups = [
 
 [[package]]
 name = "hikari-lightbulb"
-version = "3.0.0a23"
+version = "3.0.0a24"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "async-timeout" },
@@ -609,9 +609,9 @@ dependencies = [
     { name = "hikari" },
     { name = "linkd" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f8/c4/19ff034af7ef3547e75e54f833f97243d8d133bb44720d030728e4559a7e/hikari_lightbulb-3.0.0a23.tar.gz", hash = "sha256:dc3badfd925b5b77117106cc5d62b0ab8480fcadb66804888cda9c09cadf63c2", size = 130925, upload-time = "2025-05-17T14:51:02.809Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9c/ae/6975b9a8c7eb3cd74f07db72d292013c53f30c5454944c7d0760bc13060b/hikari_lightbulb-3.0.0a24.tar.gz", hash = "sha256:62fecaed8bdcb24a0cf59b515ac4b022aac8e720fd5adab10dc3f42bce519bd0", size = 130987, upload-time = "2025-05-20T22:22:06.309Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/71/51/642da5fb897dd1065d66d2b091d5f4220c149f77d915be5005dc752bc287/hikari_lightbulb-3.0.0a23-py3-none-any.whl", hash = "sha256:bf19f2c4642e6aa5fceeebb65257d29809407e7ec8f7dedc52188cb6a60e8799", size = 99435, upload-time = "2025-05-17T14:51:00.831Z" },
+    { url = "https://files.pythonhosted.org/packages/c6/c3/a6168b08361a2c616b0e19cd99962e9a34f14b74f55691788d0a99e1c423/hikari_lightbulb-3.0.0a24-py3-none-any.whl", hash = "sha256:39ecbee7a2969af8d546a163aeebcb1d7598d4825edf5c6ce5b5a8e6815ed992", size = 99467, upload-time = "2025-05-20T22:22:04.829Z" },
 ]
 
 [[package]]
@@ -669,7 +669,7 @@ requires-dist = [
     { name = "aiosqlite", specifier = "==0.21.0" },
     { name = "asyncpg", specifier = "==0.30.0" },
     { name = "hikari", extras = ["speedups"], specifier = "==2.3.3" },
-    { name = "hikari-lightbulb", specifier = "==3.0.0a23" },
+    { name = "hikari-lightbulb", specifier = "==3.0.0a24" },
     { name = "hikari-toolbox", specifier = "==0.1.7" },
     { name = "pydantic", specifier = "==2.11.4" },
     { name = "pydantic-extra-types", specifier = "==2.10.4" },
