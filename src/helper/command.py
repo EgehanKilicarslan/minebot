@@ -33,41 +33,72 @@ class CommandHelper:
             command_log_channel (PositiveInt): The channel ID for logging.
         """
         self.command_name: LiteralString = command.name.lower()
+        self._cached_permission_value: int | None = None
 
         try:
             command_info: BasicCommand = Settings.get(command)
 
+            # Check if command_info is None and handle it
+            if command_info is None:
+                self._set_defaults()
+                return
+
             # Basic command properties
-            self.command_enabled: bool = command_info.enabled
-
-            # Convert string permissions to hikari.Permissions enum values using a list comprehension
-            self.command_permissions: list[hikari.Permissions] = [
-                hikari.Permissions.NONE if p == "NONE" else hikari.Permissions[p]
-                for p in command_info.permissions
-            ]
-
-            # Cooldown properties
+            self.command_enabled: bool = True
             self.command_cooldown: CommandCooldown | None = command_info.cooldown
+            self.command_permissions = self._parse_permissions(command_info.permissions)
 
-            # Log command initialization with basic details
-            logger.debug(
-                f"[Command: {self.command_name}] Initialized - Enabled: {self.command_enabled}, "
-                f"Permissions: {[p.name for p in self.command_permissions]}"
-            )
+            # Log initialization
+            self._log_initialization()
 
-            # Optional logging properties - only log if it's a LoggedCommandConfig
-            if isinstance(command_info, LoggedCommandConfig):
-                self.command_log_enabled: bool = command_info.log.enabled
-                self.command_log_channel: PositiveInt | None = command_info.log.channel
-                logger.debug(
-                    f"[Command: {self.command_name}] Logging configured - Enabled: {self.command_log_enabled}, "
-                    f"Channel: {self.command_log_channel}"
-                )
+            # Handle logging configuration
+            self._configure_logging(command_info)
 
         except Exception as e:
             # Provide a clear error message with the command name and error
             logger.error(f"[Command: {self.command_name}] Initialization FAILED: {str(e)}")
             raise ValueError(f"Failed to initialize command {command.name}: {str(e)}")
+
+    def _set_defaults(self) -> None:
+        """Set default values for command properties."""
+        self.command_enabled = False
+        self.command_permissions = [hikari.Permissions.NONE]
+        self.command_cooldown = None
+        self.command_log_enabled = False
+        self.command_log_channel = None
+
+        logger.debug(
+            f"[Command: {self.command_name}] Initialized with defaults - Enabled: {self.command_enabled}, "
+            f"Permissions: {[p.name for p in self.command_permissions]}"
+        )
+
+    def _parse_permissions(self, permission_strings: list[str]) -> list[hikari.Permissions]:
+        """Parse string permissions into hikari.Permissions enum values."""
+        return [
+            hikari.Permissions.NONE if p == "NONE" else hikari.Permissions[p]
+            for p in permission_strings
+        ]
+
+    def _log_initialization(self) -> None:
+        """Log basic command initialization details."""
+        logger.debug(
+            f"[Command: {self.command_name}] Initialized - Enabled: {self.command_enabled}, "
+            f"Permissions: {[p.name for p in self.command_permissions]}"
+        )
+
+    def _configure_logging(self, command_info: BasicCommand) -> None:
+        """Configure logging properties if available."""
+        # Default values
+        self.command_log_enabled = False
+        self.command_log_channel = None
+
+        if isinstance(command_info, LoggedCommandConfig):
+            self.command_log_enabled = bool(command_info.log)
+            self.command_log_channel = command_info.log
+            logger.debug(
+                f"[Command: {self.command_name}] Logging configured - Enabled: {self.command_log_enabled}, "
+                f"Channel: {self.command_log_channel}"
+            )
 
     def get_loader(self) -> lightbulb.Loader:
         """
@@ -89,9 +120,14 @@ class CommandHelper:
         Returns:
             int: The combined permission value as expected by Discord's API.
         """
+        # Return cached value if available
+        if self._cached_permission_value is not None:
+            return self._cached_permission_value
+
         # Special case: if NONE is in the permissions list, return 0
         if any(p == hikari.Permissions.NONE for p in self.command_permissions):
             logger.debug(f"[Command: {self.command_name}] Using NONE permission (value: 0)")
+            self._cached_permission_value = 0
             return 0
 
         # Combine permissions
@@ -102,6 +138,9 @@ class CommandHelper:
         logger.debug(
             f"[Command: {self.command_name}] Permissions: {[p.name for p in self.command_permissions]} → {combined_permissions}"
         )
+
+        # Cache the result
+        self._cached_permission_value = combined_permissions
         return combined_permissions
 
     def generate_hooks(
@@ -149,7 +188,7 @@ class CommandHelper:
         Returns:
             PositiveInt | None: The channel ID if logging is enabled, None otherwise.
         """
-        return self.command_log_channel
+        return self.command_log_channel if self.command_log_enabled else None
 
     def _get_cooldown(self) -> ExecutionHook | None:
         """
@@ -168,8 +207,13 @@ class CommandHelper:
             bucket: str = self.command_cooldown.bucket
             algorithm: str = self.command_cooldown.algorithm
 
-            # Validate bucket type
-            assert bucket in ["global", "user", "channel", "guild"]
+            # Validate bucket type with explicit error message
+            valid_buckets = ["global", "user", "channel", "guild"]
+            if bucket not in valid_buckets:
+                raise ValueError(
+                    f"Invalid bucket type: '{bucket}'. Must be one of: {valid_buckets}"
+                )
+
             bucket_literal = cast(Literal["global", "user", "channel", "guild"], bucket)
 
             logger.debug(
@@ -177,32 +221,28 @@ class CommandHelper:
                 f"{allowed_invocations} invocations per {window_length}s ({bucket})"
             )
 
-            match algorithm:
-                case "fixed_window":
-                    return cooldowns.fixed_window(
-                        window_length=window_length,
-                        allowed_invocations=allowed_invocations,
-                        bucket=bucket_literal,
-                    )
+            # Dictionary-based cooldown creation
+            cooldown_creators = {
+                "fixed_window": lambda: cooldowns.fixed_window(
+                    window_length=window_length,
+                    allowed_invocations=allowed_invocations,
+                    bucket=bucket_literal,
+                ),
+                "sliding_window": lambda: cooldowns.sliding_window(
+                    window_length=window_length,
+                    allowed_invocations=allowed_invocations,
+                    bucket=bucket_literal,
+                ),
+            }
 
-                case "sliding_window":
-                    return cooldowns.sliding_window(
-                        window_length=window_length,
-                        allowed_invocations=allowed_invocations,
-                        bucket=bucket_literal,
-                    )
+            if algorithm not in cooldown_creators:
+                raise ValueError(f"Unknown cooldown algorithm: {algorithm}")
 
-                case _:
-                    logger.error(
-                        f"[Command: {self.command_name}] Unknown cooldown algorithm: {algorithm}"
-                    )
-                    raise ValueError(
-                        f"Unknown cooldown algorithm for {self.command_name}: {algorithm}"
-                    )
+            return cooldown_creators[algorithm]()
 
-        except Exception as e:
+        except (ValueError, KeyError, AttributeError) as e:
+            # More specific exception handling
             logger.error(f"[Command: {self.command_name}] Failed to create cooldown: {str(e)}")
-            # Re-raise with context for better error handling upstream
             raise ValueError(
                 f"Failed to configure cooldown for {self.command_name}: {str(e)}"
             ) from e

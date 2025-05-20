@@ -248,13 +248,12 @@ class CommandCooldown(BaseModel):
 
 
 class BasicCommand(BaseModel):
-    enabled: bool
     permissions: list[str] = Field(default=["NONE"])
     cooldown: CommandCooldown | None = None
 
     @model_validator(mode="after")
     def validate_permissions(self) -> "BasicCommand":
-        if self.enabled and isinstance(self.permissions, list):
+        if isinstance(self.permissions, list):
             valid = hikari.Permissions.__members__
             for perm in self.permissions:
                 if perm not in valid and perm != "NONE":
@@ -262,19 +261,8 @@ class BasicCommand(BaseModel):
         return self
 
 
-class LoggingConfig(BaseModel):
-    enabled: bool
-    channel: PositiveInt | None
-
-    @model_validator(mode="after")
-    def validate_channel(self) -> "LoggingConfig":
-        if self.enabled and self.channel is None:
-            raise ValueError("Channel ID must be provided when logging is enabled.")
-        return self
-
-
 class LoggedCommandConfig(BasicCommand):
-    log: LoggingConfig
+    log: PositiveInt | None = None
 
 
 class LinkAccountCommandConfig(LoggedCommandConfig):
@@ -287,11 +275,11 @@ class SuggestCommandConfig(LoggedCommandConfig):
 
 
 class CommandConfiguration(BaseModel):
-    link_account: LinkAccountCommandConfig
-    withdraw_rewards: LoggedCommandConfig
-    ban: LoggedCommandConfig
-    suggest: SuggestCommandConfig
-    wiki: BasicCommand
+    link_account: LinkAccountCommandConfig | None = None
+    withdraw_rewards: LoggedCommandConfig | None = None
+    ban: LoggedCommandConfig | None = None
+    suggest: SuggestCommandConfig | None = None
+    wiki: BasicCommand | None = None
 
 
 class BotSettings(BaseModel):

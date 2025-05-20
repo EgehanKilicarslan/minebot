@@ -5,9 +5,8 @@ from typing import Final
 import hikari
 
 from debug import debugger
+from helper.command import CommandHelper
 from model import CommandsKeys
-from model.schemas import BasicCommand
-from settings import Settings
 from utils import fetch_available_locales, fetch_files_with_extension
 
 # Set up logging
@@ -24,9 +23,9 @@ class WikiHelper:
     @classmethod
     def load_wiki_data(cls) -> None:
         """Load wiki data from markdown files for all available locales."""
-        system_data: BasicCommand = Settings.get(CommandsKeys.WIKI)
+        system_data: CommandHelper = CommandHelper(CommandsKeys.WIKI)
 
-        if not system_data.enabled:
+        if not system_data.command_enabled:
             return
 
         wiki_data_path = Path("configuration/wiki")

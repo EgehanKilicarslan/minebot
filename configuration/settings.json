@@ -27,7 +27,6 @@
     },
     "commands": {
         "link_account": {
-            "enabled": null,
             "permissions": [],
             "cooldown": {
                 "algorithm": "",
@@ -35,10 +34,7 @@
                 "window_length": null,
                 "allowed_invocations": null
             },
-            "log": {
-                "enabled": null,
-                "channel": null
-            },
+            "log": null,
             "reward": {
                 "mode": "",
                 "role": [],
@@ -49,7 +45,6 @@
             }
         },
         "withdraw_rewards": {
-            "enabled": null,
             "permissions": [],
             "cooldown": {
                 "algorithm": "",
@@ -57,13 +52,9 @@
                 "window_length": null,
                 "allowed_invocations": null
             },
-            "log": {
-                "enabled": null,
-                "channel": null
-            }
+            "log": null
         },
         "ban": {
-            "enabled": null,
             "permissions": [],
             "cooldown": {
                 "algorithm": "",
@@ -71,13 +62,9 @@
                 "window_length": null,
                 "allowed_invocations": null
             },
-            "log": {
-                "enabled": null,
-                "channel": null
-            }
+            "log": null
         },
         "suggest": {
-            "enabled": null,
             "permissions": [],
             "cooldown": {
                 "algorithm": "",
@@ -85,10 +72,7 @@
                 "window_length": null,
                 "allowed_invocations": null
             },
-            "log": {
-                "enabled": null,
-                "channel": null
-            },
+            "log": null,
             "result_channel": null,
             "reward": {
                 "mode": "",
@@ -100,7 +84,6 @@
             }
         },
         "wiki": {
-            "enabled": null,
             "permissions": [],
             "cooldown": {
                 "algorithm": "",
