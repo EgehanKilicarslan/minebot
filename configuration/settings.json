@@ -25,6 +25,19 @@
             }
         }
     },
+    "events": {
+        "guild_boost": {
+            "log": null,
+            "reward": {
+                "mode": "",
+                "role": [],
+                "item": {
+                    "test1": [],
+                    "default": []
+                }
+            }
+        }
+    },
     "commands": {
         "link_account": {
             "permissions": [],

@@ -6,7 +6,14 @@ from pydantic import PositiveInt
 from database.schemas import SuggestionSchema, UserSchema
 from database.services import SuggestionService, UserService
 from exceptions.command import CommandExecutionError
-from helper import MINECRAFT_SERVERS, ChannelHelper, CommandHelper, MessageHelper, ModalHelper
+from helper import (
+    MINECRAFT_SERVERS,
+    ChannelHelper,
+    CommandHelper,
+    MessageHelper,
+    MinecraftHelper,
+    ModalHelper,
+)
 from model import CommandsKeys, MessageKeys, ModalKeys, SecretKeys
 from model.schemas import (
     LinkAccountCommandConfig,
@@ -296,76 +303,13 @@ class SuggestResponseModal(Modal):
             "rejected": MessageKeys.SUGGEST_LOG_REJECT,
         }
 
-    def _process_items(self, items: list[str], username: str, uuid: str) -> list[str]:
-        """Process items by replacing placeholders with actual values."""
-        return [
-            item.replace("{minecraft_username}", username).replace("{minecraft_uuid}", uuid)
-            if isinstance(item, str)
-            else item
-            for item in items
-        ]
-
-    async def _assign_role_rewards(self, ctx: ModalContext, role_reward: list[PositiveInt]) -> None:
-        """Assign role rewards to the user."""
-        try:
-            guild: RESTGuild = await ctx.client.rest.fetch_guild(
-                Settings.get(SecretKeys.DEFAULT_GUILD)
-            )
-
-            for role_id in role_reward:
-                try:
-                    await ctx.client.rest.add_role_to_member(
-                        guild=guild, user=ctx.user, role=role_id
-                    )
-                except Exception as e:
-                    raise CommandExecutionError(f"Failed to assign role {role_id}: {e}")
-        except Exception as e:
-            raise CommandExecutionError(f"Failed to assign roles: {e}")
-
-    async def _process_item_rewards(self, user_id: int, item_reward: dict[str, list[str]]) -> None:
-        """Process and assign item rewards to the user."""
-        user_data: UserSchema | None = await UserService.get_user(user_id)
-
-        if not user_data or not user_data.minecraft_username or not user_data.minecraft_uuid:
-            return
-
-        username = user_data.minecraft_username
-        uuid = user_data.minecraft_uuid
-        default_reward = item_reward.get("default", None)
-        final_item_reward: dict[str, list[str]] = {}
-
-        # Map server names to their specific rewards or default rewards
-        for server_name, items in item_reward.items():
-            if server_name in MINECRAFT_SERVERS:
-                # Use server-specific rewards
-                final_item_reward[server_name] = self._process_items(items, username, uuid)
-            elif server_name != "default":  # Skip the default key itself
-                # Use default rewards for non-server keys
-                if default_reward:
-                    final_item_reward[server_name] = self._process_items(
-                        default_reward, username, uuid
-                    )
-
-        # Add items to user inventory in database
-        for server_name, items in final_item_reward.items():
-            if items:  # Only process non-empty item lists
-                await UserService.add_item(user_id, server_name, items)
-
     async def give_rewards(self, ctx: ModalContext, user_id: int) -> None:
         """Give rewards to the user based on configuration."""
         rewards: UserReward | None = self._command_data.reward
         if not rewards:
             return
 
-        # Process role rewards if configured
-        role_reward: list[PositiveInt] | None = rewards.role  # type: ignore
-        if role_reward:
-            await self._assign_role_rewards(ctx, role_reward)
-
-        # Process item rewards if configured
-        item_reward: dict[str, list[str]] | None = rewards.item  # type: ignore
-        if item_reward:
-            await self._process_item_rewards(user_id, item_reward)
+        await MinecraftHelper.add_rewards(ctx.client, ctx.user, rewards)
 
     async def on_submit(self, ctx: ModalContext) -> None:
         """Handle modal submission."""

@@ -33,6 +33,12 @@ class WebSocketKeys(Enum):
     PASSWORD = "server.websocket.auth.password"
 
 
+class EventsKeys(Enum):
+    """Enum for event keys in the configuration."""
+
+    GUILD_BOOST = "events.guild_boost"
+
+
 class CommandsKeys(Enum):
     """Enum for command keys in the configuration."""
 

@@ -1,4 +1,5 @@
 from logging import Logger
+from typing import Sequence
 
 import hikari
 import lightbulb
@@ -10,6 +11,7 @@ from model import SecretKeys
 from settings import Localization, Settings
 
 REQUIRED_PERMISSIONS = 1829587348619263  # Administrator permissions value
+BOOSTER_ROLE: hikari.Role | None = None
 
 loader = lightbulb.Loader()
 logger: Logger = get_logger(__name__)
@@ -17,6 +19,8 @@ logger: Logger = get_logger(__name__)
 
 @loader.listener(hikari.ShardReadyEvent)
 async def on_ready(event: hikari.ShardReadyEvent) -> None:
+    global BOOSTER_ROLE
+
     try:
         # Fetch and validate default guild
         guild: hikari.Guild = await event.app.rest.fetch_guild(
@@ -44,6 +48,9 @@ async def on_ready(event: hikari.ShardReadyEvent) -> None:
             logger.critical("Bot does not have administrator permissions.")
             raise Exception("Bot does not have administrator permissions.")
         logger.info("Bot has the required administrator permissions.")
+
+        guild_roles: Sequence[hikari.Role] = await guild.fetch_roles()
+        BOOSTER_ROLE = next((r for r in guild_roles if r.is_premium_subscriber_role), None)
 
         logger.info("Bot is ready and fully operational.")
     except Exception as e:

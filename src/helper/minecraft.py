@@ -2,12 +2,16 @@ import asyncio
 from logging import Logger
 
 import hikari
+import lightbulb
+from pydantic import PositiveInt
 
 from data_types import TimedDict, TimedSet
 from database.schemas import UserSchema
 from database.services import UserService
 from debug import get_logger
-from model import MessageType
+from model import MessageType, SecretKeys
+from model.schemas import UserReward
+from settings.json_wrapper import Settings
 from websocket.schemas import ResponseAwaitableSchema
 from websocket.schemas.request import (
     DispatchCommandSchema,
@@ -405,6 +409,92 @@ class MinecraftHelper:
         logger.debug(f"Dispatching command(s) to server {server}")
         await WebSocketManager.send_message(DispatchCommandSchema(server=server, commands=commands))
         return True
+
+    @staticmethod
+    def _process_items(items: list[str], username: str, uuid: str) -> list[str]:
+        """Process items by replacing placeholders with actual values."""
+        return [
+            item.replace("{minecraft_username}", username).replace("{minecraft_uuid}", uuid)
+            if isinstance(item, str)
+            else item
+            for item in items
+        ]
+
+    @staticmethod
+    async def add_rewards(
+        client: lightbulb.Client, user: hikari.User, rewards: UserReward | None
+    ) -> bool:
+        """
+        Add rewards to a user including Discord roles and Minecraft items.
+
+        Args:
+            client: The lightbulb client
+            user: The Discord user to reward
+            rewards: The reward configuration
+
+        Returns:
+            True if any rewards were successfully added, False otherwise
+        """
+        if not rewards:
+            logger.debug(f"No rewards to add for user {user.id}")
+            return False
+
+        success = False
+        role_reward: list[PositiveInt] | None = rewards.role  # type: ignore
+        item_reward: dict[str, list[str]] | None = rewards.item  # type: ignore
+
+        # Process role rewards
+        if role_reward:
+            try:
+                guild: hikari.RESTGuild = await client.rest.fetch_guild(
+                    Settings.get(SecretKeys.DEFAULT_GUILD)
+                )
+
+                for role_id in role_reward:
+                    try:
+                        await client.rest.add_role_to_member(guild=guild, user=user, role=role_id)
+                        success = True
+                    except Exception as e:
+                        logger.error(f"Failed to assign role {role_id} to user {user.id}: {e}")
+            except Exception as e:
+                logger.error(f"Failed to fetch guild for role assignment: {e}")
+
+        # Process item rewards
+        if item_reward:
+            user_data: UserSchema | None = await UserService.get_user(user.id)
+
+            if user_data and user_data.minecraft_username and user_data.minecraft_uuid:
+                username = user_data.minecraft_username
+                uuid = user_data.minecraft_uuid
+                default_reward = item_reward.get("default", [])
+                final_item_reward: dict[str, list[str]] = {}
+
+                # Map server names to their specific rewards or default rewards
+                for server_name, items in item_reward.items():
+                    if server_name == "default":
+                        continue
+
+                    if server_name in MINECRAFT_SERVERS:
+                        # Use server-specific rewards
+                        final_item_reward[server_name] = MinecraftHelper._process_items(
+                            items, username, uuid
+                        )
+                    elif default_reward:
+                        # Use default rewards for servers not explicitly configured
+                        final_item_reward[server_name] = MinecraftHelper._process_items(
+                            default_reward, username, uuid
+                        )
+
+                # Add items to user inventory in database
+                try:
+                    for server_name, items in final_item_reward.items():
+                        if items:  # Only process non-empty item lists
+                            await UserService.add_item(user.id, server_name, items)
+                            success = True
+                except Exception as e:
+                    logger.error(f"Failed to add item rewards for user {user.id}: {e}")
+
+        return success
 
     @staticmethod
     async def give_rewards(user: hikari.User | None = None, user_id: int | None = None) -> bool:

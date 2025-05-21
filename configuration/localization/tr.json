@@ -1,332 +1,350 @@
 {
-  "link_account": {
-    "command": {
-      "label": "hesap_bagla",
-      "description": "Hesap bağlama işlemi.",
-      "options": {
-        "username": {
-          "label": "kullanıcı_adı",
-          "description": "Bağlanacak Minecraft kullanıcı adı."
-        }
-      }
-    },
-    "messages": {
-      "minecraft": {
-        "confirmation_code": {
-          "text": "Doğrulama kodunuz <white><bold><hover:show_text:'Kodu kopyalamak için tıklayın'><click:suggest_command:'{confirmation_code}'>{confirmation_code}</click></hover></bold></white>. Lütfen bağlantı işlemini tamamlamak için bu kodu Discord'a girin."
-        },
-        "success": {
-          "text": "Minecraft hesabınız başarıyla Discord hesabınıza bağlandı"
-        },
-        "failure": {
-          "text": "Minecraft hesabınızı bağlarken bir hata oluştu. Lütfen daha sonra tekrar deneyin."
-        }
-      },
-      "user": {
-        "success": {
-          "message_type": "embed",
-          "content": {
-            "title": "Hesap Başarıyla Bağlandı",
-            "description": "Minecraft hesabınız başarıyla Discord hesabınıza bağlandı.",
-            "color": "GREEN"
-          }
-        },
-        "failure": {
-          "message_type": "embed",
-          "content": {
-            "title": "Hesap Bağlama Başarısız",
-            "description": "Minecraft hesabınızı bağlarken bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
-            "color": "RED"
-          }
-        }
-      },
-      "log": {
-        "success": {
-          "message_type": "embed",
-          "content": {
-            "title": "Account Linked",
-            "description": "{discord_user_mention} kullanıcısı Minecraft hesabını bağladı.",
-            "color": "GREEN",
-            "fields": [
-              {
-                "name": "Minecraft Kullanıcı Adı",
-                "value": "{minecraft_username}"
-              },
-              {
-                "name": "Minecraft UUID",
-                "value": "{minecraft_uuid}"
-              }
-            ]
-          }
-        },
-        "failure": {
-          "message_type": "embed",
-          "content": {
-            "title": "Hesap Bağlama Başarısız",
-            "description": "{discord_user_mention} kullanıcısı Minecraft hesabını bağlarken hata oluştu.",
-            "color": "RED",
-            "fields": [
-              {
-                "name": "Hata",
-                "value": "{error_message}"
-              }
-            ]
-          }
-        }
-      }
-    },
-    "modal": {
-      "confirmation": {
-        "title": "Hesap Bağlama Doğrulaması",
-        "fields": {
-          "code": {
-            "style": "SHORT",
-            "label": "Doğrulama Kodu",
-            "placeholder": "Minecraft hesabınıza gönderilen doğrulama kodunu girin."
+  "events": {
+    "guild_boost": {
+      "messages": {
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Sunucu Boost",
+              "description": "{discord_user_mention} kullanıcısı sunucuya boost yaptı.",
+              "color": "GREEN"
+            }
           }
         }
       }
     }
   },
-  "withdraw_rewards": {
-    "command": {
-      "label": "ödül_çek",
-      "description": "Ödüllerinizi çekin."
-    },
-    "messages": {
-      "user": {
-        "success": {
-          "message_type": "embed",
-          "content": {
-            "title": "Ödül Çekme Başarılı",
-            "description": "Ödülleriniz başarıyla çekildi.",
-            "color": "GREEN"
-          }
-        },
-        "failure": {
-          "message_type": "embed",
-          "content": {
-            "title": "Ödül Çekme Başarısız",
-            "description": "Ödüllerinizi çekerken bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
-            "color": "RED"
+  "commands": {
+    "link_account": {
+      "command": {
+        "label": "hesap_bagla",
+        "description": "Hesap bağlama işlemi.",
+        "options": {
+          "username": {
+            "label": "kullanıcı_adı",
+            "description": "Bağlanacak Minecraft kullanıcı adı."
           }
         }
       },
-      "log": {
-        "success": {
-          "message_type": "embed",
-          "content": {
-            "title": "Ödül Çekme Başarılı",
-            "description": "{discord_user_mention} kullanıcısı ödüllerini başarıyla çekti.",
-            "color": "GREEN"
+      "messages": {
+        "minecraft": {
+          "confirmation_code": {
+            "text": "Doğrulama kodunuz <white><bold><hover:show_text:'Kodu kopyalamak için tıklayın'><click:suggest_command:'{confirmation_code}'>{confirmation_code}</click></hover></bold></white>. Lütfen bağlantı işlemini tamamlamak için bu kodu Discord'a girin."
+          },
+          "success": {
+            "text": "Minecraft hesabınız başarıyla Discord hesabınıza bağlandı"
+          },
+          "failure": {
+            "text": "Minecraft hesabınızı bağlarken bir hata oluştu. Lütfen daha sonra tekrar deneyin."
           }
         },
-        "failure": {
-          "message_type": "embed",
-          "content": {
-            "title": "Ödül Çekme Başarısız",
-            "description": "{discord_user_mention} kullanıcısı ödüllerini çekerken hata oluştu.",
-            "color": "RED"
-          }
-        }
-      }
-    }
-  },
-  "ban": {
-    "command": {
-      "label": "yasakla",
-      "description": "Sunucudan bir kullanıcıyı yasakla.",
-      "options": {
         "user": {
-          "label": "kullanıcı",
-          "description": "Yasaklanacak kullanıcı."
-        },
-        "duration": {
-          "label": "süre",
-          "description": "Yasak süresi."
-        },
-        "reason": {
-          "label": "sebep",
-          "description": "Yasaklama sebebi."
-        }
-      }
-    },
-    "messages": {
-      "user": {
-        "success": {
-          "message_type": "plain",
-          "content": {
-            "text": "{discurd_user_mention} kullanıcısı başarıyla yasaklandı."
-          }
-        }
-      }
-    }
-  },
-  "suggest": {
-    "command": {
-      "label": "öneri",
-      "description": "Öneri gönderin."
-    },
-    "messages": {
-      "minecraft": {
-        "approve": {
-          "text": "Öneriniz {discord_staff_username} tarafından onaylandı."
-        },
-        "reject": {
-          "text": "Öneriniz {discord_staff_username} tarafından reddedildi."
-        }
-      },
-      "user": {
-        "success": {
-          "message_type": "embed",
-          "content": {
-            "title": "Öneri Gönderildi",
-            "description": "Öneriniz başarıyla gönderildi.",
-            "color": "GREEN"
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Hesap Başarıyla Bağlandı",
+              "description": "Minecraft hesabınız başarıyla Discord hesabınıza bağlandı.",
+              "color": "GREEN"
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Hesap Bağlama Başarısız",
+              "description": "Minecraft hesabınızı bağlarken bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+              "color": "RED"
+            }
           }
         },
-        "failure": {
-          "message_type": "embed",
-          "content": {
-            "title": "Öneri Gönderme Başarısız",
-            "description": "Önerinizi gönderirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
-            "color": "RED"
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Account Linked",
+              "description": "{discord_user_mention} kullanıcısı Minecraft hesabını bağladı.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Minecraft Kullanıcı Adı",
+                  "value": "{minecraft_username}"
+                },
+                {
+                  "name": "Minecraft UUID",
+                  "value": "{minecraft_uuid}"
+                }
+              ]
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Hesap Bağlama Başarısız",
+              "description": "{discord_user_mention} kullanıcısı Minecraft hesabını bağlarken hata oluştu.",
+              "color": "RED",
+              "fields": [
+                {
+                  "name": "Hata",
+                  "value": "{error_message}"
+                }
+              ]
+            }
           }
         }
       },
-      "log": {
-        "success": {
-          "message_type": "embed",
-          "content": {
-            "title": "Öneri Gönderildi",
-            "description": "{discord_user_mention} kullanıcısı öneri gönderdi.",
-            "color": "GREEN",
-            "fields": [
-              {
-                "name": "Öneri",
-                "value": "{suggestion}"
-              }
-            ]
-          }
-        },
-        "failure": {
-          "message_type": "embed",
-          "content": {
-            "title": "Öneri Gönderme Başarısız",
-            "description": "{discord_user_mention} kullanıcısı öneri gönderirken hata oluştu.",
-            "color": "RED"
-          }
-        },
-        "approve": {
-          "message_type": "embed",
-          "content": {
-            "title": "Öneri Kabul Edildi",
-            "description": "{discord_user_mention}'ın önerisi kabul edildi.",
-            "color": "GREEN",
-            "fields": [
-              {
-                "name": "Yetkili",
-                "value": "{discord_staff_user_mention}"
-              },
-              {
-                "name": "Sebep",
-                "value": "{reason}"
-              },
-              {
-                "name": "Öneri",
-                "value": "{suggestion}"
-              }
-            ]
-          }
-        },
-        "reject": {
-          "message_type": "embed",
-          "content": {
-            "title": "Öneri Reddedildi",
-            "description": "{discord_user_mention}'ın önerisi reddedildi.",
-            "color": "RED",
-            "fields": [
-              {
-                "name": "Yetkili",
-                "value": "{discord_staff_user_mention}"
-              },
-              {
-                "name": "Sebep",
-                "value": "{reason}"
-              },
-              {
-                "name": "Öneri",
-                "value": "{suggestion}"
-              }
-            ]
+      "modal": {
+        "confirmation": {
+          "title": "Hesap Bağlama Doğrulaması",
+          "fields": {
+            "code": {
+              "style": "SHORT",
+              "label": "Doğrulama Kodu",
+              "placeholder": "Minecraft hesabınıza gönderilen doğrulama kodunu girin."
+            }
           }
         }
       }
     },
-    "menu": {
-      "confirmation": {
-        "approve": {
-          "label": "Approve",
-          "emoji": "✅",
-          "style": "SUCCESS"
+    "withdraw_rewards": {
+      "command": {
+        "label": "ödül_çek",
+        "description": "Ödüllerinizi çekin."
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Ödül Çekme Başarılı",
+              "description": "Ödülleriniz başarıyla çekildi.",
+              "color": "GREEN"
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Ödül Çekme Başarısız",
+              "description": "Ödüllerinizi çekerken bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+              "color": "RED"
+            }
+          }
         },
-        "reject": {
-          "label": "Reject",
-          "emoji": "❌",
-          "style": "DANGER"
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Ödül Çekme Başarılı",
+              "description": "{discord_user_mention} kullanıcısı ödüllerini başarıyla çekti.",
+              "color": "GREEN"
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Ödül Çekme Başarısız",
+              "description": "{discord_user_mention} kullanıcısı ödüllerini çekerken hata oluştu.",
+              "color": "RED"
+            }
+          }
         }
       }
     },
-    "modal": {
-      "send": {
-        "title": "Give a Suggestion",
-        "fields": {
-          "suggestion": {
-            "style": "PARAGRAPH",
-            "label": "Suggestion",
-            "placeholder": "Enter your suggestion here."
+    "ban": {
+      "command": {
+        "label": "yasakla",
+        "description": "Sunucudan bir kullanıcıyı yasakla.",
+        "options": {
+          "user": {
+            "label": "kullanıcı",
+            "description": "Yasaklanacak kullanıcı."
+          },
+          "duration": {
+            "label": "süre",
+            "description": "Yasak süresi."
+          },
+          "reason": {
+            "label": "sebep",
+            "description": "Yasaklama sebebi."
           }
         }
       },
-      "respond": {
-        "title": "Respond to Suggestion",
-        "fields": {
-          "response": {
-            "style": "PARAGRAPH",
-            "label": "Response",
-            "placeholder": "Enter your response here."
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "plain",
+            "content": {
+              "text": "{discurd_user_mention} kullanıcısı başarıyla yasaklandı."
+            }
           }
-        }
-      }
-    }
-  },
-  "wiki": {
-    "command": {
-      "label": "wiki",
-      "description": "Wiki'de arama yapın.",
-      "options": {
-        "query": {
-          "label": "sorgu",
-          "description": "Aranacak sorgu."
         }
       }
     },
-    "messages": {
-      "user": {
-        "success": {
-          "message_type": "embed",
-          "content": {
-            "title": "{query} - Wiki Arama Sonucu",
-            "description": "{result}",
-            "color": "BLUE"
+    "suggest": {
+      "command": {
+        "label": "öneri",
+        "description": "Öneri gönderin."
+      },
+      "messages": {
+        "minecraft": {
+          "approve": {
+            "text": "Öneriniz {discord_staff_username} tarafından onaylandı."
+          },
+          "reject": {
+            "text": "Öneriniz {discord_staff_username} tarafından reddedildi."
           }
         },
-        "failure": {
-          "message_type": "embed",
-          "content": {
-            "title": "Wiki Bilgisi Alınamadı",
-            "description": "Aradığınız bilgi bulunamadı.",
-            "color": "RED"
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Öneri Gönderildi",
+              "description": "Öneriniz başarıyla gönderildi.",
+              "color": "GREEN"
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Öneri Gönderme Başarısız",
+              "description": "Önerinizi gönderirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+              "color": "RED"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Öneri Gönderildi",
+              "description": "{discord_user_mention} kullanıcısı öneri gönderdi.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Öneri",
+                  "value": "{suggestion}"
+                }
+              ]
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Öneri Gönderme Başarısız",
+              "description": "{discord_user_mention} kullanıcısı öneri gönderirken hata oluştu.",
+              "color": "RED"
+            }
+          },
+          "approve": {
+            "message_type": "embed",
+            "content": {
+              "title": "Öneri Kabul Edildi",
+              "description": "{discord_user_mention}'ın önerisi kabul edildi.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Yetkili",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Sebep",
+                  "value": "{reason}"
+                },
+                {
+                  "name": "Öneri",
+                  "value": "{suggestion}"
+                }
+              ]
+            }
+          },
+          "reject": {
+            "message_type": "embed",
+            "content": {
+              "title": "Öneri Reddedildi",
+              "description": "{discord_user_mention}'ın önerisi reddedildi.",
+              "color": "RED",
+              "fields": [
+                {
+                  "name": "Yetkili",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Sebep",
+                  "value": "{reason}"
+                },
+                {
+                  "name": "Öneri",
+                  "value": "{suggestion}"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "menu": {
+        "confirmation": {
+          "approve": {
+            "label": "Approve",
+            "emoji": "✅",
+            "style": "SUCCESS"
+          },
+          "reject": {
+            "label": "Reject",
+            "emoji": "❌",
+            "style": "DANGER"
+          }
+        }
+      },
+      "modal": {
+        "send": {
+          "title": "Give a Suggestion",
+          "fields": {
+            "suggestion": {
+              "style": "PARAGRAPH",
+              "label": "Suggestion",
+              "placeholder": "Enter your suggestion here."
+            }
+          }
+        },
+        "respond": {
+          "title": "Respond to Suggestion",
+          "fields": {
+            "response": {
+              "style": "PARAGRAPH",
+              "label": "Response",
+              "placeholder": "Enter your response here."
+            }
+          }
+        }
+      }
+    },
+    "wiki": {
+      "command": {
+        "label": "wiki",
+        "description": "Wiki'de arama yapın.",
+        "options": {
+          "query": {
+            "label": "sorgu",
+            "description": "Aranacak sorgu."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "{query} - Wiki Arama Sonucu",
+              "description": "{result}",
+              "color": "BLUE"
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Wiki Bilgisi Alınamadı",
+              "description": "Aradığınız bilgi bulunamadı.",
+              "color": "RED"
+            }
           }
         }
       }

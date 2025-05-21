@@ -1,326 +1,344 @@
 {
-  "link_account": {
-    "command": {
-      "label": "link_account",
-      "description": "Link your Minecraft account to your Discord account.",
-      "options": {
-        "username": {
-          "label": "username",
-          "description": "The Minecraft username to link."
-        }
-      }
-    },
-    "messages": {
-      "minecraft": {
-        "confirmation_code": {
-          "text": "Your confirmation code is <white><bold><hover:show_text:'Click to copy the code'><click:suggest_command:'{confirmation_code}'>{confirmation_code}</click></hover></bold></white>. Please enter this code in Discord to complete the linking process."
-        },
-        "success": {
-          "text": "Your Minecraft account has been successfully linked to your Discord account."
-        },
-        "failure": {
-          "text": "Failed to link your Minecraft account. Please try again later."
-        }
-      },
-      "user": {
-        "success": {
-          "message_type": "embed",
-          "content": {
-            "title": "Account Successfully Linked",
-            "description": "Your Minecraft account has been successfully linked to your Discord account.",
-            "color": "GREEN"
-          }
-        },
-        "failure": {
-          "message_type": "embed",
-          "content": {
-            "title": "Account Linking Failed",
-            "description": "Failed to link your Minecraft account. Please try again later.",
-            "color": "RED"
-          }
-        }
-      },
-      "log": {
-        "success": {
-          "message_type": "embed",
-          "content": {
-            "title": "Account Linked",
-            "description": "{discord_user_mention} has linked their Minecraft account.",
-            "color": "GREEN",
-            "fields": [
-              {
-                "name": "Minecraft Username",
-                "value": "{minecraft_username}"
-              },
-              {
-                "name": "Minecraft UUID",
-                "value": "{minecraft_uuid}"
-              }
-            ]
-          }
-        },
-        "failure": {
-          "message_type": "embed",
-          "content": {
-            "title": "Account Linking Failed",
-            "description": "{discord_user_mention} failed to link their Minecraft account.",
-            "color": "RED"
-          }
-        }
-      }
-    },
-    "modal": {
-      "confirmation": {
-        "title": "Account Linking Confirmation",
-        "fields": {
-          "code": {
-            "style": "SHORT",
-            "label": "Confirmation Code",
-            "placeholder": "Enter the confirmation code sent to your Minecraft account."
+  "events": {
+    "guild_boost": {
+      "messages": {
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Server Boosted",
+              "description": "{discord_user_mention} has boosted the server.",
+              "color": "GREEN"
+            }
           }
         }
       }
     }
   },
-  "withdraw_rewards": {
-    "command": {
-      "label": "withdraw_rewards",
-      "description": "Withdraw your rewards."
-    },
-    "messages": {
-      "user": {
-        "success": {
-          "message_type": "embed",
-          "content": {
-            "title": "Rewards Withdrawn",
-            "description": "Your rewards have been successfully withdrawn.",
-            "color": "GREEN"
-          }
-        },
-        "failure": {
-          "message_type": "embed",
-          "content": {
-            "title": "Withdrawal Failed",
-            "description": "Failed to withdraw your rewards. Please try again later.",
-            "color": "RED"
+  "commands": {
+    "link_account": {
+      "command": {
+        "label": "link_account",
+        "description": "Link your Minecraft account to your Discord account.",
+        "options": {
+          "username": {
+            "label": "username",
+            "description": "The Minecraft username to link."
           }
         }
       },
-      "log": {
-        "success": {
-          "message_type": "embed",
-          "content": {
-            "title": "Rewards Withdrawn",
-            "description": "{discord_user_mention} has withdrawn their rewards.",
-            "color": "GREEN"
+      "messages": {
+        "minecraft": {
+          "confirmation_code": {
+            "text": "Your confirmation code is <white><bold><hover:show_text:'Click to copy the code'><click:suggest_command:'{confirmation_code}'>{confirmation_code}</click></hover></bold></white>. Please enter this code in Discord to complete the linking process."
+          },
+          "success": {
+            "text": "Your Minecraft account has been successfully linked to your Discord account."
+          },
+          "failure": {
+            "text": "Failed to link your Minecraft account. Please try again later."
           }
         },
-        "failure": {
-          "message_type": "embed",
-          "content": {
-            "title": "Withdrawal Failed",
-            "description": "{discord_user_mention} failed to withdraw their rewards.",
-            "color": "RED"
-          }
-        }
-      }
-    }
-  },
-  "ban": {
-    "command": {
-      "label": "ban",
-      "description": "Ban a user from the server.",
-      "options": {
         "user": {
-          "label": "user",
-          "description": "The user to ban."
-        },
-        "duration": {
-          "label": "duration",
-          "description": "The duration of the ban."
-        },
-        "reason": {
-          "label": "reason",
-          "description": "The reason for the ban."
-        }
-      }
-    },
-    "messages": {
-      "user": {
-        "success": {
-          "message_type": "plain",
-          "content": {
-            "text": "User {discord_user_mention} has been banned successfully."
-          }
-        }
-      }
-    }
-  },
-  "suggest": {
-    "command": {
-      "label": "suggest",
-      "description": "Suggest a feature."
-    },
-    "messages": {
-      "minecraft": {
-        "approve": {
-          "text": "Your suggestion has been approved by {discord_staff_username}."
-        },
-        "reject": {
-          "text": "Your suggestion has been rejected by {discord_staff_username}."
-        }
-      },
-      "user": {
-        "success": {
-          "message_type": "embed",
-          "content": {
-            "title": "Suggestion Submitted",
-            "description": "Your suggestion has been submitted successfully.",
-            "color": "GREEN"
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Account Successfully Linked",
+              "description": "Your Minecraft account has been successfully linked to your Discord account.",
+              "color": "GREEN"
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Account Linking Failed",
+              "description": "Failed to link your Minecraft account. Please try again later.",
+              "color": "RED"
+            }
           }
         },
-        "failure": {
-          "message_type": "embed",
-          "content": {
-            "title": "Suggestion Submission Failed",
-            "description": "Failed to submit your suggestion. Please try again later.",
-            "color": "RED"
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Account Linked",
+              "description": "{discord_user_mention} has linked their Minecraft account.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Minecraft Username",
+                  "value": "{minecraft_username}"
+                },
+                {
+                  "name": "Minecraft UUID",
+                  "value": "{minecraft_uuid}"
+                }
+              ]
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Account Linking Failed",
+              "description": "{discord_user_mention} failed to link their Minecraft account.",
+              "color": "RED"
+            }
           }
         }
       },
-      "log": {
-        "success": {
-          "message_type": "embed",
-          "content": {
-            "title": "Suggestion Submitted",
-            "description": "{discord_user_mention} has submitted a suggestion.",
-            "color": "GREEN",
-            "fields": [
-              {
-                "name": "Suggestion",
-                "value": "{suggestion}"
-              }
-            ]
-          }
-        },
-        "failure": {
-          "message_type": "embed",
-          "content": {
-            "title": "Suggestion Submission Failed",
-            "description": "{discord_user_mention} failed to submit a suggestion.",
-            "color": "RED"
-          }
-        },
-        "approve": {
-          "message_type": "embed",
-          "content": {
-            "title": "Suggestion Approved",
-            "description": "{discord_user_mention}'s suggestion has been approved.",
-            "color": "GREEN",
-            "fields": [
-              {
-                "name": "Moderator",
-                "value": "{discord_staff_user_mention}"
-              },
-              {
-                "name": "Reason",
-                "value": "{reason}"
-              },
-              {
-                "name": "Suggestion",
-                "value": "{suggestion}"
-              }
-            ]
-          }
-        },
-        "reject": {
-          "message_type": "embed",
-          "content": {
-            "title": "Suggestion Rejected",
-            "description": "{discord_user_mention}'s suggestion has been rejected.",
-            "color": "RED",
-            "fields": [
-              {
-                "name": "Moderator",
-                "value": "{discord_staff_user_mention}"
-              },
-              {
-                "name": "Reason",
-                "value": "{reason}"
-              },
-              {
-                "name": "Suggestion",
-                "value": "{suggestion}"
-              }
-            ]
+      "modal": {
+        "confirmation": {
+          "title": "Account Linking Confirmation",
+          "fields": {
+            "code": {
+              "style": "SHORT",
+              "label": "Confirmation Code",
+              "placeholder": "Enter the confirmation code sent to your Minecraft account."
+            }
           }
         }
       }
     },
-    "menu": {
-      "confirmation": {
-        "approve": {
-          "label": "Approve",
-          "emoji": "✅",
-          "style": "SUCCESS"
+    "withdraw_rewards": {
+      "command": {
+        "label": "withdraw_rewards",
+        "description": "Withdraw your rewards."
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Rewards Withdrawn",
+              "description": "Your rewards have been successfully withdrawn.",
+              "color": "GREEN"
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Withdrawal Failed",
+              "description": "Failed to withdraw your rewards. Please try again later.",
+              "color": "RED"
+            }
+          }
         },
-        "reject": {
-          "label": "Reject",
-          "emoji": "❌",
-          "style": "DANGER"
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Rewards Withdrawn",
+              "description": "{discord_user_mention} has withdrawn their rewards.",
+              "color": "GREEN"
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Withdrawal Failed",
+              "description": "{discord_user_mention} failed to withdraw their rewards.",
+              "color": "RED"
+            }
+          }
         }
       }
     },
-    "modal": {
-      "send": {
-        "title": "Give a Suggestion",
-        "fields": {
-          "suggestion": {
-            "style": "PARAGRAPH",
-            "label": "Suggestion",
-            "placeholder": "Enter your suggestion here."
+    "ban": {
+      "command": {
+        "label": "ban",
+        "description": "Ban a user from the server.",
+        "options": {
+          "user": {
+            "label": "user",
+            "description": "The user to ban."
+          },
+          "duration": {
+            "label": "duration",
+            "description": "The duration of the ban."
+          },
+          "reason": {
+            "label": "reason",
+            "description": "The reason for the ban."
           }
         }
       },
-      "respond": {
-        "title": "Respond to Suggestion",
-        "fields": {
-          "response": {
-            "style": "PARAGRAPH",
-            "label": "Response",
-            "placeholder": "Enter your response here."
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "plain",
+            "content": {
+              "text": "User {discord_user_mention} has been banned successfully."
+            }
           }
-        }
-      }
-    }
-  },
-  "wiki": {
-    "command": {
-      "label": "wiki",
-      "description": "Get information from the wiki.",
-      "options": {
-        "query": {
-          "label": "query",
-          "description": "The query to search for."
         }
       }
     },
-    "messages": {
-      "user": {
-        "success": {
-          "message_type": "embed",
-          "content": {
-            "title": "{query} - Wiki Search Result",
-            "description": "{result}",
-            "color": "BLUE"
+    "suggest": {
+      "command": {
+        "label": "suggest",
+        "description": "Suggest a feature."
+      },
+      "messages": {
+        "minecraft": {
+          "approve": {
+            "text": "Your suggestion has been approved by {discord_staff_username}."
+          },
+          "reject": {
+            "text": "Your suggestion has been rejected by {discord_staff_username}."
           }
         },
-        "failure": {
-          "message_type": "embed",
-          "content": {
-            "title": "Wiki Search Failed",
-            "description": "Failed to retrieve the wiki information. Please try again later.",
-            "color": "RED"
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Suggestion Submitted",
+              "description": "Your suggestion has been submitted successfully.",
+              "color": "GREEN"
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Suggestion Submission Failed",
+              "description": "Failed to submit your suggestion. Please try again later.",
+              "color": "RED"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Suggestion Submitted",
+              "description": "{discord_user_mention} has submitted a suggestion.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Suggestion",
+                  "value": "{suggestion}"
+                }
+              ]
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Suggestion Submission Failed",
+              "description": "{discord_user_mention} failed to submit a suggestion.",
+              "color": "RED"
+            }
+          },
+          "approve": {
+            "message_type": "embed",
+            "content": {
+              "title": "Suggestion Approved",
+              "description": "{discord_user_mention}'s suggestion has been approved.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Moderator",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Reason",
+                  "value": "{reason}"
+                },
+                {
+                  "name": "Suggestion",
+                  "value": "{suggestion}"
+                }
+              ]
+            }
+          },
+          "reject": {
+            "message_type": "embed",
+            "content": {
+              "title": "Suggestion Rejected",
+              "description": "{discord_user_mention}'s suggestion has been rejected.",
+              "color": "RED",
+              "fields": [
+                {
+                  "name": "Moderator",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Reason",
+                  "value": "{reason}"
+                },
+                {
+                  "name": "Suggestion",
+                  "value": "{suggestion}"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "menu": {
+        "confirmation": {
+          "approve": {
+            "label": "Approve",
+            "emoji": "✅",
+            "style": "SUCCESS"
+          },
+          "reject": {
+            "label": "Reject",
+            "emoji": "❌",
+            "style": "DANGER"
+          }
+        }
+      },
+      "modal": {
+        "send": {
+          "title": "Give a Suggestion",
+          "fields": {
+            "suggestion": {
+              "style": "PARAGRAPH",
+              "label": "Suggestion",
+              "placeholder": "Enter your suggestion here."
+            }
+          }
+        },
+        "respond": {
+          "title": "Respond to Suggestion",
+          "fields": {
+            "response": {
+              "style": "PARAGRAPH",
+              "label": "Response",
+              "placeholder": "Enter your response here."
+            }
+          }
+        }
+      }
+    },
+    "wiki": {
+      "command": {
+        "label": "wiki",
+        "description": "Get information from the wiki.",
+        "options": {
+          "query": {
+            "label": "query",
+            "description": "The query to search for."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "{query} - Wiki Search Result",
+              "description": "{result}",
+              "color": "BLUE"
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Wiki Search Failed",
+              "description": "Failed to retrieve the wiki information. Please try again later.",
+              "color": "RED"
+            }
           }
         }
       }

@@ -93,8 +93,8 @@ class CommandHelper:
         self.command_log_channel = None
 
         if isinstance(command_info, LoggedCommandConfig):
-            self.command_log_enabled = bool(command_info.log)
-            self.command_log_channel = command_info.log
+            self.command_log_enabled: bool = command_info.log is not None
+            self.command_log_channel: PositiveInt | None = command_info.log
             logger.debug(
                 f"[Command: {self.command_name}] Logging configured - Enabled: {self.command_log_enabled}, "
                 f"Channel: {self.command_log_channel}"

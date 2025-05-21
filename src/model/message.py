@@ -4,54 +4,58 @@ from enum import Enum
 class CommandKeys(Enum):
     """Command keys for the bot"""
 
-    LINK_ACCOUNT_LABEL = "link_account.command.label"
-    LINK_ACCOUNT_DESCRIPTION = "link_account.command.description"
-    LINK_ACCOUNT_OPTIONS = "link_account.command.options"
+    LINK_ACCOUNT_LABEL = "commands.link_account.command.label"
+    LINK_ACCOUNT_DESCRIPTION = "commands.link_account.command.description"
+    LINK_ACCOUNT_OPTIONS = "commands.link_account.command.options"
 
-    WITHDRAW_REWARDS_LABEL = "withdraw_rewards.command.label"
-    WITHDRAW_REWARDS_DESCRIPTION = "withdraw_rewards.command.description"
+    WITHDRAW_REWARDS_LABEL = "commands.withdraw_rewards.command.label"
+    WITHDRAW_REWARDS_DESCRIPTION = "commands.withdraw_rewards.command.description"
 
-    BAN_LABEL = "ban.command.label"
-    BAN_DESCRIPTION = "ban.command.description"
-    BAN_OPTIONS = "ban.command.options"
+    BAN_LABEL = "commands.ban.command.label"
+    BAN_DESCRIPTION = "commands.ban.command.description"
+    BAN_OPTIONS = "commands.ban.command.options"
 
-    SUGGEST_LABEL = "suggest.command.label"
-    SUGGEST_DESCRIPTION = "suggest.command.description"
+    SUGGEST_LABEL = "commands.suggest.command.label"
+    SUGGEST_DESCRIPTION = "commands.suggest.command.description"
 
-    WIKI_LABEL = "wiki.command.label"
-    WIKI_DESCRIPTION = "wiki.command.description"
-    WIKI_OPTIONS = "wiki.command.options"
+    WIKI_LABEL = "commands.wiki.command.label"
+    WIKI_DESCRIPTION = "commands.wiki.command.description"
+    WIKI_OPTIONS = "commands.wiki.command.options"
 
 
 class MessageKeys(Enum):
     """Message keys for the bot"""
 
-    LINK_ACCOUNT_MINECRAFT_CONFIRMATION_CODE = "link_account.messages.minecraft.confirmation_code"
-    LINK_ACCOUNT_MINECRAFT_SUCCESS = "link_account.messages.minecraft.success"
-    LINK_ACCOUNT_MINECRAFT_FAILURE = "link_account.messages.minecraft.failure"
-    LINK_ACCOUNT_USER_SUCCESS = "link_account.messages.user.success"
-    LINK_ACCOUNT_USER_FAILURE = "link_account.messages.user.failure"
-    LINK_ACCOUNT_LOG_SUCCESS = "link_account.messages.log.success"
-    LINK_ACCOUNT_LOG_FAILURE = "link_account.messages.log.failure"
+    GUILD_BOOST_LOG_SUCCESS = "events.guild_boost.messages.log.success"
 
-    WITHDRAW_REWARDS_USER_SUCCESS = "withdraw_rewards.messages.user.success"
-    WITHDRAW_REWARDS_USER_FAILURE = "withdraw_rewards.messages.user.failure"
-    WITHDRAW_REWARDS_LOG_SUCCESS = "withdraw_rewards.messages.log.success"
-    WITHDRAW_REWARDS_LOG_FAILURE = "withdraw_rewards.messages.log.failure"
+    LINK_ACCOUNT_MINECRAFT_CONFIRMATION_CODE = (
+        "commands.link_account.messages.minecraft.confirmation_code"
+    )
+    LINK_ACCOUNT_MINECRAFT_SUCCESS = "commands.link_account.messages.minecraft.success"
+    LINK_ACCOUNT_MINECRAFT_FAILURE = "commands.link_account.messages.minecraft.failure"
+    LINK_ACCOUNT_USER_SUCCESS = "commands.link_account.messages.user.success"
+    LINK_ACCOUNT_USER_FAILURE = "commands.link_account.messages.user.failure"
+    LINK_ACCOUNT_LOG_SUCCESS = "commands.link_account.messages.log.success"
+    LINK_ACCOUNT_LOG_FAILURE = "commands.link_account.messages.log.failure"
 
-    BAN_COMMAND_USER_SUCCESS = "ban.messages.user.success"
+    WITHDRAW_REWARDS_USER_SUCCESS = "commands.withdraw_rewards.messages.user.success"
+    WITHDRAW_REWARDS_USER_FAILURE = "commands.withdraw_rewards.messages.user.failure"
+    WITHDRAW_REWARDS_LOG_SUCCESS = "commands.withdraw_rewards.messages.log.success"
+    WITHDRAW_REWARDS_LOG_FAILURE = "commands.withdraw_rewards.messages.log.failure"
 
-    SUGGEST_MINECRAFT_APPROVE = "suggest.messages.minecraft.approve"
-    SUGGEST_MINECRAFT_REJECT = "suggest.messages.minecraft.reject"
-    SUGGEST_USER_SUCCESS = "suggest.messages.user.success"
-    SUGGEST_USER_FAILURE = "suggest.messages.user.failure"
-    SUGGEST_LOG_SUCCESS = "suggest.messages.log.success"
-    SUGGEST_LOG_FAILURE = "suggest.messages.log.failure"
-    SUGGEST_LOG_APPROVE = "suggest.messages.log.approve"
-    SUGGEST_LOG_REJECT = "suggest.messages.log.reject"
+    BAN_COMMAND_USER_SUCCESS = "commands.ban.messages.user.success"
 
-    WIKI_COMMAND_USER_SUCCESS = "wiki.messages.user.success"
-    WIKI_COMMAND_USER_FAILURE = "wiki.messages.user.failure"
+    SUGGEST_MINECRAFT_APPROVE = "commands.suggest.messages.minecraft.approve"
+    SUGGEST_MINECRAFT_REJECT = "commands.suggest.messages.minecraft.reject"
+    SUGGEST_USER_SUCCESS = "commands.suggest.messages.user.success"
+    SUGGEST_USER_FAILURE = "commands.suggest.messages.user.failure"
+    SUGGEST_LOG_SUCCESS = "commands.suggest.messages.log.success"
+    SUGGEST_LOG_FAILURE = "commands.suggest.messages.log.failure"
+    SUGGEST_LOG_APPROVE = "commands.suggest.messages.log.approve"
+    SUGGEST_LOG_REJECT = "commands.suggest.messages.log.reject"
+
+    WIKI_COMMAND_USER_SUCCESS = "commands.wiki.messages.user.success"
+    WIKI_COMMAND_USER_FAILURE = "commands.wiki.messages.user.failure"
 
     GENERAL_SUCCESS = "general.success"
     GENERAL_FAILURE = "general.failure"
@@ -69,12 +73,12 @@ class MessageKeys(Enum):
 class ModalKeys(Enum):
     """Modal keys for the bot"""
 
-    LINK_ACCOUNT_CONFIRMATION = "link_account.modal.confirmation"
-    SUGGEST_SEND = "suggest.modal.send"
-    SUGGEST_RESPOND = "suggest.modal.respond"
+    LINK_ACCOUNT_CONFIRMATION = "commands.link_account.modal.confirmation"
+    SUGGEST_SEND = "commands.suggest.modal.send"
+    SUGGEST_RESPOND = "commands.suggest.modal.respond"
 
 
 class MenuKeys(Enum):
     """Menu keys for the bot"""
 
-    SUGGEST_CONFIRMATION = "suggest.menu.confirmation"
+    SUGGEST_CONFIRMATION = "commands.suggest.menu.confirmation"

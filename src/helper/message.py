@@ -5,7 +5,7 @@ import hikari
 import lightbulb
 
 from debug import get_logger
-from helper import ChannelHelper, CommandHelper
+from helper import ChannelHelper, CommandHelper, EventHelper
 from model import DiscordEmbed, DiscordMessage, MessageKeys, TextMessage
 from settings import Localization
 
@@ -219,7 +219,7 @@ class MessageHelper:
     async def send_to_log_channel(
         self,
         client: lightbulb.Client,
-        helper: CommandHelper,
+        helper: CommandHelper | EventHelper,
         components: Sequence[hikari.api.ComponentBuilder] | None = None,
     ) -> hikari.Message | None:
         """
@@ -230,7 +230,7 @@ class MessageHelper:
 
         Args:
             client: The Lightbulb client instance.
-            helper: The CommandHelper instance to check logging configuration.
+            helper: The (CommandHelper | EventHelper) instance to check logging configuration.
 
         Returns:
             None: The method returns early if logging is disabled or no channel is configured.

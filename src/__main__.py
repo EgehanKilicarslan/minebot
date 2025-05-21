@@ -89,7 +89,7 @@ if __name__ == "__main__":
                 await menu.attach(client, wait=False, timeout=None)
 
             # Load extensions and events
-            await client.load_extensions_from_package(events)
+            await client.load_extensions_from_package(events, recursive=True)
             await client.load_extensions_from_package(extensions, recursive=True)
             await client.start()
             await websocket.start()
@@ -101,14 +101,38 @@ if __name__ == "__main__":
             await client.stop()
             await close_database()
 
+        # Prepare status
+        status_value = Settings.get(BotKeys.STATUS)
+        status = (
+            getattr(hikari.Status, status_value)
+            if status_value is not None
+            else hikari.Status.ONLINE
+        )
+
+        # Prepare activity
+        activity = None
+        name = Settings.get(BotKeys.NAME)
+        if name is not None:
+            activity_args = {"name": name}
+
+            # Add optional parameters
+            state = Settings.get(BotKeys.STATE)
+            if state is not None:
+                activity_args["state"] = state
+
+            url = Settings.get(BotKeys.URL)
+            if url is not None:
+                activity_args["url"] = url
+
+            type_value = Settings.get(BotKeys.TYPE)
+            if type_value is not None:
+                activity_args["type"] = getattr(hikari.ActivityType, type_value)
+
+            activity = hikari.Activity(**activity_args)
+
         bot.run(
-            status=getattr(hikari.Status, Settings.get(BotKeys.STATUS)),
-            activity=hikari.Activity(
-                name=Settings.get(BotKeys.NAME),
-                state=Settings.get(BotKeys.STATE),
-                url=Settings.get(BotKeys.URL),
-                type=getattr(hikari.ActivityType, Settings.get(BotKeys.TYPE)),
-            ),
+            status=status,
+            activity=activity,
         )
     except Exception as e:
         logger.critical(f"Failed to start bot: {e}")

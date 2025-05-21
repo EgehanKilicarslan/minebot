@@ -240,6 +240,18 @@ class ServerConfiguration(BaseModel):
     websocket: WebSocketConfig
 
 
+class BasicEvent(BaseModel):
+    log: PositiveInt | None = None
+
+
+class GuildBoostEvent(BasicEvent):
+    reward: UserReward | None = None
+
+
+class EventConfiguration(BaseModel):
+    guild_boost: GuildBoostEvent | None = None
+
+
 class CommandCooldown(BaseModel):
     algorithm: str = Field(..., pattern=r"^(fixed_window|sliding_window)$")
     bucket: str = Field(..., pattern=r"^(global|user|channel|guild)$")
@@ -285,9 +297,10 @@ class CommandConfiguration(BaseModel):
 class BotSettings(BaseModel):
     secret: BotCredentials
     database: DatabaseConnection
-    bot: BotConfiguration
+    bot: BotConfiguration | None = None
     server: ServerConfiguration | None = None
-    commands: CommandConfiguration
+    events: EventConfiguration | None = None
+    commands: CommandConfiguration | None = None
 
 
 # ==== Localization Schema ====
@@ -428,12 +441,35 @@ class WikiLocalization(BaseModel):
     messages: WikiMessages
 
 
-class GeneralMessages(BaseModel):
+class CommandLocalization(BaseModel):
+    link_account: LinkAccountLocalization
+    withdraw_rewards: WithdrawRewardsLocalization
+    ban: BanLocalization
+    suggest: SuggestLocalization
+    wiki: WikiLocalization
+
+
+class GuildBoostMessages(BaseModel):
+    class Log(BaseModel):
+        success: DiscordMessage
+
+    log: Log
+
+
+class GuildBoostLocalization(BaseModel):
+    messages: GuildBoostMessages
+
+
+class EventLocalization(BaseModel):
+    guild_boost: GuildBoostLocalization
+
+
+class GeneralLocalization(BaseModel):
     success: DiscordMessage
     failure: DiscordMessage
 
 
-class ErrorMessages(BaseModel):
+class ErrorLocalization(BaseModel):
     unknown_error: DiscordMessage
     timeout_error: DiscordMessage
     channel_not_found_error: DiscordMessage
@@ -446,10 +482,7 @@ class ErrorMessages(BaseModel):
 
 class LocalizationData(BaseModel):
     locale: str
-    link_account: LinkAccountLocalization
-    withdraw_rewards: WithdrawRewardsLocalization
-    ban: BanLocalization
-    suggest: SuggestLocalization
-    wiki: WikiLocalization
-    general: GeneralMessages
-    error: ErrorMessages
+    events: EventLocalization
+    commands: CommandLocalization
+    general: GeneralLocalization
+    error: ErrorLocalization

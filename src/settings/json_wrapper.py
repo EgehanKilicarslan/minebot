@@ -16,7 +16,14 @@ from model import BotSettings, LocalizationData, config, message
 
 logger: logging.Logger = get_logger(__name__)
 
-SettingsType = config.SecretKeys | config.DatabaseKeys | config.CommandsKeys | config.WebSocketKeys
+SettingsType = (
+    config.SecretKeys
+    | config.DatabaseKeys
+    | config.BotKeys
+    | config.EventsKeys
+    | config.CommandsKeys
+    | config.WebSocketKeys
+)
 LocalizationType = message.CommandKeys | message.MessageKeys | message.ModalKeys | message.MenuKeys
 
 DEFAULT_CONFIG_PATH: Final[Path] = Path("configuration/settings.json").resolve()
@@ -333,10 +340,16 @@ class Localization:
             try:
                 hikari_locale = hikari.Locale(locale)
 
-                # Process commands (e.g., ban command)
-                # We'll directly access the structure we know exists based on the model
-                for command_name, command_data in vars(locale_data).items():
-                    # Skip non-command attributes like 'locale' or 'error'
+                # Access commands through the commands attribute
+                if not hasattr(locale_data, "commands"):
+                    logger.warning(f"No commands found in locale data for {locale}")
+                    continue
+
+                commands_data = locale_data.commands
+
+                # Process each command in the commands section
+                for command_name, command_data in vars(commands_data).items():
+                    # Skip non-command attributes
                     if not hasattr(command_data, "command"):
                         continue
 
