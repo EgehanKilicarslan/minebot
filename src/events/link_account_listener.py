@@ -5,7 +5,7 @@ import lightbulb
 
 from database.schemas import UserSchema
 from database.services import UserService
-from debug import debugger
+from debug import get_logger
 from helper import CommandHelper
 from model import CommandsKeys
 from model.schemas import LinkAccountCommandConfig, UserReward
@@ -13,7 +13,8 @@ from settings import Settings
 
 helper: CommandHelper = CommandHelper(CommandsKeys.LINK_ACCOUNT)
 loader: lightbulb.Loader = helper.get_loader()
-logger: Logger = debugger.get_logger(__name__)
+
+logger: Logger = get_logger(__name__)
 
 
 @loader.listener(hikari.MemberCreateEvent)
