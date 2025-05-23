@@ -59,7 +59,7 @@ async def on_guild_boost(event: hikari.MemberUpdateEvent, client: lightbulb.Clie
     # Find and cache the booster role if needed
     if not BOOSTER_ROLE:
         logger.info("Booster role not cached, attempting to find it")
-        BOOSTER_ROLE: hikari.Role | None = await find_booster_role(guild)
+        BOOSTER_ROLE = await find_booster_role(guild)
         if not BOOSTER_ROLE:
             logger.error(f"Couldn't find booster role in guild {guild.id}")
             return
