@@ -1,3 +1,4 @@
+import inspect
 from logging import Logger
 from typing import Any, Callable
 
@@ -35,6 +36,7 @@ def websocket_action(
             action_handlers[action_name] = {
                 "handler": func,
                 "schema": schema,
+                "signature": inspect.signature(func),
             }
 
             # Only log at debug level instead of info to reduce noise

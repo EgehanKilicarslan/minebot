@@ -1,7 +1,5 @@
 from logging import Logger
 
-from websockets import ServerConnection
-
 from debug import get_logger
 from helper import PLAYER_SERVERS
 
@@ -12,7 +10,7 @@ logger: Logger = get_logger(__name__)
 
 
 @websocket_action("player-server-check", PlayerServerCheckSchema)
-async def player_server_check(websocket: ServerConnection, data: PlayerServerCheckSchema) -> None:
+async def player_server_check(data: PlayerServerCheckSchema) -> None:
     logger.debug(
         f"Received player status check request: username={data.username}, uuid={data.uuid}, server={data.server}"
     )

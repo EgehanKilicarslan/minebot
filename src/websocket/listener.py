@@ -1,8 +1,10 @@
 import asyncio
+import inspect
 import json
 from logging import Logger
 from typing import Any, Callable
 
+import lightbulb
 from pydantic import BaseModel, ValidationError
 from websockets import ServerConnection
 
@@ -19,7 +21,7 @@ logger: Logger = get_logger(__name__)
 authenticated_client: dict[int, tuple[ServerConnection, AuthenticateSchema]] = {}
 
 
-async def handle_connection(websocket: ServerConnection) -> None:
+async def handle_connection(websocket: ServerConnection, client: lightbulb.Client) -> None:
     """
     Handle an incoming WebSocket connection.
 
@@ -31,6 +33,7 @@ async def handle_connection(websocket: ServerConnection) -> None:
 
     Args:
         websocket: The WebSocket connection object.
+        bot_client: The Discord bot client for performing Discord operations.
     """
     allowed_ip = Settings.get(WebSocketKeys.ALLOWED_IP)
     client_ip = websocket.remote_address[0] if websocket.remote_address else None
@@ -85,10 +88,27 @@ async def handle_connection(websocket: ServerConnection) -> None:
                 if action_info:
                     handler: Callable | None = action_info.get("handler")
                     schema: type[BaseModel] | None = action_info.get("schema")
+                    signature: inspect.Signature | None = action_info.get("signature")
 
                     if handler and schema:
                         try:
-                            await handler(websocket, schema(**data))
+                            # Create parameters based on function signature
+                            validated_data = schema(**data)
+                            kwargs = {}
+
+                            if signature:
+                                param_names = signature.parameters.keys()
+
+                                # Only pass parameters that the handler function expects
+                                if "websocket" in param_names:
+                                    kwargs["websocket"] = websocket
+                                if "data" in param_names:
+                                    kwargs["data"] = validated_data
+                                if "client" in param_names and client:
+                                    kwargs["client"] = client
+
+                            await handler(**kwargs)
+
                             # Mark authentication as complete if this was an auth request and it succeeded
                             if action == "authenticate" and client_id in authenticated_client:
                                 auth_complete = True

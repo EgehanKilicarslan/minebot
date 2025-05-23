@@ -1,7 +1,5 @@
 from logging import Logger
 
-from websockets import ServerConnection
-
 from debug import get_logger
 from helper import ONLINE_PLAYERS
 from helper.minecraft import PLAYER_UUIDS
@@ -13,7 +11,7 @@ logger: Logger = get_logger(__name__)
 
 
 @websocket_action("player-status-check", PlayerStatusCheckSchema)
-async def player_status_check(websocket: ServerConnection, data: PlayerStatusCheckSchema) -> None:
+async def player_status_check(data: PlayerStatusCheckSchema) -> None:
     logger.debug(
         f"Received player status check request: username={data.username}, uuid={data.uuid}, online={data.online}"
     )

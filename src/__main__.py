@@ -34,7 +34,6 @@ if __name__ == "__main__":
     try:
         Settings.initialize()
         Localization.initialize()
-        websocket = WebSocketServer()
 
         bot = hikari.GatewayBot(
             token=Settings.get(SecretKeys.TOKEN),
@@ -46,6 +45,8 @@ if __name__ == "__main__":
         client: GatewayEnabledClient = lightbulb.client_from_app(
             bot, localization_provider=Localization.serialize(), hooks=[add_or_update_user]
         )
+
+        websocket = WebSocketServer(client)
 
         @client.error_handler
         async def handler(exc: lightbulb.exceptions.ExecutionPipelineFailedException) -> bool:
