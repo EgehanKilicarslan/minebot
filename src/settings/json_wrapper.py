@@ -24,7 +24,13 @@ SettingsType = (
     | config.CommandsKeys
     | config.WebSocketKeys
 )
-LocalizationType = message.CommandKeys | message.MessageKeys | message.ModalKeys | message.MenuKeys
+LocalizationType = (
+    message.CommandKeys
+    | message.MessageKeys
+    | message.ModalKeys
+    | message.MenuKeys
+    | message.TimeUnitKeys
+)
 
 DEFAULT_CONFIG_PATH: Final[Path] = Path("configuration/settings.json").resolve()
 DEFAULT_LOCALIZATION_PATH: Final[Path] = Path("configuration/localization").resolve()

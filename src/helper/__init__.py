@@ -12,6 +12,7 @@ from .menu import MenuHelper
 from .message import MessageHelper
 from .minecraft import MINECRAFT_SERVERS, ONLINE_PLAYERS, PLAYER_SERVERS, MinecraftHelper
 from .modal import ModalHelper
+from .time import TimeHelper
 from .wiki import WikiHelper
 
 __all__: list[str] = [
@@ -25,5 +26,6 @@ __all__: list[str] = [
     "PLAYER_SERVERS",
     "MINECRAFT_SERVERS",
     "ModalHelper",
+    "TimeHelper",
     "WikiHelper",
 ]

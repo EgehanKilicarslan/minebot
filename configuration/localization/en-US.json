@@ -469,5 +469,35 @@
         ]
       }
     }
+  },
+  "time_units": {
+    "year": {
+      "singular": ["year", "yr", "y"],
+      "plural": ["years", "yrs", "y"]
+    },
+    "month": {
+      "singular": ["month", "mo"],
+      "plural": ["months", "mos"]
+    },
+    "week": {
+      "singular": ["week", "wk", "w"],
+      "plural": ["weeks", "wks", "w"]
+    },
+    "day": {
+      "singular": ["day", "d"],
+      "plural": ["days", "d"]
+    },
+    "hour": {
+      "singular": ["hour", "hr", "h"],
+      "plural": ["hours", "hrs", "h"]
+    },
+    "minute": {
+      "singular": ["minute", "min", "m"],
+      "plural": ["minutes", "mins", "m"]
+    },
+    "second": {
+      "singular": ["second", "sec", "s"],
+      "plural": ["seconds", "secs", "s"]
+    }
   }
 }

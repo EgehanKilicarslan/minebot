@@ -82,3 +82,15 @@ class MenuKeys(Enum):
     """Menu keys for the bot"""
 
     SUGGEST_CONFIRMATION = "commands.suggest.menu.confirmation"
+
+
+class TimeUnitKeys(Enum):
+    """Time unit keys for the bot"""
+
+    YEAR = "time_units.year"
+    MONTH = "time_units.month"
+    WEEK = "time_units.week"
+    DAY = "time_units.day"
+    HOUR = "time_units.hour"
+    MINUTE = "time_units.minute"
+    SECOND = "time_units.second"

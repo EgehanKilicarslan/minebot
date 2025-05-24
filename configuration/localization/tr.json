@@ -469,5 +469,35 @@
         ]
       }
     }
+  },
+  "time_units": {
+    "year": {
+      "singular": ["yıl", "sene", "yl", "y"],
+      "plural": ["yıllar", "seneler", "yl", "y"]
+    },
+    "month": {
+      "singular": ["ay"],
+      "plural": ["aylar"]
+    },
+    "week": {
+      "singular": ["hafta", "hft"],
+      "plural": ["haftalar", "hft"]
+    },
+    "day": {
+      "singular": ["gün", "g"],
+      "plural": ["günler", "g"]
+    },
+    "hour": {
+      "singular": ["saat", "sa"],
+      "plural": ["saatler", "sa"]
+    },
+    "minute": {
+      "singular": ["dakika", "dk"],
+      "plural": ["dakikalar", "dk"]
+    },
+    "second": {
+      "singular": ["saniye", "sn"],
+      "plural": ["saniyeler", "sn"]
+    }
   }
 }

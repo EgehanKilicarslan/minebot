@@ -137,12 +137,12 @@ class UserReward(BaseModel):
     role: PositiveInt | list[PositiveInt] | None = None
     item: dict[str, str | list[str]] | None = None
 
-    @field_validator("role")
+    @field_validator("role", mode="before")
     @classmethod
     def ensure_role_id_is_list(cls, v: PositiveInt | list[PositiveInt]) -> list[PositiveInt]:
         return [v] if isinstance(v, int) else v
 
-    @field_validator("item")
+    @field_validator("item", mode="before")
     @classmethod
     def ensure_command_is_list(cls, v: str | list[str]) -> list[str]:
         return [v] if isinstance(v, str) else v
@@ -480,9 +480,29 @@ class ErrorLocalization(BaseModel):
     player_not_online: DiscordMessage
 
 
+class TimeUnitsLocalization(BaseModel):
+    class BasicUnit(BaseModel):
+        singular: str | list[str]
+        plural: str | list[str]
+
+        @field_validator("singular", "plural", mode="before")
+        @classmethod
+        def ensure_as_list(cls, v: str | list[str]) -> list[str]:
+            return [v] if isinstance(v, str) else v
+
+    year: BasicUnit
+    month: BasicUnit
+    week: BasicUnit
+    day: BasicUnit
+    hour: BasicUnit
+    minute: BasicUnit
+    second: BasicUnit
+
+
 class LocalizationData(BaseModel):
     locale: str
     events: EventLocalization
     commands: CommandLocalization
     general: GeneralLocalization
     error: ErrorLocalization
+    time_units: TimeUnitsLocalization
