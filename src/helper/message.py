@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Any, Sequence, cast
+from typing import Any, Literal, Sequence, cast, overload
 
 import hikari
 import lightbulb
@@ -15,6 +15,9 @@ logger: Logger = get_logger(__name__)
 ContextType = (
     lightbulb.Context | lightbulb.components.MenuContext | lightbulb.components.ModalContext
 )
+
+# Replace DecodeType with more specific typing
+MessagePairMode = Literal["text", "embed", "mixed"]
 
 
 class MessageHelper:
@@ -178,6 +181,87 @@ class MessageHelper:
         logger.debug(f"[Message: {self.key.name}] Building embed message")
         content = cast(DiscordEmbed, content)
         return self._decode_embed(content)
+
+    @overload
+    def get_localized_message_pair(self, mode: Literal["text"]) -> tuple[str, str]: ...
+
+    @overload
+    def get_localized_message_pair(
+        self, mode: Literal["embed"]
+    ) -> tuple[hikari.Embed, hikari.Embed]: ...
+
+    @overload
+    def get_localized_message_pair(
+        self, mode: Literal["mixed"]
+    ) -> tuple[str | hikari.Embed, str | hikari.Embed]: ...
+
+    def get_localized_message_pair(
+        self, mode: MessagePairMode = "mixed"
+    ) -> (
+        tuple[str, str]
+        | tuple[hikari.Embed, hikari.Embed]
+        | tuple[str | hikari.Embed, str | hikari.Embed]
+    ):
+        """
+        Creates a pair of messages: one in the user's preferred locale and one in the default locale.
+
+        This method generates two versions of the same message using the current key and format parameters:
+        1. First message using the currently set locale (user's preference)
+        2. Second message using the system default locale
+
+        Args:
+            mode: The format mode for the message pair:
+                - "text": Force both messages to be plain text
+                - "embed": Force both messages to be embeds
+                - "mixed": Let each message be its natural type (text or embed)
+
+        Returns:
+            A tuple containing:
+                - First element: Message in user's preferred locale
+                - Second element: Same message in system default locale
+
+        Note:
+            This method temporarily modifies the instance's locale attribute but restores
+            it before returning.
+        """
+        # Store original locale to restore it later
+        original_locale = self.locale
+
+        try:
+            # Choose decoder method based on mode
+            if mode == "text":
+                # Use plain text decoder for string pairs
+                user_message = self._decode_plain()
+
+                # Create message with default locale
+                self.locale = None
+                default_message = self._decode_plain()
+
+                return (user_message, default_message)
+
+            elif mode == "embed":
+                # Use embed decoder for embed pairs
+                user_message = self._decode_embed()
+
+                # Create message with default locale
+                self.locale = None
+                default_message = self._decode_embed()
+
+                return (user_message, default_message)
+
+            else:  # mode == "mixed"
+                # Default behavior using general decode method
+                user_message = self.decode()
+
+                # Create message with default locale
+                self.locale = None
+                default_message = self.decode()
+
+                return (user_message, default_message)
+
+        finally:
+            # Restore the original locale to prevent side effects
+            self.locale = original_locale
 
     async def send_response(
         self,

@@ -171,9 +171,43 @@
       "messages": {
         "user": {
           "success": {
-            "message_type": "plain",
+            "message_type": "embed",
             "content": {
-              "text": "{discurd_user_mention} kullanıcısı başarıyla yasaklandı."
+              "title": "Yasaklama Başarılı",
+              "description": "{discord_user_mention} başarıyla yasaklandı.",
+              "color": "GREEN"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Yasaklama Başarılı",
+              "description": "{discord_user_mention} kullanıcısı başarıyla yasaklandı.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Yetkili",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Sebep",
+                  "value": "{reason}"
+                },
+                {
+                  "name": "Süre",
+                  "value": "{duration}"
+                }
+              ]
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Yasaklama Başarısız",
+              "description": "{discord_user_mention} kullanıcısı yasaklanırken hata oluştu.",
+              "color": "RED"
             }
           }
         }
@@ -366,6 +400,9 @@
         "description": "İşlem başarısız oldu. Lütfen daha sonra tekrar deneyin.",
         "color": "RED"
       }
+    },
+    "no_reason": {
+      "text": "Sebep belirtilmedi."
     }
   },
   "error": {
@@ -385,7 +422,25 @@
         "color": "RED"
       }
     },
-    "channel_not_found_error": {
+    "member_not_found": {
+      "message_type": "embed",
+      "content": {
+        "title": "Üye Bulunamadı",
+        "description": "Belirtilen üye bulunamadı.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "Kullanıcı ID",
+            "value": "{discord_user_id}"
+          },
+          {
+            "name": "Kullanıcı Adı",
+            "value": "{discord_username}"
+          }
+        ]
+      }
+    },
+    "channel_not_found": {
       "message_type": "embed",
       "content": {
         "title": "Kanal Bulunamadı",
@@ -465,6 +520,24 @@
           {
             "name": "Oyuncu UUID",
             "value": "{minecraft_uuid}"
+          }
+        ]
+      }
+    },
+    "can_not_moderate": {
+      "message_type": "embed",
+      "content": {
+        "title": "Yeterli Yetki Yok",
+        "description": "Bu kullanıcıyı moderasyon işlemi yapamazsınız.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "Kullanıcı Adı",
+            "value": "{discord_username}"
+          },
+          {
+            "name": "Kullanıcı ID",
+            "value": "{discord_user_id}"
           }
         ]
       }

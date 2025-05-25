@@ -362,10 +362,11 @@ class BanCommandParameters(DescriptiveElement):
 
 
 class BanMessages(BaseModel):
-    class User(BaseModel):
+    class SuccessMessage(BaseModel):
         success: DiscordMessage
 
-    user: User
+    user: SuccessMessage
+    log: SuccessMessage
 
 
 class BanLocalization(BaseModel):
@@ -467,17 +468,20 @@ class EventLocalization(BaseModel):
 class GeneralLocalization(BaseModel):
     success: DiscordMessage
     failure: DiscordMessage
+    no_reason: TextMessage
 
 
 class ErrorLocalization(BaseModel):
     unknown_error: DiscordMessage
     timeout_error: DiscordMessage
-    channel_not_found_error: DiscordMessage
+    member_not_found: DiscordMessage
+    channel_not_found: DiscordMessage
     command_execution_error: DiscordMessage
     user_record_not_found: DiscordMessage
     account_already_linked: DiscordMessage
     account_not_linked: DiscordMessage
     player_not_online: DiscordMessage
+    can_not_moderate: DiscordMessage
 
 
 class TimeUnitsLocalization(BaseModel):

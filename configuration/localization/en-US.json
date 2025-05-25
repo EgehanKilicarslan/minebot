@@ -165,9 +165,35 @@
       "messages": {
         "user": {
           "success": {
-            "message_type": "plain",
+            "message_type": "embed",
             "content": {
-              "text": "User {discord_user_mention} has been banned successfully."
+              "title": "Ban Successful",
+              "description": "You have been banned {discord_user_mention} from the server.",
+              "color": "RED"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "User Banned",
+              "description": "{discord_user_mention} has been banned from the server.",
+              "color": "RED",
+              "fields": [
+                {
+                  "name": "Moderator",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Reason",
+                  "value": "{reason}"
+                },
+                {
+                  "name": "Duration",
+                  "value": "{duration}"
+                }
+              ]
             }
           }
         }
@@ -366,6 +392,9 @@
           }
         ]
       }
+    },
+    "no_reason": {
+      "text": "No reason provided."
     }
   },
   "error": {
@@ -385,7 +414,25 @@
         "color": "RED"
       }
     },
-    "channel_not_found_error": {
+    "member_not_found": {
+      "message_type": "embed",
+      "content": {
+        "title": "Member Not Found",
+        "description": "The specified member was not found in the server.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "User ID",
+            "value": "{discord_user_id}"
+          },
+          {
+            "name": "Username",
+            "value": "{discord_username}"
+          }
+        ]
+      }
+    },
+    "channel_not_found": {
       "message_type": "embed",
       "content": {
         "title": "Channel Not Found",
@@ -465,6 +512,24 @@
           {
             "name": "Player UUID",
             "value": "{minecraft_uuid}"
+          }
+        ]
+      }
+    },
+    "can_not_moderate": {
+      "message_type": "embed",
+      "content": {
+        "title": "Cannot Moderate",
+        "description": "You do not have permission to moderate this user.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "User",
+            "value": "{discord_user_mention}"
+          },
+          {
+            "name": "Moderator",
+            "value": "{discord_staff_user_mention}"
           }
         ]
       }

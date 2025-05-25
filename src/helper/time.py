@@ -2,7 +2,6 @@ import datetime
 import re
 from functools import lru_cache
 from logging import Logger
-from typing import Dict, List, Optional, Tuple, Union
 
 import hikari
 
@@ -28,7 +27,7 @@ class TimeHelper:
         abbr_to_unit: Mapping of all localized unit names/abbreviations to canonical unit names
     """
 
-    def __init__(self, locale: Optional[Union[str, hikari.Locale]] = None) -> None:
+    def __init__(self, locale: str | hikari.Locale | None = None) -> None:
         """
         Initialize the TimeHelper with the specified locale.
 
@@ -38,7 +37,7 @@ class TimeHelper:
         logger.debug(f"Initializing TimeHelper with locale: {locale}")
 
         # Store units directly in the dictionary with their localized names
-        self.units: Dict[str, Tuple[TimeUnitsLocalization.BasicUnit, int]] = {
+        self.units: dict[str, tuple[TimeUnitsLocalization.BasicUnit, int]] = {
             "year": (Localization.get(TimeUnitKeys.YEAR, locale=locale), 31536000),
             "month": (Localization.get(TimeUnitKeys.MONTH, locale=locale), 2592000),
             "week": (Localization.get(TimeUnitKeys.WEEK, locale=locale), 604800),
@@ -49,13 +48,13 @@ class TimeHelper:
         }
 
         # Pre-sort units by seconds (descending) for faster from_timedelta processing
-        self.sorted_units: List[Tuple[str, Tuple[TimeUnitsLocalization.BasicUnit, int]]] = sorted(
+        self.sorted_units: list[tuple[str, tuple[TimeUnitsLocalization.BasicUnit, int]]] = sorted(
             self.units.items(), key=lambda x: x[1][1], reverse=True
         )
         logger.debug(f"Sorted {len(self.sorted_units)} time units for efficient processing")
 
         # Create a mapping of localized abbreviations to unit names with a single iteration
-        self.abbr_to_unit: Dict[str, str] = {}
+        self.abbr_to_unit: dict[str, str] = {}
         for unit_name, (unit_info, _) in self.units.items():
             # Add all forms from singular and plural lists to the mapping
             for form in unit_info.singular + unit_info.plural:  # type: ignore
@@ -70,7 +69,7 @@ class TimeHelper:
         self._time_pattern = re.compile(r"(\d+)\s*([a-zA-Z]+)")
 
     @lru_cache(maxsize=128)
-    def to_timedelta(self, value: Union[int, float], unit: str) -> datetime.timedelta:
+    def to_timedelta(self, value: int | float, unit: str) -> datetime.timedelta:
         """
         Convert a value and unit to a timedelta object.
 
@@ -163,7 +162,7 @@ class TimeHelper:
         logger.debug(f"Formatted timedelta as: '{result}'")
         return result
 
-    def format_time_remaining(self, seconds: Union[int, float]) -> str:
+    def format_time_remaining(self, seconds: int | float) -> str:
         """
         Format a number of seconds as a human-readable time remaining string.
 

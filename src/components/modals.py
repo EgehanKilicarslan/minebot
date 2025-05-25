@@ -394,5 +394,5 @@ class SuggestResponseModal(Modal):
         except Exception:
             # Handle general errors
             await MessageHelper(
-                key=MessageKeys.CHANNEL_NOT_FOUND_ERROR, locale=self._user_locale
+                key=MessageKeys.CHANNEL_NOT_FOUND, locale=self._user_locale
             ).send_response(ctx, ephemeral=True)

@@ -59,15 +59,18 @@ class MessageKeys(Enum):
 
     GENERAL_SUCCESS = "general.success"
     GENERAL_FAILURE = "general.failure"
+    GENERAL_NO_REASON = "general.no_reason"
 
     UNKNOWN_ERROR = "error.unknown_error"
     TIMEOUT_ERROR = "error.timeout_error"
-    CHANNEL_NOT_FOUND_ERROR = "error.channel_not_found_error"
+    MEMBER_NOT_FOUND = "error.member_not_found"
+    CHANNEL_NOT_FOUND = "error.channel_not_found"
     COMMAND_EXECUTION_ERROR = "error.command_execution_error"
     USER_RECORD_NOT_FOUND = "error.user_record_not_found"
     ACCOUNT_ALREADY_LINKED = "error.account_already_linked"
     ACCOUNT_NOT_LINKED = "error.account_not_linked"
     PLAYER_NOT_ONLINE = "error.player_not_online"
+    CAN_NOT_MODERATE = "error.can_not_moderate"
 
 
 class ModalKeys(Enum):

@@ -6,7 +6,7 @@ import lightbulb
 import toolbox
 
 from debug import get_logger
-from helper import WikiHelper
+from helper import PunishmentHelper, WikiHelper
 from model import SecretKeys
 from settings import Localization, Settings
 
@@ -42,6 +42,8 @@ async def on_ready(event: hikari.ShardReadyEvent) -> None:
         if my_member is None:
             logger.critical("Failed to retrieve bot member.")
             raise Exception("Failed to retrieve bot member.")
+
+        PunishmentHelper._set_bot_member(my_member)
 
         # Check permissions
         if toolbox.calculate_permissions(my_member).value != REQUIRED_PERMISSIONS:
