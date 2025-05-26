@@ -7,7 +7,6 @@ os.environ["LINKD_DI_DISABLED"] = "true"
 
 import hikari
 import lightbulb
-from lightbulb import GatewayEnabledClient
 
 from core import GlobalState
 from database import close_database, initialize_database
@@ -15,8 +14,7 @@ from debug import get_logger, setup_logging
 from exceptions.command import CommandExecutionError
 from exceptions.utility import EmptyException
 from hooks.database import add_or_update_user
-from model import BotKeys, SecretKeys
-from model.config import CommandsKeys
+from model import BotKeys, CommandsKeys, SecretKeys
 from settings import Localization, Settings
 from websocket import WebSocketServer
 
@@ -46,7 +44,7 @@ if __name__ == "__main__":
             banner=None,
         )
 
-        client: GatewayEnabledClient = lightbulb.client_from_app(
+        client = lightbulb.client_from_app(
             bot, localization_provider=Localization.serialize(), hooks=[add_or_update_user]
         )
 
