@@ -44,6 +44,7 @@ class MessageKeys(Enum):
     WITHDRAW_REWARDS_LOG_FAILURE = "commands.withdraw_rewards.messages.log.failure"
 
     BAN_COMMAND_USER_SUCCESS = "commands.ban.messages.user.success"
+    BAN_COMMAND_LOG_SUCCESS = "commands.ban.messages.log.success"
 
     SUGGEST_MINECRAFT_APPROVE = "commands.suggest.messages.minecraft.approve"
     SUGGEST_MINECRAFT_REJECT = "commands.suggest.messages.minecraft.reject"
