@@ -3,6 +3,8 @@ import os
 import sys
 from logging import Logger
 
+os.environ["LINKD_DI_DISABLED"] = "true"
+
 import hikari
 import lightbulb
 from lightbulb import GatewayEnabledClient
