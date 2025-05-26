@@ -1,5 +1,8 @@
 import asyncio
+import datetime
+import ssl
 from logging import Logger
+from pathlib import Path
 
 import websockets
 
@@ -31,12 +34,135 @@ class WebSocketServer:
         self.server = None
         self._task = None
         self._shutdown_event = asyncio.Event()
+        self.ssl_context = None
 
         if self.host is None or self.port is None:
             logger.info("WebSocket server is disabled (host or port not set)")
             self.is_enabled = False
         else:
             self.is_enabled = True
+
+    def generate_self_signed_cert(self):
+        """
+        Generate a self-signed certificate for the WebSocket server.
+
+        Returns:
+            tuple: Paths to the certificate and key files
+        """
+        try:
+            from cryptography import x509
+            from cryptography.hazmat.primitives import hashes, serialization
+            from cryptography.hazmat.primitives.asymmetric import rsa
+            from cryptography.x509.oid import NameOID
+
+            # Create certificate directory if it doesn't exist
+            cert_path = Path("configuration/websocket")
+            cert_path.mkdir(parents=True, exist_ok=True)
+
+            # Always use 'localhost' for local development certificates
+            cert_name = self.host or "localhost"
+            key_file = cert_path / f"{cert_name}.key"
+            cert_file = cert_path / f"{cert_name}.crt"
+
+            # Check if certificates already exist
+            if key_file.exists() and cert_file.exists():
+                logger.debug(f"Using existing SSL certificates in {cert_path}")
+                return str(cert_file), str(key_file)
+
+            logger.debug("Generating new self-signed SSL certificate")
+
+            # Generate private key
+            private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+
+            # Write private key to file
+            with open(key_file, "wb") as f:
+                f.write(
+                    private_key.private_bytes(
+                        encoding=serialization.Encoding.PEM,
+                        format=serialization.PrivateFormat.PKCS8,
+                        encryption_algorithm=serialization.NoEncryption(),
+                    )
+                )
+
+            # Subject and issuer are the same for self-signed certificates
+            # Always use 'localhost' for local development
+            subject = issuer = x509.Name(
+                [
+                    x509.NameAttribute(NameOID.COMMON_NAME, "localhost"),
+                    x509.NameAttribute(NameOID.ORGANIZATION_NAME, "MineBotSSL"),
+                ]
+            )
+
+            # Build certificate
+            cert = (
+                x509.CertificateBuilder()
+                .subject_name(subject)
+                .issuer_name(issuer)
+                .public_key(private_key.public_key())
+                .serial_number(x509.random_serial_number())
+                .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
+                .not_valid_after(
+                    # Valid for 1 year
+                    datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=365)
+                )
+                .add_extension(
+                    x509.SubjectAlternativeName(
+                        [
+                            x509.DNSName("localhost"),
+                            x509.DNSName("127.0.0.1"),
+                        ]
+                    ),
+                    critical=False,
+                )
+                .sign(private_key, hashes.SHA256())
+            )
+
+            # Write certificate to file
+            with open(cert_file, "wb") as f:
+                f.write(cert.public_bytes(serialization.Encoding.PEM))
+
+            logger.debug(f"Generated SSL certificates in {cert_path}")
+            return str(cert_file), str(key_file)
+
+        except ImportError:
+            logger.error("Failed to create SSL certificates: cryptography package required")
+            return None, None
+        except Exception as e:
+            logger.error(f"Failed to create SSL certificates: {e}", exc_info=True)
+            return None, None
+
+    def _setup_ssl_context(self):
+        """
+        Set up an SSL context for secure WebSocket connections.
+
+        Returns:
+            ssl.SSLContext or None: Configured SSL context if successful, None otherwise
+        """
+        try:
+            # Generate or use existing self-signed certificate
+            cert_file, key_file = self.generate_self_signed_cert()
+
+            if not cert_file or not key_file:
+                logger.error("SSL certificate generation failed")
+                return None
+
+            # Create and configure SSL context
+            logger.debug(f"Setting up SSL context with cert: {cert_file}, key: {key_file}")
+            ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+
+            # Load the certificate
+            try:
+                ssl_context.load_cert_chain(cert_file, key_file)
+            except ssl.SSLError as e:
+                logger.error(f"Failed to load SSL certificates: {e}")
+                return None
+
+            logger.debug("SSL context created successfully")
+            return ssl_context
+
+        except Exception as e:
+            logger.error(f"Failed to setup SSL context: {e}", exc_info=True)
+            return None
 
     async def start(self) -> None:
         """
@@ -54,10 +180,9 @@ class WebSocketServer:
 
         logger.info("Starting WebSocket server")
 
-        # Import actionss here to avoid circular imports
+        # Import actions here to avoid circular imports
         # This triggers registration of action handlers
         try:
-            # Downgraded to debug
             logger.debug("Loading WebSocket action handlers")
             import websocket.actions.event  # noqa: F401
             import websocket.actions.request  # noqa: F401
@@ -71,6 +196,10 @@ class WebSocketServer:
             logger.error(f"Failed to load WebSocket action handlers: {e}", exc_info=True)
             return
 
+        self.ssl_context = self._setup_ssl_context()
+        if not self.ssl_context:
+            logger.error("SSL context setup failed, WebSocket server will not start")
+            return
         self._task = asyncio.create_task(self._run_server())
 
     async def _run_server(self) -> None:
@@ -81,16 +210,25 @@ class WebSocketServer:
             None
         """
         try:
-            self.server = await websockets.serve(
-                handle_connection,
-                self.host,
-                self.port,
-                ping_interval=30,
-                ping_timeout=10,
-                close_timeout=5,
-            )
+            if not self.ssl_context:
+                logger.error("Cannot start WebSocket server without SSL context")
+                return
 
-            logger.info(f"WebSocket server started on ws://{self.host}:{self.port}")
+            try:
+                self.server = await websockets.serve(
+                    handle_connection,
+                    self.host,
+                    self.port,
+                    ping_interval=30,
+                    ping_timeout=10,
+                    close_timeout=5,
+                    ssl=self.ssl_context,
+                )
+            except Exception as e:
+                logger.error(f"Failed to start WebSocket server: {e}", exc_info=True)
+                return
+
+            logger.info(f"WebSocket server started on wss://{self.host}:{self.port}")
 
             # Run until shutdown event is set
             await self._shutdown_event.wait()

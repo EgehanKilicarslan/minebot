@@ -14,5 +14,6 @@ dependencies = [
     "pydantic-extra-types==2.10.4",
     "sqlalchemy==2.0.41",
     "websockets==15.0.1",
-    "uvloop==0.21.0; sys_platform != 'win32'"
+    "uvloop==0.21.0; sys_platform != 'win32'",
+    "cryptography>=45.0.3",
 ]

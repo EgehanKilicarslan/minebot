@@ -179,3 +179,8 @@ cython_debug/
 
 # Log files
 *.log
+
+# Self-signed certificates
+*.pem
+*.crt
+*.key
