@@ -68,7 +68,7 @@ class Ban(
         if not PunishmentHelper.can_moderate(target_member, ctx.member):
             await MessageHelper(
                 MessageKeys.CAN_NOT_MODERATE, locale=ctx.interaction.locale
-            ).send_response(ctx)
+            ).send_response(ctx, ephemeral=True)
             return
 
         # Handle temporary ban if duration is provided
@@ -124,7 +124,7 @@ class Ban(
             locale=ctx.interaction.locale,
             **common_params,
             reason=reason_messages[0],  # User-facing reason
-        ).send_response(ctx)
+        ).send_response(ctx, ephemeral=True)
 
         # Log the ban in a designated moderation log channel
         await MessageHelper(
