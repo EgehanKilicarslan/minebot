@@ -5,13 +5,12 @@ import hikari
 import lightbulb
 import toolbox
 
+from core import GlobalState
 from debug import get_logger
-from helper import PunishmentHelper, WikiHelper
 from model import SecretKeys
-from settings import Localization, Settings
+from settings import Settings
 
 REQUIRED_PERMISSIONS = 1829587348619263  # Administrator permissions value
-BOOSTER_ROLE: hikari.Role | None = None
 
 loader = lightbulb.Loader()
 logger: Logger = get_logger(__name__)
@@ -19,8 +18,6 @@ logger: Logger = get_logger(__name__)
 
 @loader.listener(hikari.ShardReadyEvent)
 async def on_ready(event: hikari.ShardReadyEvent) -> None:
-    global BOOSTER_ROLE
-
     try:
         # Fetch and validate default guild
         guild: hikari.Guild = await event.app.rest.fetch_guild(
@@ -33,8 +30,7 @@ async def on_ready(event: hikari.ShardReadyEvent) -> None:
 
         # Set guild language
         preferred_locale = hikari.Locale(guild.preferred_locale)
-        Localization.set_guild_language(preferred_locale)
-        WikiHelper.set_guild_language(preferred_locale)
+        GlobalState.guild.set_locale(preferred_locale)
         logger.info(f"Guild language set to: {preferred_locale}")
 
         # Verify bot member
@@ -43,7 +39,7 @@ async def on_ready(event: hikari.ShardReadyEvent) -> None:
             logger.critical("Failed to retrieve bot member.")
             raise Exception("Failed to retrieve bot member.")
 
-        PunishmentHelper._set_bot_member(my_member)
+        GlobalState.bot.set_member(my_member)
 
         # Check permissions
         if toolbox.calculate_permissions(my_member).value != REQUIRED_PERMISSIONS:
@@ -52,7 +48,9 @@ async def on_ready(event: hikari.ShardReadyEvent) -> None:
         logger.info("Bot has the required administrator permissions.")
 
         guild_roles: Sequence[hikari.Role] = await guild.fetch_roles()
-        BOOSTER_ROLE = next((r for r in guild_roles if r.is_premium_subscriber_role), None)
+        GlobalState.guild.set_booster_role(
+            next((r for r in guild_roles if r.is_premium_subscriber_role), None)
+        )
 
         logger.info("Bot is ready and fully operational.")
     except Exception as e:

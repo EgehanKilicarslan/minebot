@@ -1,7 +1,7 @@
 from logging import Logger
 
+from core import GlobalState
 from debug import get_logger
-from helper import PLAYER_SERVERS
 
 from ...action_registry import websocket_action
 from ...schemas.response import PlayerServerCheckSchema
@@ -18,6 +18,8 @@ async def player_server_check(data: PlayerServerCheckSchema) -> None:
     # Validate the provided username or UUID
     if data.server:
         if data.username:
-            PLAYER_SERVERS[data.username] = data.server  # Assign server to username
+            GlobalState.minecraft.add_player_server(
+                data.username, data.server
+            )  # Assign server to username
         if data.uuid:
-            PLAYER_SERVERS[data.uuid] = data.server  # Assign server to UUID
+            GlobalState.minecraft.add_player_server(data.uuid, data.server)  # Assign server to UUID

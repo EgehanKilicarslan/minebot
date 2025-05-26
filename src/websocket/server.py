@@ -1,7 +1,6 @@
 import asyncio
 from logging import Logger
 
-import lightbulb
 import websockets
 
 from debug import get_logger
@@ -20,7 +19,7 @@ class WebSocketServer:
     Handles initialization, running, and graceful shutdown of the WebSocket server.
     """
 
-    def __init__(self, client: lightbulb.Client) -> None:
+    def __init__(self) -> None:
         """
         Initialize the WebSocket manager with host and port configuration.
 
@@ -29,7 +28,6 @@ class WebSocketServer:
         """
         self.host: str | None = Settings.get(WebSocketKeys.HOST)
         self.port: int | None = Settings.get(WebSocketKeys.PORT)
-        self.client: lightbulb.Client = client
         self.server = None
         self._task = None
         self._shutdown_event = asyncio.Event()
@@ -84,7 +82,7 @@ class WebSocketServer:
         """
         try:
             self.server = await websockets.serve(
-                lambda websocket: handle_connection(websocket, self.client),
+                handle_connection,
                 self.host,
                 self.port,
                 ping_interval=30,

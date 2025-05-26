@@ -11,6 +11,7 @@ import hikari
 import lightbulb
 from pydantic import ValidationError
 
+from core import GlobalState
 from debug import get_logger
 from model import BotSettings, LocalizationData, config, message
 
@@ -184,7 +185,8 @@ class Localization:
     _instance: Localization | None = None
     _data: dict[str, LocalizationData] | None = None
     _localization_path: Path = DEFAULT_LOCALIZATION_PATH
-    _guild_lang: hikari.Locale = hikari.Locale.EN_US
+    _guild_locale: hikari.Locale = hikari.Locale.EN_US
+    _fetched_locales_once: bool = False
 
     def __new__(cls) -> Localization:
         if cls._instance is None:
@@ -388,25 +390,16 @@ class Localization:
         return lightbulb.DictLocalizationProvider(localization_data)
 
     @classmethod
-    def set_guild_language(cls, guild_lang: hikari.Locale) -> None:
-        """
-        Set the guild language for localization.
-
-        Args:
-            guild_lang (hikari.Locale): The locale representing the guild language.
-        """
-        cls._guild_lang = guild_lang
-        logger.info(f"Guild language set to {guild_lang}")
-
-    @classmethod
-    def get_guild_language(cls) -> hikari.Locale:
-        """
-        Get the current guild language.
-
-        Returns:
-            hikari.Locale: The current guild language.
-        """
-        return cls._guild_lang
+    def _get_guild_locale(cls) -> hikari.Locale:
+        """Get and cache the guild locale if not already cached."""
+        try:
+            if not cls._fetched_locales_once:
+                cls._guild_locale = GlobalState.guild.get_locale()
+                cls._fetched_locales_once = True
+            return cls._guild_locale
+        except ValueError:
+            cls._fetched_locales_once = False
+            return hikari.Locale.EN_US
 
     @classmethod
     @lru_cache(maxsize=128)
@@ -437,7 +430,7 @@ class Localization:
         # Resolve locale
         locale_key = locale
         if locale_key is None:
-            locale_key = cls._guild_lang
+            locale_key = cls._get_guild_locale()
         if isinstance(locale_key, hikari.Locale):
             locale_key = locale_key.value
 

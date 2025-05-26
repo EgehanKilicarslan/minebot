@@ -7,6 +7,7 @@ import hikari
 import lightbulb
 from lightbulb import GatewayEnabledClient
 
+from core import GlobalState
 from database import close_database, initialize_database
 from debug import get_logger, setup_logging
 from exceptions.command import CommandExecutionError
@@ -34,6 +35,7 @@ if __name__ == "__main__":
     try:
         Settings.initialize()
         Localization.initialize()
+        websocket = WebSocketServer()
 
         bot = hikari.GatewayBot(
             token=Settings.get(SecretKeys.TOKEN),
@@ -46,7 +48,8 @@ if __name__ == "__main__":
             bot, localization_provider=Localization.serialize(), hooks=[add_or_update_user]
         )
 
-        websocket = WebSocketServer(client)
+        GlobalState.bot.set_bot(bot)
+        GlobalState.bot.set_client(client)
 
         @client.error_handler
         async def handler(exc: lightbulb.exceptions.ExecutionPipelineFailedException) -> bool:

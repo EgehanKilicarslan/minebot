@@ -4,6 +4,7 @@ from typing import Final
 
 import hikari
 
+from core import GlobalState
 from debug import debugger
 from helper.command import CommandHelper
 from model import CommandsKeys
@@ -18,7 +19,14 @@ class WikiHelper:
     # Format: {locale: {filename: (path, content)}}
     _data: dict[str, dict[str, tuple[Path, str | None]]] = {}
     MAX_CONTENT_LENGTH: Final[int] = 4000
-    GUILD_LANGUAGE: hikari.Locale
+    GUILD_LANGUAGE: hikari.Locale | None = None
+
+    @classmethod
+    def _get_guild_locale(cls) -> hikari.Locale:
+        """Get and cache the guild locale if not already cached."""
+        if cls.GUILD_LANGUAGE is None:
+            cls.GUILD_LANGUAGE = GlobalState.guild.get_locale()
+        return cls.GUILD_LANGUAGE
 
     @classmethod
     def load_wiki_data(cls) -> None:
@@ -60,11 +68,6 @@ class WikiHelper:
                 logger.info(f"No wiki files found for locale: {locale_str}")
 
     @classmethod
-    def set_guild_language(cls, guild_locale: hikari.Locale) -> None:
-        """Set the guild language for fallback purposes."""
-        cls.GUILD_LANGUAGE = guild_locale
-
-    @classmethod
     def get_wiki_files(cls, locale: str) -> dict[str, Path] | None:
         """Get all wiki files for a specific locale, falling back to guild locale if needed."""
         # Try with requested locale first
@@ -72,7 +75,7 @@ class WikiHelper:
             return {name: path_content[0] for name, path_content in cls._data[locale].items()}
 
         # Fall back to guild locale if user locale has no wiki files
-        guild_locale = str(cls.GUILD_LANGUAGE)
+        guild_locale = str(cls._get_guild_locale())
         if guild_locale in cls._data and cls._data[guild_locale]:
             logger.info(
                 f"Falling back to guild locale {guild_locale} for wiki files (requested: {locale})"
@@ -89,7 +92,7 @@ class WikiHelper:
             return cls._data[locale][file_name][1]
 
         # Fall back to guild locale if content not found in user locale
-        guild_locale = str(cls.GUILD_LANGUAGE)
+        guild_locale = str(cls._get_guild_locale())
         if guild_locale in cls._data and file_name in cls._data.get(guild_locale, {}):
             logger.info(
                 f"Falling back to guild locale {guild_locale} for wiki content {file_name} (requested: {locale})"

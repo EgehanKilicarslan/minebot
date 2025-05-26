@@ -1,8 +1,7 @@
 from logging import Logger
 
+from core import GlobalState
 from debug import get_logger
-from helper import ONLINE_PLAYERS
-from helper.minecraft import PLAYER_UUIDS
 
 from ...action_registry import websocket_action
 from ...schemas.response import PlayerStatusCheckSchema
@@ -18,6 +17,6 @@ async def player_status_check(data: PlayerStatusCheckSchema) -> None:
 
     # Validate the provided username or UUID
     if data.online and data.username and data.uuid:
-        ONLINE_PLAYERS.add(data.username)  # Assign username to online players
-        ONLINE_PLAYERS.add(data.uuid)  # Assign UUID to online players
-        PLAYER_UUIDS[data.username] = data.uuid  # Map username to UUID
+        GlobalState.minecraft.add_online_player(data.username)  # Assign username to online players
+        GlobalState.minecraft.add_online_player(data.uuid)  # Assign UUID to online players
+        GlobalState.minecraft.add_player_uuid(data.username, data.uuid)  # Map username to UUID

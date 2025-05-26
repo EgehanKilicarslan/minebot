@@ -3,11 +3,11 @@ from hikari import RESTGuild
 from lightbulb.components.modals import Modal, ModalContext, TextInput
 from pydantic import PositiveInt
 
+from core import GlobalState
 from database.schemas import SuggestionSchema, UserSchema
 from database.services import SuggestionService, UserService
 from exceptions.command import CommandExecutionError
 from helper import (
-    MINECRAFT_SERVERS,
     ChannelHelper,
     CommandHelper,
     MessageHelper,
@@ -96,9 +96,7 @@ class LinkAccountConfirmModal(Modal):
         )
 
         # Send message to the bot's log channel with additional Discord user details
-        await MessageHelper(key=log_key, **default_params).send_to_log_channel(
-            ctx.client, self._helper
-        )
+        await MessageHelper(key=log_key, **default_params).send_to_log_channel(self._helper)
 
     def _process_items(self, items: list[str], username: str, uuid: str) -> list[str]:
         return [
@@ -163,7 +161,7 @@ class LinkAccountConfirmModal(Modal):
 
             # Map server names to their specific rewards or default rewards
             for server_name, items in item_reward.items():
-                if server_name in MINECRAFT_SERVERS:
+                if GlobalState.minecraft.contains_server(server_name):
                     # Use server-specific rewards
                     final_item_reward[server_name] = self._process_items(items, username, uuid)
                 elif server_name != "default":  # Skip the default key itself
@@ -247,7 +245,7 @@ class SuggestRequestModal(Modal):
 
             log_message: hikari.Message | None = await MessageHelper(
                 key=MessageKeys.SUGGEST_LOG_SUCCESS, **common_params
-            ).send_to_log_channel(ctx.client, self._helper, components=menu)
+            ).send_to_log_channel(self._helper, components=menu)
 
             if log_message:
                 await SuggestionService.create_or_update_suggestion(
@@ -267,7 +265,7 @@ class SuggestRequestModal(Modal):
             ).send_response(ctx, ephemeral=True)
             await MessageHelper(
                 key=MessageKeys.SUGGEST_LOG_FAILURE, **common_params
-            ).send_to_log_channel(ctx.client, self._helper)
+            ).send_to_log_channel(self._helper)
 
 
 class SuggestResponseModal(Modal):
@@ -309,7 +307,7 @@ class SuggestResponseModal(Modal):
         if not rewards:
             return
 
-        await MinecraftHelper.add_rewards(ctx.client, ctx.user, rewards)
+        await MinecraftHelper.add_rewards(ctx.user, rewards)
 
     async def on_submit(self, ctx: ModalContext) -> None:
         """Handle modal submission."""
@@ -347,7 +345,7 @@ class SuggestResponseModal(Modal):
 
             # Send response to result channel
             result_channel: hikari.TextableChannel = await ChannelHelper.fetch_channel(
-                ctx.client, self._result_channel, hikari.TextableChannel
+                self._result_channel, hikari.TextableChannel
             )
 
             await ctx.client.rest.create_message(

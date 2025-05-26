@@ -302,7 +302,6 @@ class MessageHelper:
 
     async def send_to_log_channel(
         self,
-        client: lightbulb.Client,
         helper: CommandHelper | EventHelper,
         components: Sequence[hikari.api.ComponentBuilder] | None = None,
     ) -> hikari.Message | None:
@@ -313,7 +312,6 @@ class MessageHelper:
         fetches the channel, and then sends the decoded message to it.
 
         Args:
-            client: The Lightbulb client instance.
             helper: The (CommandHelper | EventHelper) instance to check logging configuration.
 
         Returns:
@@ -332,7 +330,7 @@ class MessageHelper:
 
         logger.debug(f"[Message: {self.key.name}] Fetching channel {channel_id}")
         channel: hikari.TextableGuildChannel = await ChannelHelper.fetch_channel(
-            client, channel_id, hikari.TextableGuildChannel
+            channel_id, hikari.TextableGuildChannel
         )
 
         message: str | hikari.Embed = self.decode()

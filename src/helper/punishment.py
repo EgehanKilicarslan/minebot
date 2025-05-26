@@ -1,6 +1,7 @@
 import hikari
 import toolbox
 
+from core import GlobalState
 from helper.message import MessageHelper
 from model.message import MessageKeys
 
@@ -9,13 +10,11 @@ class PunishmentHelper:
     _bot_member: hikari.Member | None = None
 
     @classmethod
-    def _set_bot_member(cls, bot_member: hikari.Member) -> None:
-        """Set the bot member for permission checks.
-
-        Args:
-            bot_member: The bot's member object
-        """
-        cls._bot_member = bot_member
+    def _get_bot_member(cls) -> hikari.Member:
+        """Get and cache the bot member if not already cached."""
+        if cls._bot_member is None:
+            cls._bot_member = GlobalState.bot.get_member()
+        return cls._bot_member
 
     @classmethod
     def can_moderate(
@@ -34,11 +33,13 @@ class PunishmentHelper:
         Returns:
             bool: True if moderation is allowed
         """
-        if cls._bot_member is None:
+        try:
+            bot_member = cls._get_bot_member()
+        except ValueError:
             return False
 
         return toolbox.can_moderate(moderator, target, permission) and toolbox.can_moderate(
-            cls._bot_member, target, permission
+            bot_member, target, permission
         )
 
     @staticmethod

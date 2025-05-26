@@ -10,7 +10,7 @@ from .command import CommandHelper
 from .event import EventHelper
 from .menu import MenuHelper
 from .message import MessageHelper
-from .minecraft import MINECRAFT_SERVERS, ONLINE_PLAYERS, PLAYER_SERVERS, MinecraftHelper
+from .minecraft import MinecraftHelper
 from .modal import ModalHelper
 from .punishment import PunishmentHelper
 from .time import TimeHelper
@@ -24,9 +24,6 @@ __all__: list[str] = [
     "MenuHelper",
     "MessageHelper",
     "MinecraftHelper",
-    "ONLINE_PLAYERS",
-    "PLAYER_SERVERS",
-    "MINECRAFT_SERVERS",
     "ModalHelper",
     "PunishmentHelper",
     "TimeHelper",

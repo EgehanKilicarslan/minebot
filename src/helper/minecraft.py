@@ -2,10 +2,9 @@ import asyncio
 from logging import Logger
 
 import hikari
-import lightbulb
 from pydantic import PositiveInt
 
-from data_types import TimedDict, TimedSet
+from core import GlobalState
 from database.schemas import UserSchema
 from database.services import UserService
 from debug import get_logger
@@ -22,12 +21,6 @@ from websocket.schemas.request import (
 from websocket.schemas.response import PlayerServerCheckSchema, PlayerStatusCheckSchema
 
 logger: Logger = get_logger(__name__)
-
-# Global state
-MINECRAFT_SERVERS: list[str] = []
-ONLINE_PLAYERS: TimedSet[str] = TimedSet[str](10)
-PLAYER_UUIDS: TimedDict[str, str] = TimedDict[str, str](10)
-PLAYER_SERVERS: TimedDict[str, str] = TimedDict[str, str](10)
 
 
 class MinecraftHelper:
@@ -98,7 +91,7 @@ class MinecraftHelper:
     @staticmethod
     def check_servers_available() -> bool:
         """Check if any Minecraft servers are available."""
-        if not MINECRAFT_SERVERS:
+        if not GlobalState.minecraft.get_servers():
             logger.debug("No Minecraft servers available for the requested operation")
             return False
         return True
@@ -139,7 +132,7 @@ class MinecraftHelper:
         logger.debug(f"Using identifier: {identifier}")
 
         # Quick check if already in cache before making request
-        if ONLINE_PLAYERS.contains(identifier):
+        if GlobalState.minecraft.check_player_online(identifier):
             logger.debug(f"Player {identifier} found in cache, returning online status")
             return True
 
@@ -152,7 +145,7 @@ class MinecraftHelper:
             response_timeout,
         )
 
-        is_online = ONLINE_PLAYERS.contains(identifier)
+        is_online = GlobalState.minecraft.check_player_online(identifier)
         logger.debug(f"Player {identifier} is {'online' if is_online else 'offline'}")
         return is_online
 
@@ -175,9 +168,9 @@ class MinecraftHelper:
         if await MinecraftHelper.fetch_player_status(
             username=username, response_timeout=response_timeout
         ):
-            if username in PLAYER_UUIDS:
-                logger.debug(f"UUID for {username} found: {PLAYER_UUIDS[username]}")
-                return PLAYER_UUIDS[username]
+            if bool(UUID := GlobalState.minecraft.get_player_uuid(username)):
+                logger.debug(f"UUID for {username} found: {UUID}")
+                return UUID
 
     @staticmethod
     async def fetch_player_server(
@@ -215,11 +208,9 @@ class MinecraftHelper:
         logger.debug(f"Using identifier: {identifier}")
 
         # Quick check if already in cache before making request
-        if identifier in PLAYER_SERVERS:
-            logger.debug(
-                f"Player {identifier} found in cache, returning server: {PLAYER_SERVERS[identifier]}"
-            )
-            return PLAYER_SERVERS[identifier]
+        if SERVER := GlobalState.minecraft.get_player_server(identifier):
+            logger.debug(f"Player {identifier} found in cache, returning server: {SERVER}")
+            return SERVER
 
         # Check online status first, this already includes waiting for the response
         is_online = await MinecraftHelper.fetch_player_status(
@@ -233,14 +224,14 @@ class MinecraftHelper:
             return None
 
         # After status check, see if server info was populated
-        if identifier in PLAYER_SERVERS:
-            logger.debug(f"Server found in cache after status check: {PLAYER_SERVERS[identifier]}")
-            return PLAYER_SERVERS[identifier]
+        if SERVER := GlobalState.minecraft.get_player_server(identifier):
+            logger.debug(f"Server found in cache after status check: {SERVER}")
+            return SERVER
 
         # If only one server is available, we know the player must be there
-        if len(MINECRAFT_SERVERS) == 1:
-            logger.debug(f"Only one server available: {MINECRAFT_SERVERS[0]}")
-            return MINECRAFT_SERVERS[0]
+        if len(SERVERS := GlobalState.minecraft.get_servers()) == 1:
+            logger.debug(f"Only one server available: {SERVERS[0]}")
+            return SERVERS[0]
 
         # If we need to explicitly request server info
         logger.debug(f"Player {identifier} is online but server unknown, requesting from WebSocket")
@@ -251,7 +242,7 @@ class MinecraftHelper:
             response_timeout,
         )
 
-        server = PLAYER_SERVERS.get(identifier)
+        server = GlobalState.minecraft.get_player_server(identifier)
         logger.debug(f"Player {identifier} is on server: {server}")
         return server
 
@@ -362,7 +353,7 @@ class MinecraftHelper:
         if not MinecraftHelper.check_servers_available():
             return False
 
-        if server not in MINECRAFT_SERVERS:
+        if not GlobalState.minecraft.contains_server(server):
             logger.warning(f"Server '{server}' not found in available servers")
             return False
 
@@ -399,7 +390,7 @@ class MinecraftHelper:
         if not MinecraftHelper.check_servers_available():
             return False
 
-        if server not in MINECRAFT_SERVERS:
+        if not GlobalState.minecraft.contains_server(server):
             logger.warning(f"Server '{server}' not found in available servers")
             raise ValueError(f"Server '{server}' not found in available servers")
 
@@ -421,14 +412,11 @@ class MinecraftHelper:
         ]
 
     @staticmethod
-    async def add_rewards(
-        client: lightbulb.Client, user: hikari.User, rewards: UserReward | None
-    ) -> bool:
+    async def add_rewards(user: hikari.User, rewards: UserReward | None) -> bool:
         """
         Add rewards to a user including Discord roles and Minecraft items.
 
         Args:
-            client: The lightbulb client
             user: The Discord user to reward
             rewards: The reward configuration
 
@@ -446,13 +434,15 @@ class MinecraftHelper:
         # Process role rewards
         if role_reward:
             try:
-                guild: hikari.RESTGuild = await client.rest.fetch_guild(
+                guild: hikari.RESTGuild = await GlobalState.bot.get_bot().rest.fetch_guild(
                     Settings.get(SecretKeys.DEFAULT_GUILD)
                 )
 
                 for role_id in role_reward:
                     try:
-                        await client.rest.add_role_to_member(guild=guild, user=user, role=role_id)
+                        await GlobalState.bot.get_bot().rest.add_role_to_member(
+                            guild=guild, user=user, role=role_id
+                        )
                         success = True
                     except Exception as e:
                         logger.error(f"Failed to assign role {role_id} to user {user.id}: {e}")
@@ -474,7 +464,7 @@ class MinecraftHelper:
                     if server_name == "default":
                         continue
 
-                    if server_name in MINECRAFT_SERVERS:
+                    if GlobalState.minecraft.contains_server(server_name):
                         # Use server-specific rewards
                         final_item_reward[server_name] = MinecraftHelper._process_items(
                             items, username, uuid

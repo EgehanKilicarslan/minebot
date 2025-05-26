@@ -4,12 +4,11 @@ import json
 from logging import Logger
 from typing import Any, Callable
 
-import lightbulb
 from pydantic import BaseModel, ValidationError
 from websockets import ServerConnection
 
+from core import GlobalState
 from debug import get_logger
-from helper import MINECRAFT_SERVERS
 from model import WebSocketKeys
 from settings import Settings
 
@@ -21,7 +20,7 @@ logger: Logger = get_logger(__name__)
 authenticated_client: dict[int, tuple[ServerConnection, AuthenticateSchema]] = {}
 
 
-async def handle_connection(websocket: ServerConnection, client: lightbulb.Client) -> None:
+async def handle_connection(websocket: ServerConnection) -> None:
     """
     Handle an incoming WebSocket connection.
 
@@ -33,7 +32,6 @@ async def handle_connection(websocket: ServerConnection, client: lightbulb.Clien
 
     Args:
         websocket: The WebSocket connection object.
-        bot_client: The Discord bot client for performing Discord operations.
     """
     allowed_ip = Settings.get(WebSocketKeys.ALLOWED_IP)
     client_ip = websocket.remote_address[0] if websocket.remote_address else None
@@ -104,7 +102,11 @@ async def handle_connection(websocket: ServerConnection, client: lightbulb.Clien
                                     kwargs["websocket"] = websocket
                                 if "data" in param_names:
                                     kwargs["data"] = validated_data
-                                if "client" in param_names and client:
+                                if "bot" in param_names and (bot := GlobalState.bot.get_bot()):
+                                    kwargs["bot"] = bot
+                                if "client" in param_names and (
+                                    client := GlobalState.bot.get_client()
+                                ):
                                     kwargs["client"] = client
 
                             await handler(**kwargs)
@@ -140,8 +142,7 @@ async def handle_connection(websocket: ServerConnection, client: lightbulb.Clien
         if client_id in authenticated_client:
             del authenticated_client[client_id]
 
-        if MINECRAFT_SERVERS:
-            MINECRAFT_SERVERS.clear()
+        GlobalState.minecraft.clear_servers()
 
         # Keep connections at debug level, not info
         logger.debug(f"WebSocket connection closed [id={client_id}]")

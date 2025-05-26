@@ -2,8 +2,8 @@ from logging import Logger
 
 from websockets import ServerConnection
 
+from core import GlobalState
 from debug import get_logger
-from helper.minecraft import MINECRAFT_SERVERS
 from model import WebSocketKeys
 from settings import Settings
 
@@ -29,8 +29,7 @@ async def authenticate(websocket: ServerConnection, data: AuthenticateSchema) ->
     authenticated_client[client_id] = (websocket, data)
 
     # Update the Minecraft server list
-    MINECRAFT_SERVERS.append("all")
-    MINECRAFT_SERVERS.extend(data.server_list)
+    GlobalState.minecraft.add_server(data.server_list + ["all"])
 
     logger.info(
         f"Client [id={client_id}] authenticated successfully (server_list={data.server_list})"

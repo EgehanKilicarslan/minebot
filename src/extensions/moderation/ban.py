@@ -44,7 +44,7 @@ class Ban(
 
     @lightbulb.invoke
     async def invoke(self, ctx: lightbulb.Context) -> None:
-        target_member: hikari.Member | None = await UserHelper.fetch_member(ctx.client, self.user)
+        target_member: hikari.Member | None = await UserHelper.fetch_member(self.user)
 
         assert ctx.member is not None
         assert target_member is not None
