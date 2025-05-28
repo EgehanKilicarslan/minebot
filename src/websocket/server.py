@@ -56,7 +56,7 @@ class WebSocketServer:
             from cryptography.x509.oid import NameOID
 
             # Create certificate directory if it doesn't exist
-            cert_path = Path("configuration/websocket")
+            cert_path = Path("configuration/certs")
             cert_path.mkdir(parents=True, exist_ok=True)
 
             # Always use 'localhost' for local development certificates
