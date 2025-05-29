@@ -213,6 +213,62 @@
         }
       }
     },
+    "timeout": {
+      "command": {
+        "label": "sustur",
+        "description": "Sunucudan bir kullanıcıyı sustur.",
+        "options": {
+          "user": {
+            "label": "kullanıcı",
+            "description": "Susturulacak kullanıcı."
+          },
+          "duration": {
+            "label": "süre",
+            "description": "Susturma süresi."
+          },
+          "reason": {
+            "label": "sebep",
+            "description": "Susturma sebebi."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Susturma Başarılı",
+              "description": "{discord_user_mention} başarıyla susturuldu.",
+              "color": "YELLOW"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Susturma Başarılı",
+              "description": "{discord_user_mention} kullanıcısı başarıyla susturuldu.",
+              "color": "YELLOW",
+              "fields": [
+                {
+                  "name": "Yetkili",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Sebep",
+                  "value": "{reason}"
+                },
+                {
+                  "name": "Süre",
+                  "value": "{duration}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
     "suggest": {
       "command": {
         "label": "öneri",
@@ -540,6 +596,14 @@
             "value": "{discord_user_id}"
           }
         ]
+      }
+    },
+    "user_already_timed_out": {
+      "message_type": "embed",
+      "content": {
+        "title": "Zaten Susturulmuş",
+        "description": "{discord_user_mention} zaten susturulmuş.",
+        "color": "RED"
       }
     }
   },

@@ -199,6 +199,62 @@
         }
       }
     },
+    "timeout": {
+      "command": {
+        "label": "timeout",
+        "description": "Timeout a user in the server.",
+        "options": {
+          "user": {
+            "label": "user",
+            "description": "The user to timeout."
+          },
+          "duration": {
+            "label": "duration",
+            "description": "The duration of the timeout."
+          },
+          "reason": {
+            "label": "reason",
+            "description": "The reason for the timeout."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Timeout Successful",
+              "description": "You have been timed out {discord_user_mention} in the server.",
+              "color": "YELLOW"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "User Timed Out",
+              "description": "{discord_user_mention} has been timed out in the server.",
+              "color": "YELLOW",
+              "fields": [
+                {
+                  "name": "Moderator",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Reason",
+                  "value": "{reason}"
+                },
+                {
+                  "name": "Duration",
+                  "value": "{duration}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
     "suggest": {
       "command": {
         "label": "suggest",
@@ -532,6 +588,14 @@
             "value": "{discord_staff_user_mention}"
           }
         ]
+      }
+    },
+    "user_already_timed_out": {
+      "message_type": "embed",
+      "content": {
+        "title": "User Already Timed Out",
+        "description": "{discord_user_mention} is already timed out.",
+        "color": "RED"
       }
     }
   },

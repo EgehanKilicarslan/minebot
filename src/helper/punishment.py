@@ -188,9 +188,26 @@ class PunishmentHelper:
             await TemporaryActionService.delete_temporary_action(action_id)
             return
 
+        # Discord's max timeout duration (28 days in seconds)
+        max_timeout: Final[int] = 2419200
+
         # Handle timeout refresh
         if refresh_at and expires_at and refresh_at < expires_at:
             await cls._handle_timeout_refresh(client, guild, action, action_id, now, no_reason)
+        # Initialize refresh for long timeouts that don't have refresh_at set
+        elif expires_at and refresh_at is None and (expires_at - now).total_seconds() > max_timeout:
+            logger.debug(f"Setting up initial refresh for long timeout for user {action.user_id}")
+            # Create a modified action with an initial refresh_at value
+            modified_action = TemporaryActionSchema(
+                id=action.id,
+                user_id=action.user_id,
+                punishment_type=action.punishment_type,
+                expires_at=action.expires_at,
+                refresh_at=now + timedelta(seconds=max_timeout),
+            )
+            await cls._handle_timeout_refresh(
+                client, guild, modified_action, action_id, now, no_reason
+            )
         # Schedule timeout removal
         elif expires_at:
             delay = int((expires_at - now).total_seconds())
@@ -215,41 +232,63 @@ class PunishmentHelper:
             )
             return
 
-        seconds = int((action.refresh_at - now).total_seconds())
+        expires_at = action.expires_at
+        if expires_at is None:
+            logger.warning(
+                f"Attempted to refresh timeout for user {action.user_id} with None expires_at"
+            )
+            return
+
+        # Ensure expires_at is timezone-aware
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+        # Calculate time until expiration (not until refresh)
+        time_until_expiry = int((expires_at - now).total_seconds())
         max_timeout: Final[int] = 2419200  # 28 days in seconds (Discord limit)
 
-        if seconds > max_timeout:
-            # Apply max allowed timeout and schedule a refresh
-            try:
-                await client.rest.edit_member(
-                    guild,
-                    action.user_id,
-                    communication_disabled_until=now + timedelta(seconds=max_timeout),
-                    reason=no_reason,
-                )
+        try:
+            # Apply the timeout (either max allowed or remaining time if less)
+            timeout_duration = min(time_until_expiry, max_timeout)
+            await client.rest.edit_member(
+                guild,
+                action.user_id,
+                communication_disabled_until=now + timedelta(seconds=timeout_duration),
+                reason=no_reason,
+            )
+
+            # Check if we'll need another refresh later
+            if time_until_expiry > max_timeout:
+                # Need another refresh after this one
                 next_refresh = now + timedelta(seconds=max_timeout)
+                logger.debug(
+                    f"Scheduling next timeout refresh for user {action.user_id} at {next_refresh}"
+                )
                 await TemporaryActionService.create_or_update_temporary_action(
                     TemporaryActionSchema(
                         id=action_id,
                         user_id=action.user_id,
                         punishment_type=action.punishment_type,
-                        expires_at=action.expires_at,
+                        expires_at=expires_at,
                         refresh_at=next_refresh,
                     )
                 )
-            except Exception as e:
-                logger.error(f"Error refreshing timeout for user {action.user_id}: {e}")
-        else:
-            # No further refresh needed
-            await TemporaryActionService.create_or_update_temporary_action(
-                TemporaryActionSchema(
-                    id=action_id,
-                    user_id=action.user_id,
-                    punishment_type=action.punishment_type,
-                    expires_at=action.expires_at,
-                    refresh_at=None,
+            else:
+                # No further refresh needed
+                logger.debug(
+                    f"No further refreshes needed for user {action.user_id}, expires in {time_until_expiry} seconds"
                 )
-            )
+                await TemporaryActionService.create_or_update_temporary_action(
+                    TemporaryActionSchema(
+                        id=action_id,
+                        user_id=action.user_id,
+                        punishment_type=action.punishment_type,
+                        expires_at=expires_at,
+                        refresh_at=None,
+                    )
+                )
+        except Exception as e:
+            logger.error(f"Error refreshing timeout for user {action.user_id}: {e}")
 
     @staticmethod
     def _create_timeout_expiry_task(

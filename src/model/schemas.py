@@ -290,6 +290,7 @@ class CommandConfiguration(BaseModel):
     link_account: LinkAccountCommandConfig | None = None
     withdraw_rewards: LoggedCommandConfig | None = None
     ban: LoggedCommandConfig | None = None
+    timeout: LoggedCommandConfig | None = None
     suggest: SuggestCommandConfig | None = None
     wiki: BasicCommand | None = None
 
@@ -374,6 +375,29 @@ class BanLocalization(BaseModel):
     messages: BanMessages
 
 
+class TimeoutParameters(BaseModel):
+    user: DescriptiveElement
+    duration: DescriptiveElement
+    reason: DescriptiveElement
+
+
+class TimeoutCommandParameters(DescriptiveElement):
+    options: TimeoutParameters
+
+
+class TimeoutMessages(BaseModel):
+    class SuccessMessage(BaseModel):
+        success: DiscordMessage
+
+    user: SuccessMessage
+    log: SuccessMessage
+
+
+class TimeoutLocalization(BaseModel):
+    command: TimeoutCommandParameters
+    messages: TimeoutMessages
+
+
 class SuggestMessages(BaseModel):
     class Minecraft(BaseModel):
         approve: TextMessage
@@ -446,6 +470,7 @@ class CommandLocalization(BaseModel):
     link_account: LinkAccountLocalization
     withdraw_rewards: WithdrawRewardsLocalization
     ban: BanLocalization
+    timeout: TimeoutLocalization
     suggest: SuggestLocalization
     wiki: WikiLocalization
 
@@ -482,6 +507,7 @@ class ErrorLocalization(BaseModel):
     account_not_linked: DiscordMessage
     player_not_online: DiscordMessage
     can_not_moderate: DiscordMessage
+    user_already_timed_out: DiscordMessage
 
 
 class TimeUnitsLocalization(BaseModel):
