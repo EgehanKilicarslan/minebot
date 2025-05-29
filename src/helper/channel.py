@@ -19,7 +19,10 @@ class ChannelHelper:
     def _get_client(cls) -> lightbulb.Client:
         """Get and cache the client if not already cached."""
         if cls._client is None:
+            logger.debug("Caching client instance")
             cls._client = GlobalState.bot.get_client()
+        else:
+            logger.debug("Using cached client instance")
         return cls._client
 
     @staticmethod

@@ -73,6 +73,9 @@ class Ban(
 
         # Handle temporary ban if duration is provided
         if self.duration:
+            # Add duration to common parameters for logging and user feedback
+            common_params["duration"] = self.duration
+
             # Convert duration string (like "1d2h") to a timedelta object
             parsed_duration = TimeHelper(ctx.interaction.locale).parse_time_string(self.duration)
 

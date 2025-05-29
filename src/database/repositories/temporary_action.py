@@ -50,6 +50,14 @@ class TemporaryActionRepository:
         logger.debug(f"Found {len(actions)} temporary actions of type: {punishment_type}")
         return actions
 
+    async def get_all(self) -> list[TemporaryAction]:
+        """Get all temporary actions."""
+        logger.debug("Fetching all temporary actions")
+        result: Result[tuple[TemporaryAction]] = await self.session.execute(select(TemporaryAction))
+        actions = list(result.scalars().all())
+        logger.debug(f"Found {len(actions)} temporary actions in total")
+        return actions
+
     async def create(self, action_schema: TemporaryActionSchema) -> TemporaryAction:
         """Create a new temporary action."""
         logger.debug(

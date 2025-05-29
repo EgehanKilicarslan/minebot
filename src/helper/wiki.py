@@ -25,7 +25,10 @@ class WikiHelper:
     def _get_guild_locale(cls) -> hikari.Locale:
         """Get and cache the guild locale if not already cached."""
         if cls.GUILD_LANGUAGE is None:
+            logger.debug("Caching guild locale")
             cls.GUILD_LANGUAGE = GlobalState.guild.get_locale()
+        else:
+            logger.debug("Using cached guild locale")
         return cls.GUILD_LANGUAGE
 
     @classmethod

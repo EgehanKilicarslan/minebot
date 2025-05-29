@@ -74,6 +74,21 @@ class TemporaryActionService:
             return [TemporaryActionSchema.model_validate(action) for action in actions]
 
     @staticmethod
+    async def get_all_temporary_actions() -> list[TemporaryActionSchema]:
+        """
+        Get all temporary actions.
+
+        Returns:
+            List of all TemporaryActionSchema objects
+        """
+        logger.debug("Getting all temporary actions")
+        async with get_db_session() as session:
+            repository = TemporaryActionRepository(session)
+            actions: list[TemporaryAction] = await repository.get_all()
+            logger.debug(f"Found {len(actions)} total temporary actions")
+            return [TemporaryActionSchema.model_validate(action) for action in actions]
+
+    @staticmethod
     async def create_or_update_temporary_action(
         action_data: TemporaryActionSchema,
     ) -> TemporaryActionSchema:

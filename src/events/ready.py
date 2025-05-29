@@ -7,6 +7,7 @@ import toolbox
 
 from core import GlobalState
 from debug import get_logger
+from helper.punishment import PunishmentHelper
 from model import SecretKeys
 from settings import Settings
 
@@ -47,10 +48,14 @@ async def on_ready(event: hikari.ShardReadyEvent) -> None:
             raise Exception("Bot does not have administrator permissions.")
         logger.info("Bot has the required administrator permissions.")
 
+        # Set booster role
         guild_roles: Sequence[hikari.Role] = await guild.fetch_roles()
         GlobalState.guild.set_booster_role(
             next((r for r in guild_roles if r.is_premium_subscriber_role), None)
         )
+
+        # Schedule punishment tasks
+        await PunishmentHelper.schedule_punishment_tasks()
 
         logger.info("Bot is ready and fully operational.")
     except Exception as e:
