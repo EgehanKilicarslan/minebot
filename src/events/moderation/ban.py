@@ -6,7 +6,7 @@ import lightbulb
 from database.schemas import PunishmentLogSchema
 from database.services import PunishmentLogService
 from helper import CommandHelper, MessageHelper, PunishmentHelper, TimeHelper, UserHelper
-from model import CommandsKeys, MessageKeys
+from model import CommandsKeys, MessageKeys, PunishmentSource, PunishmentType
 
 # Helper that manages event configuration and localization
 helper: CommandHelper = CommandHelper(CommandsKeys.BAN)
@@ -33,7 +33,7 @@ async def on_ban_create(event: hikari.AuditLogEntryCreateEvent) -> None:
     # --- Check for duplicate entries ---
     # Get the most recent ban for this user
     punishment = await PunishmentLogService.get_filtered_punishment_logs(
-        user_id=target_id, punishment_type="ban", get_latest=True
+        user_id=target_id, punishment_type=PunishmentType.BAN, get_latest=True
     )
 
     create_new_entry = True
@@ -61,10 +61,10 @@ async def on_ban_create(event: hikari.AuditLogEntryCreateEvent) -> None:
         punishment = await PunishmentLogService.create_or_update_punishment_log(
             PunishmentLogSchema(
                 user_id=target_id,
-                punishment_type="ban",
+                punishment_type=PunishmentType.BAN,
                 reason=reason_messages[1],
                 staff_id=staff_id,
-                source="discord",
+                source=PunishmentSource.DISCORD,
             )
         )
 

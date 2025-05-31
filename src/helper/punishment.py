@@ -11,7 +11,7 @@ from database.schemas import TemporaryActionSchema
 from database.services import TemporaryActionService
 from debug import get_logger
 from helper import MessageHelper
-from model import MessageKeys, SecretKeys
+from model import MessageKeys, PunishmentType, SecretKeys
 from settings import Settings
 
 logger: Logger = get_logger(__name__)
@@ -98,13 +98,16 @@ class PunishmentHelper:
         no_reason = MessageHelper(MessageKeys.GENERAL_NO_REASON)._decode_plain()
         now = datetime.now(timezone.utc)
 
-        handlers = {"ban": cls._handle_ban_action, "timeout": cls._handle_timeout_action}
+        handlers = {
+            PunishmentType.BAN: cls._handle_ban_action,
+            PunishmentType.TIMEOUT: cls._handle_timeout_action,
+        }
 
         for action in temp_actions:
             if action.id is None:
                 continue
 
-            handler = handlers.get(action.punishment_type)
+            handler = handlers.get(getattr(PunishmentType, action.punishment_type.upper()))
             if handler:
                 await handler(client, guild, action, now, no_reason)
             else:

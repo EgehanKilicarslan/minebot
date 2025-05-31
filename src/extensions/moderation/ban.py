@@ -6,7 +6,7 @@ import lightbulb
 from database.schemas import PunishmentLogSchema, TemporaryActionSchema
 from database.services import PunishmentLogService, TemporaryActionService
 from helper import CommandHelper, MessageHelper, PunishmentHelper, TimeHelper, UserHelper
-from model import CommandsKeys, MessageKeys
+from model import CommandsKeys, MessageKeys, PunishmentSource, PunishmentType
 
 # Helper that manages command configuration and localization
 helper = CommandHelper(CommandsKeys.BAN)
@@ -56,7 +56,7 @@ class Ban(
         temporary_action = await TemporaryActionService.create_or_update_temporary_action(
             TemporaryActionSchema(
                 user_id=target_member.id,
-                punishment_type="ban",
+                punishment_type=PunishmentType.BAN,
                 expires_at=expires_at,
             )
         )
@@ -130,12 +130,12 @@ class Ban(
         await PunishmentLogService.create_or_update_punishment_log(
             PunishmentLogSchema(
                 user_id=target_member.id,
-                punishment_type="ban",
+                punishment_type=PunishmentType.BAN,
                 reason=reason_messages[1],
                 staff_id=ctx.member.id,
                 duration=duration_seconds,
                 expires_at=expiry,  # Will be None for permanent bans
-                source="discord",
+                source=PunishmentSource.DISCORD,
             )
         )
 

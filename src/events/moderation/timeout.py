@@ -9,7 +9,7 @@ from database.schemas.temporary_action import TemporaryActionSchema
 from database.services import PunishmentLogService
 from database.services.temporary_action import TemporaryActionService
 from helper import CommandHelper, MessageHelper, PunishmentHelper, TimeHelper, UserHelper
-from model import CommandsKeys, MessageKeys
+from model import CommandsKeys, MessageKeys, PunishmentSource, PunishmentType
 
 # Helper that manages event configuration and localization
 helper: CommandHelper = CommandHelper(CommandsKeys.TIMEOUT)
@@ -46,7 +46,7 @@ async def on_member_update(event: hikari.AuditLogEntryCreateEvent) -> None:
 
     # --- Check if that the refresh timeout ---
     temp_punishment = await TemporaryActionService.get_filtered_temporoary_action_logs(
-        user_id=target_id, punishment_type="timeout", get_latest=True
+        user_id=target_id, punishment_type=PunishmentType.TIMEOUT, get_latest=True
     )
 
     if temp_punishment:
@@ -64,7 +64,7 @@ async def on_member_update(event: hikari.AuditLogEntryCreateEvent) -> None:
     # --- Check for duplicate entries ---
     # Get the most recent timeout for this user
     punishment = await PunishmentLogService.get_filtered_punishment_logs(
-        user_id=target_id, punishment_type="timeout", get_latest=True
+        user_id=target_id, punishment_type=PunishmentType.TIMEOUT, get_latest=True
     )
 
     # Check if the punishment is recent enough to correspond to this timeout event
@@ -97,12 +97,12 @@ async def on_member_update(event: hikari.AuditLogEntryCreateEvent) -> None:
         punishment = await PunishmentLogService.create_or_update_punishment_log(
             PunishmentLogSchema(
                 user_id=target_id,
-                punishment_type="timeout",
+                punishment_type=PunishmentType.TIMEOUT,
                 reason=reason_messages[1],
                 staff_id=staff_id,
                 duration=duration_seconds,
                 expires_at=communication_disabled_until,
-                source="discord",
+                source=PunishmentSource.DISCORD,
             )
         )
 

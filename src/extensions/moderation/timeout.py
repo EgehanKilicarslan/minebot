@@ -7,7 +7,7 @@ import lightbulb
 from database.schemas import PunishmentLogSchema, TemporaryActionSchema
 from database.services import PunishmentLogService, TemporaryActionService
 from helper import CommandHelper, MessageHelper, PunishmentHelper, TimeHelper, UserHelper
-from model import CommandsKeys, MessageKeys
+from model import CommandsKeys, MessageKeys, PunishmentSource, PunishmentType
 
 # Helper that manages command configuration and localization
 helper: CommandHelper = CommandHelper(CommandsKeys.TIMEOUT)
@@ -72,7 +72,7 @@ class Timeout(
                     TemporaryActionSchema(
                         id=punishment.id,
                         user_id=punishment.user_id,
-                        punishment_type="timeout",
+                        punishment_type=PunishmentType.TIMEOUT,
                         expires_at=punishment.expires_at,
                         refresh_at=next_refresh,  # Ensure this is not None
                     )
@@ -98,7 +98,7 @@ class Timeout(
                     TemporaryActionSchema(
                         id=punishment.id,
                         user_id=punishment.user_id,
-                        punishment_type="timeout",
+                        punishment_type=PunishmentType.TIMEOUT,
                         expires_at=punishment.expires_at,
                         refresh_at=None,  # Only set to None for final period
                     )
@@ -133,7 +133,7 @@ class Timeout(
         punishment = await TemporaryActionService.create_or_update_temporary_action(
             TemporaryActionSchema(
                 user_id=target_member.id,
-                punishment_type="timeout",
+                punishment_type=PunishmentType.TIMEOUT,
                 expires_at=expires_at,
                 refresh_at=initial_timeout_end,
             )
@@ -167,12 +167,12 @@ class Timeout(
         await PunishmentLogService.create_or_update_punishment_log(
             PunishmentLogSchema(
                 user_id=target_member.id,
-                punishment_type="timeout",
+                punishment_type=PunishmentType.TIMEOUT,
                 reason=reason_messages[1],
                 staff_id=ctx.member.id,
                 duration=int(parsed_duration.total_seconds()),
                 expires_at=expires_at,
-                source="discord",
+                source=PunishmentSource.DISCORD,
             )
         )
 
@@ -212,7 +212,7 @@ class Timeout(
             return
 
         # Check if user is already timed out
-        if target_member.raw_communication_disabled_until is not None:
+        if target_member.communication_disabled_until() is not None:
             await MessageHelper(
                 MessageKeys.USER_ALREADY_TIMED_OUT, locale=ctx.interaction.locale, **common_params
             ).send_response(ctx, ephemeral=True)

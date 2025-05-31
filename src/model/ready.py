@@ -26,3 +26,17 @@ class MessageType(Enum):
     QUESTION = "QUESTION"
     ANNOUNCE = "ANNOUNCE"
     NO_PREFIX = "NO_PREFIX"
+
+
+class PunishmentType(str, Enum):
+    """Types of punishments that can be applied to users"""
+
+    BAN = "ban"
+    TIMEOUT = "timeout"
+
+
+class PunishmentSource(str, Enum):
+    """Sources of punishment for users"""
+
+    DISCORD = "discord"
+    MINECRAFT = "minecraft"
