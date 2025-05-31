@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta, timezone
 
 import hikari
 import lightbulb
@@ -23,7 +23,7 @@ class Ban(
     contexts=[hikari.ApplicationContextType.GUILD],
     localize=True,
 ):
-    # Command parameters for banning a user
+    # User parameter definition for the ban command target
     user: hikari.User = lightbulb.user(
         "extensions.ban.options.user.label",
         "extensions.ban.options.user.description",
@@ -44,95 +44,121 @@ class Ban(
         default=None,
     )
 
+    async def _handle_temporary_ban(
+        self,
+        ctx: lightbulb.Context,
+        target_member: hikari.Member,
+        parsed_duration: timedelta,
+    ) -> None:
+        """Handle the creation and scheduling of a temporary ban."""
+        # Persist temporary ban information to database with expiration
+        expires_at = datetime.now(timezone.utc) + parsed_duration
+        temporary_action = await TemporaryActionService.create_or_update_temporary_action(
+            TemporaryActionSchema(
+                user_id=target_member.id,
+                punishment_type="ban",
+                expires_at=expires_at,
+            )
+        )
+
+        # Register timed task to automatically unban when duration expires
+        @ctx.client.task(
+            lightbulb.uniformtrigger(seconds=int(parsed_duration.total_seconds())),
+            max_invocations=1,
+        )
+        async def handle_temporary_ban() -> None:
+            try:
+                # Remove the ban when time period completes
+                await target_member.unban(
+                    reason=MessageHelper(key=MessageKeys.GENERAL_NO_REASON)._decode_plain()
+                )
+
+                # Remove temporary action record from database after completion
+                if temporary_action.id is not None:
+                    await TemporaryActionService.delete_temporary_action(temporary_action.id)
+            except Exception as e:
+                # Record error details for debugging and monitoring
+                print(f"Error in temporary ban handler: {e}")
+
     @lightbulb.invoke
     async def invoke(self, ctx: lightbulb.Context) -> None:
-        # Get Member object for target user
-        target_member: hikari.Member | None = await UserHelper.fetch_member(self.user)
-
-        # Safety assertions to ensure member objects are available
+        # Verify guild context exists for ban operation
+        assert ctx.guild_id is not None
         assert ctx.member is not None
-        assert target_member is not None
 
-        # Common parameters used in multiple message templates
-        common_params = {
-            "discord_username": target_member.username,
-            "discord_user_id": str(target_member.id),
-            "discord_user_mention": target_member.mention,
-            "discord_staff_username": ctx.member.username,
-            "discord_staff_user_id": str(ctx.member.id),
-            "discord_staff_user_mention": ctx.member.mention,
-        }
+        # Retrieve complete member information for the ban target
+        target_member = await UserHelper.fetch_member(self.user)
+        if not target_member:
+            await MessageHelper(
+                MessageKeys.MEMBER_NOT_FOUND, locale=ctx.interaction.locale
+            ).send_response(ctx, ephemeral=True)
+            return
 
-        # Check if the moderator has sufficient permissions to ban the target
-        # (prevents banning users with higher roles, other moderators, etc.)
+        # Verify permission hierarchy allows this moderation action
         if not PunishmentHelper.can_moderate(target_member, ctx.member):
             await MessageHelper(
                 MessageKeys.CAN_NOT_MODERATE, locale=ctx.interaction.locale
             ).send_response(ctx, ephemeral=True)
             return
 
-        # Handle temporary ban if duration is provided
+        # Setup timing variables for temporary ban processing
+        parsed_duration = timedelta(0)
+        formatted_duration = None
+        expiry = None
+
+        # Process duration parameter if specified by moderator
         if self.duration:
-            # Add duration to common parameters for logging and user feedback
-            common_params["duration"] = self.duration
+            time_helper = TimeHelper(ctx.interaction.locale)
+            parsed_duration = time_helper.parse_time_string(self.duration)
 
-            # Convert duration string (like "1d2h") to a timedelta object
-            parsed_duration = TimeHelper(ctx.interaction.locale).parse_time_string(self.duration)
-
+            # Configure temporary ban only for valid positive durations
             if parsed_duration.total_seconds() > 0:
-                # Store temporary action in database for tracking and recovery in case of bot restart
-                temporary_action = await TemporaryActionService.create_or_update_temporary_action(
-                    TemporaryActionSchema(
-                        user_id=target_member.id,
-                        punishment_type="ban",
-                        expires_at=datetime.datetime.now(datetime.timezone.utc) + parsed_duration,
-                    )
-                )
+                formatted_duration = time_helper.from_timedelta(parsed_duration)
+                expiry = datetime.now(timezone.utc) + parsed_duration
 
-                # Schedule the unban task to run after the specified duration
-                @ctx.client.task(
-                    lightbulb.uniformtrigger(seconds=int(parsed_duration.total_seconds())),
-                    max_invocations=1,  # Only run once
-                )
-                async def handle_temporary_ban() -> None:
-                    # Unban the user when duration expires
-                    await target_member.unban(
-                        reason=MessageHelper(key=MessageKeys.GENERAL_NO_REASON)._decode_plain()
-                    )
-
-                    # Clean up the temporary action from the database
-                    assert temporary_action.id is not None
-                    await TemporaryActionService.delete_temporary_action(temporary_action.id)
-
-        # Get formatted reason messages for different contexts (user-facing and logs)
+        # Generate appropriate reason text for logging and notifications
         reason_messages = PunishmentHelper.get_reason(self.reason, ctx.interaction.locale)
 
-        # Execute the ban with the staff-facing reason
-        await target_member.ban(reason=reason_messages[1])
+        # Set up automatic unban for temporary bans
+        if self.duration and parsed_duration.total_seconds() > 0:
+            await self._handle_temporary_ban(ctx, target_member, parsed_duration)
 
-        # Log the punishment in the database for record-keeping
+        # Record punishment details in moderation history database
+        duration_seconds = (
+            int(parsed_duration.total_seconds()) if parsed_duration.total_seconds() > 0 else None
+        )
         await PunishmentLogService.create_or_update_punishment_log(
             PunishmentLogSchema(
                 user_id=target_member.id,
                 punishment_type="ban",
                 reason=reason_messages[1],
                 staff_id=ctx.member.id,
+                duration=duration_seconds,
+                expires_at=expiry,  # Will be None for permanent bans
                 source="discord",
             )
         )
 
-        # Send success message to the command executor
+        # Apply the ban through Discord API with moderator reason
+        await target_member.ban(reason=reason_messages[1])
+
+        # Notify moderator of successful action with duration details
+        if formatted_duration is None and self.duration:
+            # Initialize time formatter if not already available
+            time_helper = (
+                TimeHelper(ctx.interaction.locale) if "time_helper" not in locals() else time_helper
+            )
+            formatted_duration = time_helper.from_timedelta(parsed_duration)
+
         await MessageHelper(
             MessageKeys.BAN_COMMAND_USER_SUCCESS,
             locale=ctx.interaction.locale,
-            **common_params,
+            discord_username=target_member.username,
+            discord_user_id=str(target_member.id),
+            discord_user_mention=target_member.mention,
+            discord_staff_username=ctx.member.username,
+            discord_staff_user_id=str(ctx.member.id),
+            discord_staff_user_mention=ctx.member.mention,
+            duration=formatted_duration,  # Empty string if None
             reason=reason_messages[0],  # User-facing reason
         ).send_response(ctx, ephemeral=True)
-
-        # Log the ban in a designated moderation log channel
-        await MessageHelper(
-            MessageKeys.BAN_COMMAND_LOG_SUCCESS,
-            locale=ctx.interaction.locale,
-            **common_params,
-            reason=reason_messages[1],  # Staff-facing/detailed reason
-        ).send_to_log_channel(helper)

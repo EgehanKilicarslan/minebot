@@ -56,10 +56,14 @@ class PunishmentHelper:
             return False
 
     @staticmethod
-    def get_reason(reason: str | None, locale: str | hikari.Locale) -> tuple[str, str]:
+    def get_reason(reason: str | None, locale: str | hikari.Locale | None) -> tuple[str, str]:
         """Get reason for a punishment action with localization support."""
         if reason:
             return reason, reason
+
+        if locale is None:
+            message = MessageHelper(MessageKeys.GENERAL_NO_REASON)._decode_plain()
+            return message, message
 
         messages = MessageHelper(
             MessageKeys.GENERAL_NO_REASON, user_locale=locale

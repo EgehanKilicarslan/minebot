@@ -68,6 +68,7 @@ class TemporaryActionRepository:
             id=action_schema.id,
             user_id=action_schema.user_id,
             punishment_type=action_schema.punishment_type,
+            created_at=action_schema.created_at,
             expires_at=action_schema.expires_at,
             refresh_at=action_schema.refresh_at,
         )
@@ -90,6 +91,7 @@ class TemporaryActionRepository:
         # Update fields
         temporary_action.user_id = action_schema.user_id
         temporary_action.punishment_type = action_schema.punishment_type
+        temporary_action.created_at = action_schema.created_at
         temporary_action.expires_at = action_schema.expires_at
         temporary_action.refresh_at = action_schema.refresh_at
 
@@ -108,3 +110,109 @@ class TemporaryActionRepository:
         await self.session.delete(temporary_action)
         await self.session.flush()
         return True
+
+    async def get_latest_filtered_log(
+        self,
+        user_id: int | None = None,
+        staff_id: int | None = None,
+        punishment_type: str | None = None,
+    ) -> TemporaryAction | None:
+        """
+        Get the latest (highest ID) punishment log matching the filters.
+
+        Args:
+            user_id: Optional filter by user ID
+            staff_id: Optional filter by staff ID
+            punishment_type: Optional filter by punishment type
+
+        Returns:
+            A single PunishmentLog object or None if no matching logs
+        """
+        from sqlalchemy import desc, select
+
+        logger.debug(
+            f"Getting latest punishment log with filters: user_id={user_id}, "
+            f"staff_id={staff_id}, punishment_type={punishment_type}"
+        )
+
+        query = select(TemporaryAction)
+
+        # Apply filters
+        if user_id is not None:
+            query = query.where(TemporaryAction.user_id == user_id)
+
+        if staff_id is not None:
+            query = query.where(TemporaryAction.staff_id == staff_id)
+
+        if punishment_type is not None:
+            query = query.where(TemporaryAction.punishment_type == punishment_type)
+
+        # Get the highest ID (most recent log)
+        query = query.order_by(desc(TemporaryAction.id)).limit(1)
+
+        result = await self.session.execute(query)
+        log = result.scalars().first()
+
+        if log:
+            logger.debug(f"Found latest log with ID: {log.id}")
+        else:
+            logger.debug("No matching logs found")
+
+        return log
+
+    async def get_filtered_logs(
+        self,
+        user_id: int | None = None,
+        staff_id: int | None = None,
+        punishment_type: str | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+    ) -> list[TemporaryAction]:
+        """
+        Get punishment logs with custom filtering.
+
+        Args:
+            user_id: Optional filter by user ID
+            staff_id: Optional filter by staff ID
+            punishment_type: Optional filter by punishment type
+            limit: Optional limit on the number of results
+            offset: Optional offset for pagination
+
+        Returns:
+            List of PunishmentLog objects matching the criteria
+        """
+        from sqlalchemy import desc, select
+
+        logger.debug(
+            f"Building filtered query with parameters: user_id={user_id}, "
+            f"staff_id={staff_id}, punishment_type={punishment_type}"
+        )
+
+        query = select(TemporaryAction)
+
+        # Apply filters
+        if user_id is not None:
+            query = query.where(TemporaryAction.user_id == user_id)
+
+        if staff_id is not None:
+            query = query.where(TemporaryAction.staff_id == staff_id)
+
+        if punishment_type is not None:
+            query = query.where(TemporaryAction.punishment_type == punishment_type)
+
+        # Order by ID descending (newest first)
+        query = query.order_by(desc(TemporaryAction.id))
+
+        # Apply pagination
+        if limit is not None:
+            query = query.limit(limit)
+
+        if offset is not None:
+            query = query.offset(offset)
+
+        logger.debug("Executing filtered punishment logs query")
+        result = await self.session.execute(query)
+        logs = list(result.scalars().all())
+        logger.debug(f"Found {len(logs)} logs matching the filter criteria")
+
+        return logs

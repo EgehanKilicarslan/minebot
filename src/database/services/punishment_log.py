@@ -139,3 +139,60 @@ class PunishmentLogService:
             result = await repository.delete(log_id)
             logger.debug(f"Deletion result for punishment log {log_id}: {result}")
             return result
+
+    @staticmethod
+    async def get_filtered_punishment_logs(
+        user_id: int | None = None,
+        staff_id: int | None = None,
+        punishment_type: str | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+        get_latest: bool = False,
+    ) -> None | PunishmentLogSchema | list[PunishmentLogSchema]:
+        """
+        Get punishment logs with custom filtering.
+
+        Args:
+            user_id: Optional filter by user ID
+            staff_id: Optional filter by staff ID
+            punishment_type: Optional filter by punishment type
+            limit: Optional limit on the number of results
+            offset: Optional offset for pagination
+            get_latest: If True, returns only the most recent log (not a list)
+
+        Returns:
+            Single PunishmentLogSchema if get_latest=True, otherwise list of PunishmentLogSchema objects.
+            If get_latest=True and no logs found, returns None.
+        """
+        logger.debug(
+            f"Getting filtered punishment logs with filters: "
+            f"user_id={user_id}, staff_id={staff_id}, "
+            f"punishment_type={punishment_type}, limit={limit}, offset={offset}, "
+            f"get_latest={get_latest}"
+        )
+
+        async with get_db_session() as session:
+            repository = PunishmentLogRepository(session)
+
+            if get_latest:
+                log = await repository.get_latest_filtered_log(
+                    user_id=user_id, staff_id=staff_id, punishment_type=punishment_type
+                )
+
+                if log:
+                    logger.debug(f"Found latest punishment log with ID: {log.id}")
+                    return PunishmentLogSchema.model_validate(log)
+                else:
+                    logger.debug("No matching logs found for latest filter")
+                    return None
+            else:
+                logs = await repository.get_filtered_logs(
+                    user_id=user_id,
+                    staff_id=staff_id,
+                    punishment_type=punishment_type,
+                    limit=limit,
+                    offset=offset,
+                )
+
+                logger.debug(f"Found {len(logs)} punishment logs matching filters")
+                return [PunishmentLogSchema.model_validate(log) for log in logs]
