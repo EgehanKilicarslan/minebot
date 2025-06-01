@@ -10,7 +10,6 @@ Each command is configured through a JSON structure that determines its behavior
 
 ```json
 "ban": {
-    "enabled": true,
     "permissions": ["BAN_MEMBERS"],
     "cooldown": {
         "algorithm": "fixed_window",
@@ -18,10 +17,7 @@ Each command is configured through a JSON structure that determines its behavior
         "window_length": 60,
         "allowed_invocations": 1
     },
-    "log": {
-        "enabled": true,
-        "channel": 1163899262044745790
-    }
+    "log": 1163899262044745790
 }
 ```
 
@@ -29,15 +25,7 @@ Each command is configured through a JSON structure that determines its behavior
 
 ### Command Activation
 
-```json
-"enabled": true
-```
-
-| Property  | Purpose                                | Values            | Default        |
-| --------- | -------------------------------------- | ----------------- | -------------- |
-| `enabled` | Controls whether the command is active | `true` or `false` | N/A (required) |
-
-- **Usage**: Quickly enable or disable commands without removing their configuration
+Commands are activated by their presence in the configuration. To disable a command, simply remove it from the configuration file.
 
 ### Permissions
 
@@ -85,24 +73,20 @@ Each command is configured through a JSON structure that determines its behavior
 ### Command Logging
 
 ```json
-"log": {
-    "enabled": true,
-    "channel": 1163899262044745790
-}
+"log": 1163899262044745790
 ```
 
-| Property  | Purpose                            | Values                   | Default                   |
-| --------- | ---------------------------------- | ------------------------ | ------------------------- |
-| `enabled` | Controls whether logging is active | `true` or `false`        | `false`                   |
-| `channel` | Channel ID for logs                | Valid Discord channel ID | N/A (required if enabled) |
+| Property | Purpose             | Values                   | Default |
+| -------- | ------------------- | ------------------------ | ------- |
+| `log`    | Channel ID for logs | Valid Discord channel ID | None    |
 
-- **Note**: If `log.enabled` is `false`, the `channel` property becomes optional
+- **Note**: If `log` is not specified, logging is disabled for the command
 
 ## 🔍 Real-World Example
 
 For the ban command shown above:
 
-1. ✅ **Status**: The command is active and available for use
+1. ✅ **Status**: The command is active because it's defined in the configuration
 2. 🔒 **Permissions**: Only users with the "Ban Members" permission can use this command
 3. ⏱️ **Cooldown**: Users can only use this command once every 60 seconds
 4. 📝 **Logging**: Every use of the ban command will be logged to the specified channel
@@ -113,13 +97,13 @@ You can simplify command configurations by omitting certain sections when defaul
 
 ```json
 "simple-command": {
-    "enabled": true
+    "permissions": ["NONE"]
 }
 ```
 
 This minimal configuration:
 
-- ✅ Enables the command
+- ✅ Enables the command by its presence in the configuration
 - 🔓 Sets permissions to `"NONE"` (anyone can use it)
 - 🕒 Has no cooldown restrictions
 - 📵 Has logging disabled
@@ -142,18 +126,15 @@ For administrators, this configuration can be modified in the `settings.json` fi
 ```json
 {
   "command-name": {
-    "enabled": true|false,                  // Required
-    "permissions": ["PERM1", "PERM2"],      // Optional, defaults to ["NONE"]
-    "cooldown": {                          // Optional, no cooldown if omitted
+    "permissions": ["PERM1", "PERM2"], // Optional, defaults to ["NONE"]
+    "cooldown": {
+      // Optional, no cooldown if omitted
       "algorithm": "fixed_window|sliding_window",
       "bucket": "user|channel|guild|global",
-      "window_length": 60,                 // Time in seconds
-      "allowed_invocations": 5             // Number of allowed uses
+      "window_length": 60, // Time in seconds
+      "allowed_invocations": 5 // Number of allowed uses
     },
-    "log": {                               // Optional, no logging if omitted
-      "enabled": true|false,
-      "channel": 1234567890123456789       // Discord channel ID
-    }
+    "log": 1234567890123456789 // Optional, Discord channel ID for logging
   }
 }
 ```
