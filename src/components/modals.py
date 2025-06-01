@@ -208,7 +208,7 @@ class LinkAccountConfirmModal(Modal):
 
 
 class SuggestRequestModal(Modal):
-    def __init__(self, user_locale: str, helper: CommandHelper) -> None:
+    def __init__(self, user_locale: str) -> None:
         # Get localized modal data based on user's locale
         modal_data: SuggestSendModal = Localization.get(ModalKeys.SUGGEST_SEND, locale=user_locale)
 
@@ -218,9 +218,12 @@ class SuggestRequestModal(Modal):
             instance=self, key=modal_data.fields.suggestion, min_lenght=10, max_length=4000
         )
 
+        # Fetch command configuration for suggestions
+        _command_data: SuggestCommandConfig = Settings.get(CommandsKeys.SUGGEST)
+        self._pending_channel: int = _command_data.pending_channel
+
         # Store data as private attributes for later use
         self._user_locale: str = user_locale
-        self._helper: CommandHelper = helper
 
     async def on_submit(self, ctx: ModalContext) -> None:
         suggestion: str = ctx.value_for(self.input) or "N/A"
@@ -235,7 +238,7 @@ class SuggestRequestModal(Modal):
         try:
             from components.menus import SuggestConfirmMenu
 
-            menu = SuggestConfirmMenu(self._helper)
+            menu = SuggestConfirmMenu()
 
             await MessageHelper(
                 key=MessageKeys.SUGGEST_USER_SUCCESS,
@@ -243,14 +246,18 @@ class SuggestRequestModal(Modal):
                 **common_params,
             ).send_response(ctx, ephemeral=True)
 
-            log_message: hikari.Message | None = await MessageHelper(
-                key=MessageKeys.SUGGEST_LOG_SUCCESS, **common_params
-            ).send_to_log_channel(self._helper, components=menu)
+            pending_channel: hikari.TextableChannel = await ChannelHelper.fetch_channel(
+                self._pending_channel, hikari.TextableChannel
+            )
 
-            if log_message:
+            pending_message: hikari.Message | None = await MessageHelper(
+                key=MessageKeys.SUGGEST_PENDING_SUCCESS, **common_params
+            ).send_to_channel(pending_channel, components=menu)
+
+            if pending_message:
                 await SuggestionService.create_or_update_suggestion(
                     SuggestionSchema(
-                        id=log_message.id,
+                        id=pending_message.id,
                         user_id=ctx.user.id,
                         suggestion=suggestion,
                         status="pending",
@@ -264,14 +271,12 @@ class SuggestRequestModal(Modal):
                 **common_params,
             ).send_response(ctx, ephemeral=True)
             await MessageHelper(
-                key=MessageKeys.SUGGEST_LOG_FAILURE, **common_params
-            ).send_to_log_channel(self._helper)
+                key=MessageKeys.SUGGEST_PENDING_FAILURE, **common_params
+            ).send_to_channel(pending_channel)
 
 
 class SuggestResponseModal(Modal):
-    def __init__(
-        self, user_locale: str, helper: CommandHelper, message_id: int, respond_type: str
-    ) -> None:
+    def __init__(self, user_locale: str, message_id: int, respond_type: str) -> None:
         # Validate respond_type early
         valid_types = {"approved", "rejectd"}
         if respond_type not in valid_types:
@@ -290,15 +295,15 @@ class SuggestResponseModal(Modal):
 
         # Store data as private attributes for later use
         self._command_data: SuggestCommandConfig = Settings.get(CommandsKeys.SUGGEST)
+        self._pending_channel: int = self._command_data.pending_channel
         self._result_channel: int = self._command_data.result_channel
         self._user_locale: str = user_locale
-        self._helper: CommandHelper = helper
         self._message_id: int = message_id
         self._respond_type: str = respond_type
         # Cache message keys mapping for respond types
         self._message_key_map: dict[str, MessageKeys] = {
-            "approved": MessageKeys.SUGGEST_LOG_APPROVE,
-            "rejected": MessageKeys.SUGGEST_LOG_REJECT,
+            "approved": MessageKeys.SUGGEST_RESULT_APPROVE,
+            "rejected": MessageKeys.SUGGEST_RESULT_REJECT,
         }
 
     async def give_rewards(self, ctx: ModalContext, user_id: int) -> None:
@@ -377,9 +382,14 @@ class SuggestResponseModal(Modal):
                 MessageKeys.GENERAL_SUCCESS, locale=self._user_locale
             ).send_response(ctx, ephemeral=True)
 
+            # Fetch pending channel to remove buttons
+            pending_channel: hikari.TextableChannel = await ChannelHelper.fetch_channel(
+                self._pending_channel, hikari.TextableChannel
+            )
+
             # Remove buttons from the original message
             await ctx.client.rest.edit_message(
-                result_channel,
+                pending_channel,
                 self._message_id,
                 components=[],
             )

@@ -85,12 +85,12 @@ if __name__ == "__main__":
             WikiHelper.load_wiki_data()
 
             # Import menu for suggest command
-            if (suggest_helper := CommandHelper(CommandsKeys.SUGGEST)).command_enabled:
+            if CommandHelper(CommandsKeys.SUGGEST).command_enabled:
                 from components.menus import SuggestConfirmMenu
 
-                menu = SuggestConfirmMenu(helper=suggest_helper)
+                menu = SuggestConfirmMenu()
 
-                await menu.attach(client, wait=False, timeout=None)
+                menu.attach_persistent(client, timeout=None)
 
             # Load extensions and events
             await client.load_extensions_from_package(events, recursive=True)

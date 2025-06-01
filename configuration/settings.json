@@ -95,7 +95,7 @@
                 "window_length": null,
                 "allowed_invocations": null
             },
-            "log": null,
+            "pending_channel": null,
             "result_channel": null,
             "reward": {
                 "mode": "",

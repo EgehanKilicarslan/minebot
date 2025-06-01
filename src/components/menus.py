@@ -4,14 +4,14 @@ import uuid
 from lightbulb.components.menus import Menu, MenuContext
 
 from components.modals import SuggestResponseModal
-from helper import CommandHelper, MenuHelper, MessageHelper
+from helper import MenuHelper, MessageHelper
 from model import MenuKeys, MessageKeys
 from model.schemas import SuggestConfirmationButtons
 from settings import Localization
 
 
 class SuggestConfirmMenu(Menu):
-    def __init__(self, helper: CommandHelper) -> None:
+    def __init__(self) -> None:
         menu_data: SuggestConfirmationButtons = Localization.get(MenuKeys.SUGGEST_CONFIRMATION)
 
         MenuHelper.get_button(
@@ -21,12 +21,9 @@ class SuggestConfirmMenu(Menu):
             self, menu_data.reject, on_press=self.on_reject, custom_id="suggestion_reject"
         )
 
-        self._helper: CommandHelper = helper
-
     async def on_approve(self, ctx: MenuContext) -> None:
         modal = SuggestResponseModal(
             ctx.interaction.locale,
-            self._helper,
             ctx.interaction.message.id,
             "approved",
         )
@@ -42,7 +39,6 @@ class SuggestConfirmMenu(Menu):
     async def on_reject(self, ctx: MenuContext) -> None:
         modal = SuggestResponseModal(
             ctx.interaction.locale,
-            self._helper,
             ctx.interaction.message.id,
             "rejected",
         )

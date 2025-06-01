@@ -28,7 +28,7 @@ class Suggest(
     @lightbulb.invoke
     async def invoke(self, ctx: lightbulb.Context) -> None:
         # Create a modal for the suggestion with appropriate localization
-        modal = SuggestRequestModal(ctx.interaction.locale, helper)
+        modal = SuggestRequestModal(ctx.interaction.locale)
 
         # Generate a unique ID for this modal instance
         c_id = str(uuid.uuid4())

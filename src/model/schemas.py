@@ -281,7 +281,8 @@ class LinkAccountCommandConfig(LoggedCommandConfig):
     reward: UserReward | None = None
 
 
-class SuggestCommandConfig(LoggedCommandConfig):
+class SuggestCommandConfig(BasicCommand):
+    pending_channel: PositiveInt
     result_channel: PositiveInt
     reward: UserReward | None = None
 
@@ -403,13 +404,14 @@ class SuggestMessages(BaseModel):
         approve: TextMessage
         reject: TextMessage
 
-    class Log(StatusMessagePair):
+    class Result(BaseModel):
         approve: DiscordMessage
         reject: DiscordMessage
 
     minecraft: Minecraft
     user: StatusMessagePair
-    log: Log
+    pending: StatusMessagePair
+    result: Result
 
 
 class SuggestConfirmationButtons(BaseModel):

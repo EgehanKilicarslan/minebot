@@ -343,3 +343,35 @@ class MessageHelper:
         logger.debug(f"[Message: {self.key.name}] Log message sent successfully")
 
         return response_message
+
+    async def send_to_channel(
+        self,
+        channel: int | hikari.TextableChannel,
+        components: Sequence[hikari.api.ComponentBuilder] | None = None,
+    ) -> hikari.Message | None:
+        """
+        Sends the message to a specific channel.
+
+        This method retrieves the channel by its ID or object, decodes the message,
+        and sends it to the specified channel.
+
+        Args:
+            channel: The ID or object of the channel to send the message to.
+
+        Returns:
+            hikari.Message | None: The sent message or None if the channel is not found.
+        """
+        logger.debug(f"[Message: {self.key.name}] Sending message to channel {channel}")
+        if isinstance(channel, int):
+            channel = await ChannelHelper.fetch_channel(channel, hikari.TextableChannel)
+
+        message: str | hikari.Embed = self.decode()
+        message_type = "embed" if isinstance(message, hikari.Embed) else "plain"
+        logger.debug(f"[Message: {self.key.name}] Sending {message_type} message to channel")
+
+        response_message: hikari.Message = await channel.send(
+            content=message, components=components or hikari.UNDEFINED
+        )
+        logger.debug(f"[Message: {self.key.name}] Message sent successfully to channel")
+
+        return response_message

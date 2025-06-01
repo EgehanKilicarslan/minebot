@@ -301,7 +301,7 @@
             }
           }
         },
-        "log": {
+        "pending": {
           "success": {
             "message_type": "embed",
             "content": {
@@ -323,7 +323,9 @@
               "description": "{discord_user_mention} kullanıcısı öneri gönderirken hata oluştu.",
               "color": "RED"
             }
-          },
+          }
+        },
+        "result": {
           "approve": {
             "message_type": "embed",
             "content": {

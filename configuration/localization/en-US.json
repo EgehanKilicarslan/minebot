@@ -287,7 +287,7 @@
             }
           }
         },
-        "log": {
+        "pending": {
           "success": {
             "message_type": "embed",
             "content": {
@@ -309,7 +309,9 @@
               "description": "{discord_user_mention} failed to submit a suggestion.",
               "color": "RED"
             }
-          },
+          }
+        },
+        "result": {
           "approve": {
             "message_type": "embed",
             "content": {
