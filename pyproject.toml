@@ -11,7 +11,7 @@ dependencies = [
     "hikari-toolbox==0.1.7",
     "hikari[speedups]==2.3.3",
     "pydantic==2.11.5",
-    "pydantic-extra-types==2.10.4",
+    "pydantic-extra-types==2.10.5",
     "sqlalchemy==2.0.41",
     "websockets==15.0.1",
     "uvloop==0.21.0; sys_platform != 'win32'",
