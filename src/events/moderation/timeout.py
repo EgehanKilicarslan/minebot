@@ -124,20 +124,15 @@ async def on_member_update(event: hikari.AuditLogEntryCreateEvent) -> None:
     if target_member is None or staff_member is None:
         return
 
-    # --- Prepare log message parameters ---
-    common_params = {
-        "discord_username": target_member.username,
-        "discord_user_id": str(target_member.id),
-        "discord_user_mention": target_member.mention,
-        "discord_staff_username": staff_member.username,
-        "discord_staff_user_id": str(staff_member.id),
-        "discord_staff_user_mention": staff_member.mention,
-        "duration": TimeHelper().from_timedelta(timedelta(seconds=punishment.duration)),
-    }
-
     # --- Send log message ---
     await MessageHelper(
         MessageKeys.TIMEOUT_COMMAND_LOG_SUCCESS,
-        **common_params,
+        discord_username=target_member.username,
+        discord_user_id=str(target_member.id),
+        discord_user_mention=target_member.mention,
+        discord_staff_username=staff_member.username,
+        discord_staff_user_id=str(staff_member.id),
+        discord_staff_user_mention=staff_member.mention,
+        duration=TimeHelper().from_timedelta(timedelta(seconds=punishment.duration)),
         reason=punishment.reason,  # Staff-facing/detailed reason
     ).send_to_log_channel(helper)

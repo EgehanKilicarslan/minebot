@@ -1,47 +1,56 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 import hikari
 import lightbulb
 
-from database.schemas import PunishmentLogSchema
-from database.services import PunishmentLogService
-from helper import CommandHelper, MessageHelper, PunishmentHelper, TimeHelper, UserHelper
+from core import GlobalState
+from database.schemas import PunishmentLogSchema, TemporaryActionSchema
+from database.services import PunishmentLogService, TemporaryActionService
+from helper import CommandHelper, MessageHelper, PunishmentHelper, UserHelper
 from model import CommandsKeys, MessageKeys, PunishmentSource, PunishmentType
 
-# Helper that manages event configuration and localization
-helper: CommandHelper = CommandHelper(CommandsKeys.BAN)
+helper: CommandHelper = CommandHelper(CommandsKeys.UNBAN)
 loader: lightbulb.Loader = helper.get_loader()
 
 
 @loader.listener(hikari.AuditLogEntryCreateEvent)
-async def on_ban_create(event: hikari.AuditLogEntryCreateEvent) -> None:
+async def on_ban_delete(event: hikari.AuditLogEntryCreateEvent) -> None:
     """
-    Handles ban events from Discord audit logs, creating punishment entries
-    and sending log messages as needed.
+    Handles unban events from Discord audit logs by cleaning up temporary actions,
+    creating punishment entries, and sending log messages as needed.
     """
     # --- Early validation checks ---
     # Skip if no target user or not a ban event
     if (target_id := event.entry.target_id) is None:
         return
 
-    if event.entry.action_type != hikari.AuditLogEventType.MEMBER_BAN_ADD:
+    if event.entry.action_type != hikari.AuditLogEventType.MEMBER_BAN_REMOVE:
         return
 
     if (staff_id := event.entry.user_id) is None:
         return
 
-    # --- Check for duplicate entries ---
-    # Get the most recent ban for this user
-    punishment = await PunishmentLogService.get_filtered_punishment_logs(
+    # --- Clean up temporary ban records ---
+    temp_punishment = await TemporaryActionService.get_filtered_temporoary_action_logs(
         user_id=target_id, punishment_type=PunishmentType.BAN, get_latest=True
     )
 
+    if temp_punishment:
+        assert isinstance(temp_punishment, TemporaryActionSchema)
+        assert temp_punishment.id is not None
+        await TemporaryActionService.delete_temporary_action(temp_punishment.id)
+        GlobalState.tasks.cancel_task(target_id, PunishmentType.BAN)
+
+    # --- Check for duplicate entries ---
     create_new_entry = True
 
     # Convert event timestamp to UTC datetime
     event_time = datetime.fromtimestamp(event.entry.id.created_at.timestamp(), tz=timezone.utc)
 
-    # Check if this is a duplicate entry (within 120 seconds window)
+    punishment = await PunishmentLogService.get_filtered_punishment_logs(
+        user_id=target_id, punishment_type=PunishmentType.UNBAN, get_latest=True
+    )
+
     if punishment:
         assert isinstance(punishment, PunishmentLogSchema)
 
@@ -52,23 +61,22 @@ async def on_ban_create(event: hikari.AuditLogEntryCreateEvent) -> None:
         if time_diff < 120:
             create_new_entry = False
 
-    # --- Get and process ban reason ---
+    # --- Create new punishment entry if needed ---
     reason_messages = PunishmentHelper.get_reason(event.entry.reason, None)
 
-    # --- Create database entry if needed ---
     if create_new_entry:
         # This is likely a ban performed outside the bot's commands
         punishment = await PunishmentLogService.create_or_update_punishment_log(
             PunishmentLogSchema(
                 user_id=target_id,
-                punishment_type=PunishmentType.BAN,
+                punishment_type=PunishmentType.UNBAN,
                 reason=reason_messages[1],
                 staff_id=staff_id,
                 source=PunishmentSource.DISCORD,
             )
         )
 
-    if not punishment:  # Safety check - don't proceed if no punishment record exists
+    if not punishment:
         return
 
     # Ensure the punishment is a valid schema instance
@@ -83,13 +91,12 @@ async def on_ban_create(event: hikari.AuditLogEntryCreateEvent) -> None:
 
     # --- Send log message ---
     await MessageHelper(
-        MessageKeys.BAN_COMMAND_LOG_SUCCESS,
+        MessageKeys.UNBAN_COMMAND_LOG_SUCCESS,
         discord_username=target_member.username,
         discord_user_id=str(target_member.id),
         discord_user_mention=target_member.mention,
         discord_staff_username=staff_member.username,
         discord_staff_user_id=str(staff_member.id),
         discord_staff_user_mention=staff_member.mention,
-        duration=TimeHelper().from_timedelta(timedelta(seconds=punishment.duration or 0)),
-        reason=punishment.reason,  # Staff-facing/detailed reason
+        reason=punishment.reason,
     ).send_to_log_channel(helper)

@@ -213,6 +213,54 @@
         }
       }
     },
+    "unban": {
+      "command": {
+        "label": "unban",
+        "description": "Sunucudan bir kullanıcının yasağını kaldır.",
+        "options": {
+          "user": {
+            "label": "kullanıcı",
+            "description": "Yasağı kaldırılacak kullanıcı."
+          },
+          "reason": {
+            "label": "sebep",
+            "description": "Yasağın kaldırılma sebebi."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Yasak Kaldırma Başarılı",
+              "description": "{discord_user_mention} kullanıcısının yasağı başarıyla kaldırıldı.",
+              "color": "GREEN"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Yasak Kaldırma Başarılı",
+              "description": "{discord_user_mention} kullanıcısının yasağı başarıyla kaldırıldı.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Yetkili",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Sebep",
+                  "value": "{reason}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
     "timeout": {
       "command": {
         "label": "sustur",
@@ -262,6 +310,54 @@
                 {
                   "name": "Süre",
                   "value": "{duration}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "untimeout": {
+      "command": {
+        "label": "sustur_ac",
+        "description": "Sunucudan bir kullanıcının susturmasını kaldır.",
+        "options": {
+          "user": {
+            "label": "kullanıcı",
+            "description": "Susturması kaldırılacak kullanıcı."
+          },
+          "reason": {
+            "label": "sebep",
+            "description": "Susturmanın kaldırılma sebebi."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Susturma Kaldırma Başarılı",
+              "description": "{discord_user_mention} kullanıcısının susturması başarıyla kaldırıldı.",
+              "color": "GREEN"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Susturma Kaldırma Başarılı",
+              "description": "{discord_user_mention} kullanıcısının susturması başarıyla kaldırıldı.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Yetkili",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Sebep",
+                  "value": "{reason}"
                 }
               ]
             }
@@ -480,6 +576,24 @@
         "color": "RED"
       }
     },
+    "user_not_found": {
+      "message_type": "embed",
+      "content": {
+        "title": "Kullanıcı Bulunamadı",
+        "description": "Belirtilen kullanıcı bulunamadı.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "Kullanıcı ID",
+            "value": "{discord_user_id}"
+          },
+          {
+            "name": "Kullanıcı Adı",
+            "value": "{discord_username}"
+          }
+        ]
+      }
+    },
     "member_not_found": {
       "message_type": "embed",
       "content": {
@@ -605,6 +719,14 @@
       "content": {
         "title": "Zaten Susturulmuş",
         "description": "{discord_user_mention} zaten susturulmuş.",
+        "color": "RED"
+      }
+    },
+    "user_not_timed_out": {
+      "message_type": "embed",
+      "content": {
+        "title": "Susturma Bulunamadı",
+        "description": "{discord_user_mention} kullanıcısı için susturma bulunamadı.",
         "color": "RED"
       }
     }

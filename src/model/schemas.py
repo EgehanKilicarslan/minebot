@@ -291,7 +291,9 @@ class CommandConfiguration(BaseModel):
     link_account: LinkAccountCommandConfig | None = None
     withdraw_rewards: LoggedCommandConfig | None = None
     ban: LoggedCommandConfig | None = None
+    unban: LoggedCommandConfig | None = None
     timeout: LoggedCommandConfig | None = None
+    untimeout: LoggedCommandConfig | None = None
     suggest: SuggestCommandConfig | None = None
     wiki: BasicCommand | None = None
 
@@ -376,6 +378,28 @@ class BanLocalization(BaseModel):
     messages: BanMessages
 
 
+class UnBanParameters(BaseModel):
+    user: DescriptiveElement
+    reason: DescriptiveElement
+
+
+class UnBanCommandParameters(DescriptiveElement):
+    options: UnBanParameters
+
+
+class UnBanMessages(BaseModel):
+    class SuccessMessage(BaseModel):
+        success: DiscordMessage
+
+    user: SuccessMessage
+    log: SuccessMessage
+
+
+class UnBanLocalization(BaseModel):
+    command: UnBanCommandParameters
+    messages: UnBanMessages
+
+
 class TimeoutParameters(BaseModel):
     user: DescriptiveElement
     duration: DescriptiveElement
@@ -397,6 +421,28 @@ class TimeoutMessages(BaseModel):
 class TimeoutLocalization(BaseModel):
     command: TimeoutCommandParameters
     messages: TimeoutMessages
+
+
+class UnTimeoutParameters(BaseModel):
+    user: DescriptiveElement
+    reason: DescriptiveElement
+
+
+class UnTimeoutCommandParameters(DescriptiveElement):
+    options: UnTimeoutParameters
+
+
+class UnTimeoutMessages(BaseModel):
+    class SuccessMessage(BaseModel):
+        success: DiscordMessage
+
+    user: SuccessMessage
+    log: SuccessMessage
+
+
+class UnTimeoutLocalization(BaseModel):
+    command: UnTimeoutCommandParameters
+    messages: UnTimeoutMessages
 
 
 class SuggestMessages(BaseModel):
@@ -472,7 +518,9 @@ class CommandLocalization(BaseModel):
     link_account: LinkAccountLocalization
     withdraw_rewards: WithdrawRewardsLocalization
     ban: BanLocalization
+    unban: UnBanLocalization
     timeout: TimeoutLocalization
+    untimeout: UnTimeoutLocalization
     suggest: SuggestLocalization
     wiki: WikiLocalization
 
@@ -501,6 +549,7 @@ class GeneralLocalization(BaseModel):
 class ErrorLocalization(BaseModel):
     unknown_error: DiscordMessage
     timeout_error: DiscordMessage
+    user_not_found: DiscordMessage
     member_not_found: DiscordMessage
     channel_not_found: DiscordMessage
     command_execution_error: DiscordMessage
@@ -510,6 +559,7 @@ class ErrorLocalization(BaseModel):
     player_not_online: DiscordMessage
     can_not_moderate: DiscordMessage
     user_already_timed_out: DiscordMessage
+    user_not_timed_out: DiscordMessage
 
 
 class TimeUnitsLocalization(BaseModel):

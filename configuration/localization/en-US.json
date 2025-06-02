@@ -199,6 +199,54 @@
         }
       }
     },
+    "unban": {
+      "command": {
+        "label": "unban",
+        "description": "Unban a user from the server.",
+        "options": {
+          "user": {
+            "label": "user",
+            "description": "The user to unban."
+          },
+          "reason": {
+            "label": "reason",
+            "description": "The reason for the unban."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Unban Successful",
+              "description": "You have been unbanned {discord_user_mention} from the server.",
+              "color": "GREEN"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "User Unbanned",
+              "description": "{discord_user_mention} has been unbanned from the server.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Moderator",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Reason",
+                  "value": "{reason}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
     "timeout": {
       "command": {
         "label": "timeout",
@@ -248,6 +296,54 @@
                 {
                   "name": "Duration",
                   "value": "{duration}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "untimeout": {
+      "command": {
+        "label": "untimeout",
+        "description": "Remove timeout from a user in the server.",
+        "options": {
+          "user": {
+            "label": "user",
+            "description": "The user to remove timeout from."
+          },
+          "reason": {
+            "label": "reason",
+            "description": "The reason for removing the timeout."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Timeout Removed",
+              "description": "You removed the timeout from {discord_user_mention} in the server.",
+              "color": "GREEN"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "User Timeout Removed",
+              "description": "{discord_user_mention}'s timeout has been removed in the server.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Moderator",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Reason",
+                  "value": "{reason}"
                 }
               ]
             }
@@ -472,6 +568,24 @@
         "color": "RED"
       }
     },
+    "user_not_found": {
+      "message_type": "embed",
+      "content": {
+        "title": "User Not Found",
+        "description": "The specified user was not found.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "User ID",
+            "value": "{discord_user_id}"
+          },
+          {
+            "name": "Username",
+            "value": "{discord_username}"
+          }
+        ]
+      }
+    },
     "member_not_found": {
       "message_type": "embed",
       "content": {
@@ -597,6 +711,14 @@
       "content": {
         "title": "User Already Timed Out",
         "description": "{discord_user_mention} is already timed out.",
+        "color": "RED"
+      }
+    },
+    "user_not_timed_out": {
+      "message_type": "embed",
+      "content": {
+        "title": "User Not Timed Out",
+        "description": "{discord_user_mention} is not currently timed out.",
         "color": "RED"
       }
     }

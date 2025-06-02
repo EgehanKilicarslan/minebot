@@ -139,9 +139,128 @@ class MinecraftState:
         return MinecraftState._player_servers.get(username)
 
 
+class TasksState:
+    """Manages scheduled tasks for the bot."""
+
+    _tasks: dict[tuple[int, str], lightbulb.Task] = {}
+
+    @staticmethod
+    def _get_key(user: hikari.User | int, punishment_type: str) -> tuple[int, str]:
+        """Convert user to ID and create a task dictionary key."""
+        user_id = user.id if isinstance(user, hikari.User) else user
+        return (user_id, punishment_type)
+
+    @staticmethod
+    def has_task(user: hikari.User | int, punishment_type: str) -> bool:
+        """Check if a task exists for the given user and punishment type."""
+        return TasksState._get_key(user, punishment_type) in TasksState._tasks
+
+    @staticmethod
+    def get_task(user: hikari.User | int, punishment_type: str) -> lightbulb.Task | None:
+        """Get a task for a user and punishment type if it exists."""
+        key = TasksState._get_key(user, punishment_type)
+        return TasksState._tasks.get(key)
+
+    @staticmethod
+    def add_task(user: hikari.User | int, punishment_type: str, task: lightbulb.Task) -> bool:
+        """
+        Add a task to the state.
+
+        Args:
+            user: User object or user ID
+            punishment_type: Type of punishment associated with the task
+            task: The scheduled task object
+
+        Returns:
+            bool: True if task was added, False if a task already exists
+        """
+        key = TasksState._get_key(user, punishment_type)
+        if key in TasksState._tasks:
+            return False
+        TasksState._tasks[key] = task
+        return True
+
+    @staticmethod
+    def add_or_refresh_task(
+        user: hikari.User | int, punishment_type: str, task: lightbulb.Task
+    ) -> None:
+        """Add a new task or refresh an existing one without raising errors."""
+        key = TasksState._get_key(user, punishment_type)
+        # Cancel existing task if present
+        existing_task = TasksState._tasks.get(key)
+        if existing_task and not existing_task.cancelled:
+            existing_task.cancel()
+        # Add new task
+        TasksState._tasks[key] = task
+
+    @staticmethod
+    def refresh_task(user: hikari.User | int, punishment_type: str, task: lightbulb.Task) -> bool:
+        """
+        Refresh an existing task for a user and punishment type.
+
+        Returns:
+            bool: True if task was refreshed, False if task doesn't exist
+        """
+        key = TasksState._get_key(user, punishment_type)
+        if key not in TasksState._tasks:
+            return False
+        TasksState._tasks[key] = task
+        return True
+
+    @staticmethod
+    def cancel_task(user: hikari.User | int, punishment_type: str) -> bool:
+        """
+        Cancel a task for a user and punishment type.
+
+        Returns:
+            bool: True if task was cancelled, False if task doesn't exist
+        """
+        key = TasksState._get_key(user, punishment_type)
+        if key not in TasksState._tasks:
+            return False
+
+        task = TasksState._tasks[key]
+        if not task.cancelled:
+            task.cancel()
+        del TasksState._tasks[key]
+        return True
+
+    @staticmethod
+    def remove_task(user: hikari.User | int, punishment_type: str) -> bool:
+        """
+        Safely remove a task entry without canceling it.
+
+        Useful when a task completes naturally but needs to be removed from state tracking.
+
+        Args:
+            user: User object or user ID
+            punishment_type: Type of punishment associated with the task
+
+        Returns:
+            bool: True if task was removed, False if task doesn't exist
+        """
+        key = TasksState._get_key(user, punishment_type)
+        if key not in TasksState._tasks:
+            return False
+
+        del TasksState._tasks[key]
+        return True
+
+    @staticmethod
+    def get_all_tasks_for_user(user: hikari.User | int) -> dict[str, lightbulb.Task]:
+        """Get all tasks associated with a specific user."""
+        user_id = user.id if isinstance(user, hikari.User) else user
+        return {
+            punishment_type: task
+            for (uid, punishment_type), task in TasksState._tasks.items()
+            if uid == user_id
+        }
+
+
 class GlobalState:
     """Global state manager for the bot."""
 
     bot: BotState = BotState()
     guild: GuildState = GuildState()
     minecraft: MinecraftState = MinecraftState()
+    tasks: TasksState = TasksState()

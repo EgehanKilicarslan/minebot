@@ -15,9 +15,17 @@ class CommandKeys(Enum):
     BAN_DESCRIPTION = "commands.ban.command.description"
     BAN_OPTIONS = "commands.ban.command.options"
 
+    UNBAN_LABEL = "commands.unban.command.label"
+    UNBAN_DESCRIPTION = "commands.unban.command.description"
+    UNBAN_OPTIONS = "commands.unban.command.options"
+
     TIMEOUT_LABEL = "commands.timeout.command.label"
     TIMEOUT_DESCRIPTION = "commands.timeout.command.description"
     TIMEOUT_OPTIONS = "commands.timeout.command.options"
+
+    UNTIMEOUT_LABEL = "commands.untimeout.command.label"
+    UNTIMEOUT_DESCRIPTION = "commands.untimeout.command.description"
+    UNTIMEOUT_OPTIONS = "commands.untimeout.command.options"
 
     SUGGEST_LABEL = "commands.suggest.command.label"
     SUGGEST_DESCRIPTION = "commands.suggest.command.description"
@@ -50,8 +58,14 @@ class MessageKeys(Enum):
     BAN_COMMAND_USER_SUCCESS = "commands.ban.messages.user.success"
     BAN_COMMAND_LOG_SUCCESS = "commands.ban.messages.log.success"
 
+    UNBAN_COMMAND_USER_SUCCESS = "commands.unban.messages.user.success"
+    UNBAN_COMMAND_LOG_SUCCESS = "commands.unban.messages.log.success"
+
     TIMEOUT_COMMAND_USER_SUCCESS = "commands.timeout.messages.user.success"
     TIMEOUT_COMMAND_LOG_SUCCESS = "commands.timeout.messages.log.success"
+
+    UNTIMEOUT_COMMAND_USER_SUCCESS = "commands.untimeout.messages.user.success"
+    UNTIMEOUT_COMMAND_LOG_SUCCESS = "commands.untimeout.messages.log.success"
 
     SUGGEST_MINECRAFT_APPROVE = "commands.suggest.messages.minecraft.approve"
     SUGGEST_MINECRAFT_REJECT = "commands.suggest.messages.minecraft.reject"
@@ -71,6 +85,7 @@ class MessageKeys(Enum):
 
     UNKNOWN_ERROR = "error.unknown_error"
     TIMEOUT_ERROR = "error.timeout_error"
+    USER_NOT_FOUND = "error.user_not_found"
     MEMBER_NOT_FOUND = "error.member_not_found"
     CHANNEL_NOT_FOUND = "error.channel_not_found"
     COMMAND_EXECUTION_ERROR = "error.command_execution_error"
@@ -80,6 +95,7 @@ class MessageKeys(Enum):
     PLAYER_NOT_ONLINE = "error.player_not_online"
     CAN_NOT_MODERATE = "error.can_not_moderate"
     USER_ALREADY_TIMED_OUT = "error.user_already_timed_out"
+    USER_NOT_TIMED_OUT = "error.user_not_timed_out"
 
 
 class ModalKeys(Enum):

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 import hikari
 import lightbulb
 
+from core import GlobalState
 from database.schemas import PunishmentLogSchema, TemporaryActionSchema
 from database.services import PunishmentLogService, TemporaryActionService
 from helper import CommandHelper, MessageHelper, PunishmentHelper, TimeHelper, UserHelper
@@ -76,9 +77,16 @@ class Ban(
                 # Remove temporary action record from database after completion
                 if temporary_action.id is not None:
                     await TemporaryActionService.delete_temporary_action(temporary_action.id)
+
+                # Remove the task from global state to prevent re-execution
+                GlobalState.tasks.remove_task(target_member, PunishmentType.BAN)
             except Exception as e:
                 # Record error details for debugging and monitoring
                 print(f"Error in temporary ban handler: {e}")
+
+        GlobalState.tasks.add_or_refresh_task(
+            target_member, PunishmentType.BAN, handle_temporary_ban
+        )
 
     @lightbulb.invoke
     async def invoke(self, ctx: lightbulb.Context) -> None:
@@ -156,9 +164,6 @@ class Ban(
             discord_username=target_member.username,
             discord_user_id=str(target_member.id),
             discord_user_mention=target_member.mention,
-            discord_staff_username=ctx.member.username,
-            discord_staff_user_id=str(ctx.member.id),
-            discord_staff_user_mention=ctx.member.mention,
             duration=formatted_duration,  # Empty string if None
             reason=reason_messages[0],  # User-facing reason
         ).send_response(ctx, ephemeral=True)

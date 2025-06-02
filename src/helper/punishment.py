@@ -146,8 +146,12 @@ class PunishmentHelper:
         if expires_at:
             delay = int((expires_at - now).total_seconds())
             logger.debug(f"Scheduling unban for user {action.user_id} in {delay} seconds")
-            client.task(lightbulb.uniformtrigger(seconds=delay), max_invocations=1)(
-                cls._create_ban_expiry_task(action_id, guild, action.user_id, no_reason)
+            GlobalState.tasks.add_or_refresh_task(
+                action.user_id,
+                PunishmentType.BAN,
+                client.task(lightbulb.uniformtrigger(seconds=delay), max_invocations=1)(
+                    cls._create_ban_expiry_task(action_id, guild, action.user_id, no_reason)
+                ),
             )
 
     @staticmethod
@@ -163,6 +167,7 @@ class PunishmentHelper:
                     guild_id, user_id, reason=reason
                 )
                 await TemporaryActionService.delete_temporary_action(action_id)
+                GlobalState.tasks.remove_task(user_id, PunishmentType.BAN)
                 logger.debug(f"Completed scheduled unban for user {user_id}")
             except hikari.NotFoundError:
                 logger.info(f"User {user_id} already unbanned or not found")
@@ -219,8 +224,12 @@ class PunishmentHelper:
         elif expires_at:
             delay = int((expires_at - now).total_seconds())
             logger.debug(f"Scheduling timeout removal for user {action.user_id} in {delay} seconds")
-            client.task(lightbulb.uniformtrigger(seconds=delay), max_invocations=1)(
-                cls._create_timeout_expiry_task(action_id, guild, action.user_id, no_reason)
+            GlobalState.tasks.add_or_refresh_task(
+                action.user_id,
+                PunishmentType.TIMEOUT,
+                client.task(lightbulb.uniformtrigger(seconds=delay), max_invocations=1)(
+                    cls._create_timeout_expiry_task(action_id, guild, action.user_id, no_reason)
+                ),
             )
 
     @staticmethod
@@ -313,6 +322,7 @@ class PunishmentHelper:
                     reason=reason,
                 )
                 await TemporaryActionService.delete_temporary_action(action_id)
+                GlobalState.tasks.remove_task(user_id, PunishmentType.TIMEOUT)
                 logger.debug(f"Completed timeout removal for user {user_id}")
             except hikari.NotFoundError:
                 logger.info(f"User {user_id} not found during timeout removal")

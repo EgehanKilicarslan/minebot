@@ -4,6 +4,7 @@ from typing import Final
 import hikari
 import lightbulb
 
+from core import GlobalState
 from database.schemas import PunishmentLogSchema, TemporaryActionSchema
 from database.services import PunishmentLogService, TemporaryActionService
 from helper import CommandHelper, MessageHelper, PunishmentHelper, TimeHelper, UserHelper
@@ -92,6 +93,10 @@ class Timeout(
                     await self._refresh_timeout_task(
                         ctx, target_member, updated_punishment, next_refresh, reason_messages
                     )
+
+                GlobalState.tasks.add_or_refresh_task(
+                    target_member, PunishmentType.TIMEOUT, next_refresh_timeout
+                )
             else:
                 # Final timeout period is less than max, set exact expiry time
                 await TemporaryActionService.create_or_update_temporary_action(
@@ -116,6 +121,7 @@ class Timeout(
                 async def timeout_expired() -> None:
                     assert punishment.id is not None
                     await TemporaryActionService.delete_temporary_action(punishment.id)
+                    GlobalState.tasks.remove_task(target_member, PunishmentType.TIMEOUT)
 
     async def _handle_extended_timeout(
         self,
@@ -194,27 +200,28 @@ class Timeout(
         assert ctx.member is not None
         assert target_member is not None
 
-        common_params = {
-            "discord_username": target_member.username,
-            "discord_user_id": str(target_member.id),
-            "discord_user_mention": target_member.mention,
-            "discord_staff_username": ctx.member.username,
-            "discord_staff_user_id": str(ctx.member.id),
-            "discord_staff_user_mention": ctx.member.mention,
-            "duration": self.duration,
-        }
-
         # Check if user can be moderated
         if not PunishmentHelper.can_moderate(target_member, ctx.member):
             await MessageHelper(
-                MessageKeys.CAN_NOT_MODERATE, locale=ctx.interaction.locale, **common_params
+                MessageKeys.CAN_NOT_MODERATE,
+                locale=ctx.interaction.locale,
+                discord_username=target_member.username,
+                discord_user_id=str(target_member.id),
+                discord_user_mention=target_member.mention,
+                discord_staff_username=ctx.member.username,
+                discord_staff_user_id=str(ctx.member.id),
+                discord_staff_user_mention=ctx.member.mention,
             ).send_response(ctx, ephemeral=True)
             return
 
         # Check if user is already timed out
         if target_member.communication_disabled_until() is not None:
             await MessageHelper(
-                MessageKeys.USER_ALREADY_TIMED_OUT, locale=ctx.interaction.locale, **common_params
+                MessageKeys.USER_ALREADY_TIMED_OUT,
+                locale=ctx.interaction.locale,
+                discord_username=target_member.username,
+                discord_user_id=str(target_member.id),
+                discord_user_mention=target_member.mention,
             ).send_response(ctx, ephemeral=True)
             return
 
@@ -229,6 +236,12 @@ class Timeout(
         await MessageHelper(
             MessageKeys.TIMEOUT_COMMAND_USER_SUCCESS,
             locale=ctx.interaction.locale,
-            **common_params,
+            discord_username=target_member.username,
+            discord_user_id=str(target_member.id),
+            discord_user_mention=target_member.mention,
+            discord_staff_username=ctx.member.username,
+            discord_staff_user_id=str(ctx.member.id),
+            discord_staff_user_mention=ctx.member.mention,
+            duration=TimeHelper(ctx.interaction.locale).from_timedelta(parsed_duration),
             reason=reason_messages[0],
         ).send_response(ctx, ephemeral=True)
