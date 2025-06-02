@@ -77,7 +77,27 @@
             },
             "log": null
         },
+        "unban": {
+            "permissions": [],
+            "cooldown": {
+                "algorithm": "",
+                "bucket": "",
+                "window_length": null,
+                "allowed_invocations": null
+            },
+            "log": null
+        },
         "timeout": {
+            "permissions": [],
+            "cooldown": {
+                "algorithm": "",
+                "bucket": "",
+                "window_length": null,
+                "allowed_invocations": null
+            },
+            "log": null
+        },
+        "untimeout": {
             "permissions": [],
             "cooldown": {
                 "algorithm": "",

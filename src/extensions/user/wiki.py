@@ -11,25 +11,26 @@ helper: CommandHelper = CommandHelper(CommandsKeys.WIKI)
 loader: lightbulb.Loader = helper.get_loader()
 
 
-# This function provides autocomplete suggestions for the wiki command
-# It filters wiki entries based on the text the user has typed so far
 async def autocomplete_callback(ctx: lightbulb.AutocompleteContext[str]) -> None:
-    # Get the current value typed by user and convert to lowercase for case-insensitive matching
-    current_value: str = ctx.focused.value.lower() if isinstance(ctx.focused.value, str) else ""
-    # Get available wiki files for user's language/locale
-    wiki_data: dict[str, Path] | None = WikiHelper.get_wiki_files(ctx.interaction.locale)
+    # Get the current input from the user and convert to lowercase for case-insensitive matching
+    current_value = ctx.focused.value.lower() if isinstance(ctx.focused.value, str) else ""
+
+    # Fetch wiki data specific to the user's locale/language
+    wiki_data = WikiHelper.get_wiki_files(ctx.interaction.locale)
 
     if wiki_data is not None:
-        # Filter wiki entries that contain the current input string
-        values_to_recommend: list[str] = [
-            key for key in wiki_data.keys() if current_value in key.lower()
-        ]
+        values_to_recommend = []
 
-        # Discord only allows up to 25 autocomplete suggestions
-        if len(values_to_recommend) > 25:
-            values_to_recommend = values_to_recommend[:25]
+        # Iterate through available wiki entries and filter based on user input
+        for key in wiki_data.keys():
+            # Check if current user input is a substring of any wiki entry (case-insensitive)
+            if current_value in key.lower():
+                values_to_recommend.append(key)
+                # Limit results to 25 entries to prevent overwhelming the UI
+                if len(values_to_recommend) >= 25:
+                    break
 
-        # Send the filtered list as suggestions to the user
+        # Return the filtered wiki entries as autocomplete suggestions
         await ctx.respond(values_to_recommend)
 
 
