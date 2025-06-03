@@ -107,6 +107,16 @@
             },
             "log": null
         },
+        "clear": {
+            "permissions": [],
+            "cooldown": {
+                "algorithm": "",
+                "bucket": "",
+                "window_length": null,
+                "allowed_invocations": null
+            },
+            "log": null
+        },
         "suggest": {
             "permissions": [],
             "cooldown": {

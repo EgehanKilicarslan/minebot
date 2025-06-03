@@ -351,6 +351,58 @@
         }
       }
     },
+    "clear": {
+      "command": {
+        "label": "clear",
+        "description": "Clear messages in a channel.",
+        "options": {
+          "amount": {
+            "label": "amount",
+            "description": "The number of messages to clear."
+          },
+          "reason": {
+            "label": "reason",
+            "description": "The reason for clearing the messages."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Messages Cleared",
+              "description": "{amount} messages have been cleared in this channel.",
+              "color": "GREEN"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Messages Cleared",
+              "description": "{discord_staff_user_mention} has cleared messages in {channel_mention}",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Moderator",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Amount",
+                  "value": "{amount}"
+                },
+                {
+                  "name": "Reason",
+                  "value": "{reason}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
     "suggest": {
       "command": {
         "label": "suggest",

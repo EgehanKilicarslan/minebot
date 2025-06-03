@@ -48,5 +48,6 @@ class CommandsKeys(Enum):
     UNBAN = "commands.unban"
     TIMEOUT = "commands.timeout"
     UNTIMEOUT = "commands.untimeout"
+    CLEAR = "commands.clear"
     SUGGEST = "commands.suggest"
     WIKI = "commands.wiki"

@@ -365,6 +365,58 @@
         }
       }
     },
+    "clear": {
+      "command": {
+        "label": "temizle",
+        "description": "Belirtilen sayıda mesajı sil.",
+        "options": {
+          "amount": {
+            "label": "miktar",
+            "description": "Silinecek mesaj sayısı."
+          },
+          "reason": {
+            "label": "sebep",
+            "description": "Temizleme sebebi."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Temizleme Başarılı",
+              "description": "{amount} mesaj başarıyla silindi.",
+              "color": "GREEN"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Temizleme Başarılı",
+              "description": "{discord_user_mention} kullanıcısı tarafından {amount} mesaj {channel_mention} kanalından silindi.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Yetkili",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Miktar",
+                  "value": "{amount}"
+                },
+                {
+                  "name": "Sebep",
+                  "value": "{reason}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
     "suggest": {
       "command": {
         "label": "öneri",

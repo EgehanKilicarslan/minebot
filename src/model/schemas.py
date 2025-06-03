@@ -294,6 +294,7 @@ class CommandConfiguration(BaseModel):
     unban: LoggedCommandConfig | None = None
     timeout: LoggedCommandConfig | None = None
     untimeout: LoggedCommandConfig | None = None
+    clear: LoggedCommandConfig | None = None
     suggest: SuggestCommandConfig | None = None
     wiki: BasicCommand | None = None
 
@@ -445,6 +446,28 @@ class UnTimeoutLocalization(BaseModel):
     messages: UnTimeoutMessages
 
 
+class ClearParamters(BaseModel):
+    amount: DescriptiveElement
+    reason: DescriptiveElement
+
+
+class ClearCommandParameters(DescriptiveElement):
+    options: ClearParamters
+
+
+class ClearMessages(BaseModel):
+    class SuccessMessage(BaseModel):
+        success: DiscordMessage
+
+    user: SuccessMessage
+    log: SuccessMessage
+
+
+class ClearLocalization(BaseModel):
+    command: ClearCommandParameters
+    messages: ClearMessages
+
+
 class SuggestMessages(BaseModel):
     class Minecraft(BaseModel):
         approve: TextMessage
@@ -521,6 +544,7 @@ class CommandLocalization(BaseModel):
     unban: UnBanLocalization
     timeout: TimeoutLocalization
     untimeout: UnTimeoutLocalization
+    clear: ClearLocalization
     suggest: SuggestLocalization
     wiki: WikiLocalization
 
