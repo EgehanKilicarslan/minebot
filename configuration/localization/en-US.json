@@ -499,6 +499,62 @@
         }
       }
     },
+    "slowmode": {
+      "command": {
+        "label": "slowmode",
+        "description": "Set slowmode for a channel.",
+        "options": {
+          "channel": {
+            "label": "channel",
+            "description": "The channel to set slowmode for."
+          },
+          "duration": {
+            "label": "duration",
+            "description": "The duration of the slowmode."
+          },
+          "reason": {
+            "label": "reason",
+            "description": "The reason for setting slowmode."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Slowmode Set",
+              "description": "Slowmode has been set to {duration} in {channel_mention}.",
+              "color": "YELLOW"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Slowmode Set",
+              "description": "{discord_staff_user_mention} has set slowmode in {channel_mention}.",
+              "color": "YELLOW",
+              "fields": [
+                {
+                  "name": "Moderator",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Duration",
+                  "value": "{duration}"
+                },
+                {
+                  "name": "Reason",
+                  "value": "{reason}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
     "suggest": {
       "command": {
         "label": "suggest",
@@ -716,6 +772,20 @@
         "color": "RED"
       }
     },
+    "command_on_cooldown": {
+      "message_type": "embed",
+      "content": {
+        "title": "Command On Cooldown",
+        "description": "This command is currently on cooldown. Please wait before trying again.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "Remaining Cooldown",
+            "value": "{remaining_cooldown}"
+          }
+        ]
+      }
+    },
     "user_not_found": {
       "message_type": "embed",
       "content": {
@@ -867,6 +937,24 @@
       "content": {
         "title": "User Not Timed Out",
         "description": "{discord_user_mention} is not currently timed out.",
+        "color": "RED"
+      }
+    },
+    "duration_out_of_range": {
+      "message_type": "embed",
+      "content": {
+        "title": "Duration Out of Range",
+        "description": "The specified duration is out of range. Please provide a valid duration.",
+        "fields": [
+          {
+            "name": "Minimum Duration",
+            "value": "{min_duration}"
+          },
+          {
+            "name": "Maximum Duration",
+            "value": "{max_duration}"
+          }
+        ],
         "color": "RED"
       }
     }

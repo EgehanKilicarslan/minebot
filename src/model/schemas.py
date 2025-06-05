@@ -297,6 +297,7 @@ class CommandConfiguration(BaseModel):
     clear: LoggedCommandConfig | None = None
     lock: LoggedCommandConfig | None = None
     unlock: LoggedCommandConfig | None = None
+    slowmode: LoggedCommandConfig | None = None
     suggest: SuggestCommandConfig | None = None
     wiki: BasicCommand | None = None
 
@@ -514,6 +515,29 @@ class UnlockLocalization(BaseModel):
     messages: UnlockMessages
 
 
+class SlowmodeParameters(BaseModel):
+    channel: DescriptiveElement
+    duration: DescriptiveElement
+    reason: DescriptiveElement
+
+
+class SlowmodeCommandParameters(DescriptiveElement):
+    options: SlowmodeParameters
+
+
+class SlowmodeMessages(BaseModel):
+    class SuccessMessage(BaseModel):
+        success: DiscordMessage
+
+    user: SuccessMessage
+    log: SuccessMessage
+
+
+class SlowmodeLocalization(BaseModel):
+    command: SlowmodeCommandParameters
+    messages: SlowmodeMessages
+
+
 class SuggestMessages(BaseModel):
     class Minecraft(BaseModel):
         approve: TextMessage
@@ -593,6 +617,7 @@ class CommandLocalization(BaseModel):
     clear: ClearLocalization
     lock: LockLocalization
     unlock: UnlockLocalization
+    slowmode: SlowmodeLocalization
     suggest: SuggestLocalization
     wiki: WikiLocalization
 
@@ -621,6 +646,7 @@ class GeneralLocalization(BaseModel):
 class ErrorLocalization(BaseModel):
     unknown_error: DiscordMessage
     timeout_error: DiscordMessage
+    command_on_cooldown: DiscordMessage
     user_not_found: DiscordMessage
     member_not_found: DiscordMessage
     channel_not_found: DiscordMessage
@@ -632,6 +658,7 @@ class ErrorLocalization(BaseModel):
     can_not_moderate: DiscordMessage
     user_already_timed_out: DiscordMessage
     user_not_timed_out: DiscordMessage
+    duration_out_of_range: DiscordMessage
 
 
 class TimeUnitsLocalization(BaseModel):

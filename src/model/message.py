@@ -76,6 +76,9 @@ class MessageKeys(Enum):
     UNLOCK_COMMAND_USER_SUCCESS = "commands.unlock.messages.user.success"
     UNLOCK_COMMAND_LOG_SUCCESS = "commands.unlock.messages.log.success"
 
+    SLOWMODE_COMMAND_USER_SUCCESS = "commands.slowmode.messages.user.success"
+    SLOWMODE_COMMAND_LOG_SUCCESS = "commands.slowmode.messages.log.success"
+
     SUGGEST_MINECRAFT_APPROVE = "commands.suggest.messages.minecraft.approve"
     SUGGEST_MINECRAFT_REJECT = "commands.suggest.messages.minecraft.reject"
     SUGGEST_USER_SUCCESS = "commands.suggest.messages.user.success"
@@ -94,6 +97,7 @@ class MessageKeys(Enum):
 
     UNKNOWN_ERROR = "error.unknown_error"
     TIMEOUT_ERROR = "error.timeout_error"
+    COMMAND_ON_COOLDOWN = "error.command_on_cooldown"
     USER_NOT_FOUND = "error.user_not_found"
     MEMBER_NOT_FOUND = "error.member_not_found"
     CHANNEL_NOT_FOUND = "error.channel_not_found"
@@ -105,6 +109,7 @@ class MessageKeys(Enum):
     CAN_NOT_MODERATE = "error.can_not_moderate"
     USER_ALREADY_TIMED_OUT = "error.user_already_timed_out"
     USER_NOT_TIMED_OUT = "error.user_not_timed_out"
+    DURATION_OUT_OF_RANGE = "error.duration_out_of_range"
 
 
 class ModalKeys(Enum):

@@ -53,7 +53,9 @@ if __name__ == "__main__":
 
         @client.error_handler
         async def handler(exc: lightbulb.exceptions.ExecutionPipelineFailedException) -> bool:
-            from helper import MessageHelper
+            from datetime import timedelta
+
+            from helper import MessageHelper, TimeHelper
             from model import MessageKeys
 
             if isinstance(exc.causes[0], EmptyException):
@@ -61,12 +63,32 @@ if __name__ == "__main__":
             elif isinstance(exc.causes[0], CommandExecutionError):
                 await exc.context.respond(
                     MessageHelper(
-                        key=MessageKeys.COMMAND_EXECUTION_ERROR, error_message=exc.causes[0]
-                    ).decode()
+                        key=MessageKeys.COMMAND_EXECUTION_ERROR,
+                        locale=exc.context.interaction.locale,
+                        error_message=exc.causes[0],
+                    ).decode(),
+                    ephemeral=True,
+                )
+                return True
+            elif isinstance(exc.causes[0], lightbulb.prefab.OnCooldown):
+                await exc.context.respond(
+                    MessageHelper(
+                        key=MessageKeys.COMMAND_ON_COOLDOWN,
+                        locale=exc.context.interaction.locale,
+                        remaining_cooldown=TimeHelper(
+                            exc.context.interaction.locale
+                        ).from_timedelta(timedelta(seconds=exc.causes[0].remaining)),
+                    ).decode(),
+                    ephemeral=True,
                 )
                 return True
             else:
-                await exc.context.respond(MessageHelper(key=MessageKeys.UNKNOWN_ERROR).decode())
+                await exc.context.respond(
+                    MessageHelper(
+                        key=MessageKeys.UNKNOWN_ERROR, locale=exc.context.interaction.locale
+                    ).decode(),
+                    ephemeral=True,
+                )
                 return True
 
         @bot.listen(hikari.StartingEvent)

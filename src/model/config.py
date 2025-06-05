@@ -51,5 +51,6 @@ class CommandsKeys(Enum):
     CLEAR = "commands.clear"
     LOCK = "commands.lock"
     UNLOCK = "commands.unlock"
+    SLOWMODE = "commands.slowmode"
     SUGGEST = "commands.suggest"
     WIKI = "commands.wiki"

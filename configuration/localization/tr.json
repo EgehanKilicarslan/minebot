@@ -513,6 +513,62 @@
         }
       }
     },
+    "slowmode": {
+      "command": {
+        "label": "yavas_mod",
+        "description": "Belirtilen kanalda yavaş modu ayarla.",
+        "options": {
+          "channel": {
+            "label": "kanal",
+            "description": "Yavaş modun uygulanacağı kanal."
+          },
+          "duration": {
+            "label": "süre",
+            "description": "Yavaş mod süresi (saniye cinsinden)."
+          },
+          "reason": {
+            "label": "sebep",
+            "description": "Yavaş modun uygulanma sebebi."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Yavaş Mod Başarılı",
+              "description": "{channel_mention} kanalında yavaş mod {duration} saniye olarak ayarlandı.",
+              "color": "GREEN"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Yavaş Mod Başarılı",
+              "description": "{discord_user_mention} kullanıcısı tarafından {channel_mention} kanalında yavaş mod {duration} saniye olarak ayarlandı.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Yetkili",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Süre",
+                  "value": "{duration}"
+                },
+                {
+                  "name": "Sebep",
+                  "value": "{reason}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
     "suggest": {
       "command": {
         "label": "öneri",
@@ -724,6 +780,20 @@
         "color": "RED"
       }
     },
+    "command_on_cooldown": {
+      "message_type": "embed",
+      "content": {
+        "title": "Komut Bekleme Süresi",
+        "description": "Bu komutu kullanmak için bekleme süresi dolmadı.",
+        "color": "RED",
+        "fields": [
+          {
+            "name": "Bekleme Süresi",
+            "value": "{remaining_cooldown}"
+          }
+        ]
+      }
+    },
     "user_not_found": {
       "message_type": "embed",
       "content": {
@@ -875,6 +945,24 @@
       "content": {
         "title": "Susturma Bulunamadı",
         "description": "{discord_user_mention} kullanıcısı için susturma bulunamadı.",
+        "color": "RED"
+      }
+    },
+    "duration_out_of_range": {
+      "message_type": "embed",
+      "content": {
+        "title": "Süre Aralığı Dışında",
+        "description": "Belirtilen süre aralığı dışında. Lütfen geçerli bir süre girin.",
+        "fields": [
+          {
+            "name": "Minimum Süre",
+            "value": "{min_duration}"
+          },
+          {
+            "name": "Maksimum Süre",
+            "value": "{max_duration}"
+          }
+        ],
         "color": "RED"
       }
     }
