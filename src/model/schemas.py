@@ -295,6 +295,8 @@ class CommandConfiguration(BaseModel):
     timeout: LoggedCommandConfig | None = None
     untimeout: LoggedCommandConfig | None = None
     clear: LoggedCommandConfig | None = None
+    lock: LoggedCommandConfig | None = None
+    unlock: LoggedCommandConfig | None = None
     suggest: SuggestCommandConfig | None = None
     wiki: BasicCommand | None = None
 
@@ -468,6 +470,50 @@ class ClearLocalization(BaseModel):
     messages: ClearMessages
 
 
+class LockParameters(BaseModel):
+    channel: DescriptiveElement
+    reason: DescriptiveElement
+
+
+class LockCommandParameters(DescriptiveElement):
+    options: LockParameters
+
+
+class LockMessages(BaseModel):
+    class SuccessMessage(BaseModel):
+        success: DiscordMessage
+
+    user: SuccessMessage
+    log: SuccessMessage
+
+
+class LockLocalization(BaseModel):
+    command: LockCommandParameters
+    messages: LockMessages
+
+
+class UnlockParameters(BaseModel):
+    channel: DescriptiveElement
+    reason: DescriptiveElement
+
+
+class UnlockCommandParameters(DescriptiveElement):
+    options: UnlockParameters
+
+
+class UnlockMessages(BaseModel):
+    class SuccessMessage(BaseModel):
+        success: DiscordMessage
+
+    user: SuccessMessage
+    log: SuccessMessage
+
+
+class UnlockLocalization(BaseModel):
+    command: UnlockCommandParameters
+    messages: UnlockMessages
+
+
 class SuggestMessages(BaseModel):
     class Minecraft(BaseModel):
         approve: TextMessage
@@ -545,6 +591,8 @@ class CommandLocalization(BaseModel):
     timeout: TimeoutLocalization
     untimeout: UnTimeoutLocalization
     clear: ClearLocalization
+    lock: LockLocalization
+    unlock: UnlockLocalization
     suggest: SuggestLocalization
     wiki: WikiLocalization
 

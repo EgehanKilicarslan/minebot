@@ -70,6 +70,12 @@ class MessageKeys(Enum):
     CLEAR_COMMAND_USER_SUCCESS = "commands.clear.messages.user.success"
     CLEAR_COMMAND_LOG_SUCCESS = "commands.clear.messages.log.success"
 
+    LOCK_COMMAND_USER_SUCCESS = "commands.lock.messages.user.success"
+    LOCK_COMMAND_LOG_SUCCESS = "commands.lock.messages.log.success"
+
+    UNLOCK_COMMAND_USER_SUCCESS = "commands.unlock.messages.user.success"
+    UNLOCK_COMMAND_LOG_SUCCESS = "commands.unlock.messages.log.success"
+
     SUGGEST_MINECRAFT_APPROVE = "commands.suggest.messages.minecraft.approve"
     SUGGEST_MINECRAFT_REJECT = "commands.suggest.messages.minecraft.reject"
     SUGGEST_USER_SUCCESS = "commands.suggest.messages.user.success"

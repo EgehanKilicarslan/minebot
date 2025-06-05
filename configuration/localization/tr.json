@@ -417,6 +417,102 @@
         }
       }
     },
+    "lock": {
+      "command": {
+        "label": "kanal_kilitle",
+        "description": "Belirtilen kanalı kilitle.",
+        "options": {
+          "channel": {
+            "label": "kanal",
+            "description": "Kilitlemek istediğiniz kanal."
+          },
+          "reason": {
+            "label": "sebep",
+            "description": "Kanalın kilitlenme sebebi."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Kilitlenme Başarılı",
+              "description": "{channel_mention} kanalı başarıyla kilitlendi.",
+              "color": "GREEN"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Kilitlenme Başarılı",
+              "description": "{discord_user_mention} kullanıcısı tarafından {channel_mention} kanalı kilitlendi.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Yetkili",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Sebep",
+                  "value": "{reason}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "unlock": {
+      "command": {
+        "label": "kanal_ac",
+        "description": "Belirtilen kanalı aç.",
+        "options": {
+          "channel": {
+            "label": "kanal",
+            "description": "Açmak istediğiniz kanal."
+          },
+          "reason": {
+            "label": "sebep",
+            "description": "Kanalın açılma sebebi."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Açılma Başarılı",
+              "description": "{channel_mention} kanalı başarıyla açıldı.",
+              "color": "GREEN"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Açılma Başarılı",
+              "description": "{discord_user_mention} kullanıcısı tarafından {channel_mention} kanalı açıldı.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Yetkili",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Sebep",
+                  "value": "{reason}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
     "suggest": {
       "command": {
         "label": "öneri",

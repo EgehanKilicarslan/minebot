@@ -403,6 +403,102 @@
         }
       }
     },
+    "lock": {
+      "command": {
+        "label": "lock",
+        "description": "Lock a channel to prevent further messages.",
+        "options": {
+          "channel": {
+            "label": "channel",
+            "description": "The channel to lock."
+          },
+          "reason": {
+            "label": "reason",
+            "description": "The reason for locking the channel."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Channel Locked",
+              "description": "{channel_mention} has been locked.",
+              "color": "YELLOW"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Channel Locked",
+              "description": "{discord_staff_user_mention} has locked {channel_mention}.",
+              "color": "YELLOW",
+              "fields": [
+                {
+                  "name": "Moderator",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Reason",
+                  "value": "{reason}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "unlock": {
+      "command": {
+        "label": "unlock",
+        "description": "Unlock a channel to allow further messages.",
+        "options": {
+          "channel": {
+            "label": "channel",
+            "description": "The channel to unlock."
+          },
+          "reason": {
+            "label": "reason",
+            "description": "The reason for unlocking the channel."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Channel Unlocked",
+              "description": "{channel_mention} has been unlocked.",
+              "color": "GREEN"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Channel Unlocked",
+              "description": "{discord_staff_user_mention} has unlocked {channel_mention}.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Moderator",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Reason",
+                  "value": "{reason}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
     "suggest": {
       "command": {
         "label": "suggest",

@@ -49,5 +49,7 @@ class CommandsKeys(Enum):
     TIMEOUT = "commands.timeout"
     UNTIMEOUT = "commands.untimeout"
     CLEAR = "commands.clear"
+    LOCK = "commands.lock"
+    UNLOCK = "commands.unlock"
     SUGGEST = "commands.suggest"
     WIKI = "commands.wiki"
