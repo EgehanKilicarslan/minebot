@@ -164,7 +164,7 @@
             "message_type": "embed",
             "content": {
               "title": "Kick Successful",
-              "description": "You have been kicked {discord_user_mention} from the server.",
+              "description": "You have kicked {discord_user_mention} from the server.",
               "color": "RED"
             }
           }
@@ -216,7 +216,7 @@
             "message_type": "embed",
             "content": {
               "title": "Ban Successful",
-              "description": "You have been banned {discord_user_mention} from the server.",
+              "description": "You have banned {discord_user_mention} from the server.",
               "color": "RED"
             }
           }
@@ -268,7 +268,7 @@
             "message_type": "embed",
             "content": {
               "title": "Unban Successful",
-              "description": "You have been unbanned {discord_user_mention} from the server.",
+              "description": "You have unbanned {discord_user_mention} from the server.",
               "color": "GREEN"
             }
           }
@@ -320,7 +320,7 @@
             "message_type": "embed",
             "content": {
               "title": "Timeout Successful",
-              "description": "You have been timed out {discord_user_mention} in the server.",
+              "description": "You have timed out {discord_user_mention} in the server.",
               "color": "YELLOW"
             }
           }
