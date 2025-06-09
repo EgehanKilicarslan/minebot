@@ -143,6 +143,54 @@
         }
       }
     },
+    "kick": {
+      "command": {
+        "label": "kick",
+        "description": "Kick a user from the server.",
+        "options": {
+          "user": {
+            "label": "user",
+            "description": "The user to kick."
+          },
+          "reason": {
+            "label": "reason",
+            "description": "The reason for the kick."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Kick Successful",
+              "description": "You have been kicked {discord_user_mention} from the server.",
+              "color": "RED"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "User Kicked",
+              "description": "{discord_user_mention} has been kicked from the server.",
+              "color": "RED",
+              "fields": [
+                {
+                  "name": "Moderator",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Reason",
+                  "value": "{reason}"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
     "ban": {
       "command": {
         "label": "ban",

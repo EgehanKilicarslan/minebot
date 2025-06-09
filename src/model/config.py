@@ -44,6 +44,7 @@ class CommandsKeys(Enum):
 
     LINK_ACCOUNT = "commands.link_account"
     WITHDRAW_REWARDS = "commands.withdraw_rewards"
+    KICK = "commands.kick"
     BAN = "commands.ban"
     UNBAN = "commands.unban"
     TIMEOUT = "commands.timeout"

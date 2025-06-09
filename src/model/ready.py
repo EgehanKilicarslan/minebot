@@ -31,6 +31,7 @@ class MessageType(Enum):
 class PunishmentType(str, Enum):
     """Types of punishments that can be applied to users"""
 
+    KICK = "kick"
     BAN = "ban"
     UNBAN = "unban"
     TIMEOUT = "timeout"

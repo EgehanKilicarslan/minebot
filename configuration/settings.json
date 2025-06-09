@@ -67,6 +67,16 @@
             },
             "log": null
         },
+        "kick": {
+            "permissions": [],
+            "cooldown": {
+                "algorithm": "",
+                "bucket": "",
+                "window_length": null,
+                "allowed_invocations": null
+            },
+            "log": null
+        },
         "ban": {
             "permissions": [],
             "cooldown": {

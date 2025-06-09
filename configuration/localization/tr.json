@@ -149,6 +149,62 @@
         }
       }
     },
+    "kick": {
+      "command": {
+        "label": "at",
+        "description": "Sunucudan bir kullanıcıyı at.",
+        "options": {
+          "user": {
+            "label": "kullanıcı",
+            "description": "Atılacak kullanıcı."
+          },
+          "reason": {
+            "label": "sebep",
+            "description": "Atma sebebi."
+          }
+        }
+      },
+      "messages": {
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Atma Başarılı",
+              "description": "{discord_user_mention} başarıyla sunucudan atıldı.",
+              "color": "GREEN"
+            }
+          }
+        },
+        "log": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Atma Başarılı",
+              "description": "{discord_user_mention} kullanıcısı başarıyla sunucudan atıldı.",
+              "color": "GREEN",
+              "fields": [
+                {
+                  "name": "Yetkili",
+                  "value": "{discord_staff_user_mention}"
+                },
+                {
+                  "name": "Sebep",
+                  "value": "{reason}"
+                }
+              ]
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Atma Başarısız",
+              "description": "{discord_user_mention} kullanıcısı atılırken hata oluştu.",
+              "color": "RED"
+            }
+          }
+        }
+      }
+    },
     "ban": {
       "command": {
         "label": "yasakla",

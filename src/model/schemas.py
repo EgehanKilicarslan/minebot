@@ -290,6 +290,7 @@ class SuggestCommandConfig(BasicCommand):
 class CommandConfiguration(BaseModel):
     link_account: LinkAccountCommandConfig | None = None
     withdraw_rewards: LoggedCommandConfig | None = None
+    kick: LoggedCommandConfig | None = None
     ban: LoggedCommandConfig | None = None
     unban: LoggedCommandConfig | None = None
     timeout: LoggedCommandConfig | None = None
@@ -357,6 +358,28 @@ class WithdrawRewardsMessages(BaseModel):
 class WithdrawRewardsLocalization(BaseModel):
     command: DescriptiveElement
     messages: WithdrawRewardsMessages
+
+
+class KickParameters(BaseModel):
+    user: DescriptiveElement
+    reason: DescriptiveElement
+
+
+class KickCommandParameters(DescriptiveElement):
+    options: KickParameters
+
+
+class KickMessages(BaseModel):
+    class SuccessMessage(BaseModel):
+        success: DiscordMessage
+
+    user: SuccessMessage
+    log: SuccessMessage
+
+
+class KickLocalization(BaseModel):
+    command: KickCommandParameters
+    messages: KickMessages
 
 
 class BanParameters(BaseModel):
@@ -610,6 +633,7 @@ class WikiLocalization(BaseModel):
 class CommandLocalization(BaseModel):
     link_account: LinkAccountLocalization
     withdraw_rewards: WithdrawRewardsLocalization
+    kick: KickLocalization
     ban: BanLocalization
     unban: UnBanLocalization
     timeout: TimeoutLocalization

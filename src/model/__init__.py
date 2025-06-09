@@ -6,7 +6,7 @@ application, ensuring consistency and reusability of key components.
 """
 
 from .config import BotKeys, CommandsKeys, DatabaseKeys, EventsKeys, SecretKeys, WebSocketKeys
-from .message import CommandKeys, MenuKeys, MessageKeys, ModalKeys, TimeUnitKeys
+from .message import MenuKeys, MessageKeys, ModalKeys, TimeUnitKeys
 from .ready import LogStyle, MessageType, PunishmentSource, PunishmentType
 from .schemas import BotSettings, DiscordEmbed, DiscordMessage, LocalizationData, TextMessage
 
@@ -17,7 +17,6 @@ __all__: list[str] = [
     "EventsKeys",
     "SecretKeys",
     "WebSocketKeys",
-    "CommandKeys",
     "MessageKeys",
     "ModalKeys",
     "TimeUnitKeys",

@@ -1,40 +1,6 @@
 from enum import Enum
 
 
-class CommandKeys(Enum):
-    """Command keys for the bot"""
-
-    LINK_ACCOUNT_LABEL = "commands.link_account.command.label"
-    LINK_ACCOUNT_DESCRIPTION = "commands.link_account.command.description"
-    LINK_ACCOUNT_OPTIONS = "commands.link_account.command.options"
-
-    WITHDRAW_REWARDS_LABEL = "commands.withdraw_rewards.command.label"
-    WITHDRAW_REWARDS_DESCRIPTION = "commands.withdraw_rewards.command.description"
-
-    BAN_LABEL = "commands.ban.command.label"
-    BAN_DESCRIPTION = "commands.ban.command.description"
-    BAN_OPTIONS = "commands.ban.command.options"
-
-    UNBAN_LABEL = "commands.unban.command.label"
-    UNBAN_DESCRIPTION = "commands.unban.command.description"
-    UNBAN_OPTIONS = "commands.unban.command.options"
-
-    TIMEOUT_LABEL = "commands.timeout.command.label"
-    TIMEOUT_DESCRIPTION = "commands.timeout.command.description"
-    TIMEOUT_OPTIONS = "commands.timeout.command.options"
-
-    UNTIMEOUT_LABEL = "commands.untimeout.command.label"
-    UNTIMEOUT_DESCRIPTION = "commands.untimeout.command.description"
-    UNTIMEOUT_OPTIONS = "commands.untimeout.command.options"
-
-    SUGGEST_LABEL = "commands.suggest.command.label"
-    SUGGEST_DESCRIPTION = "commands.suggest.command.description"
-
-    WIKI_LABEL = "commands.wiki.command.label"
-    WIKI_DESCRIPTION = "commands.wiki.command.description"
-    WIKI_OPTIONS = "commands.wiki.command.options"
-
-
 class MessageKeys(Enum):
     """Message keys for the bot"""
 
@@ -54,6 +20,9 @@ class MessageKeys(Enum):
     WITHDRAW_REWARDS_USER_FAILURE = "commands.withdraw_rewards.messages.user.failure"
     WITHDRAW_REWARDS_LOG_SUCCESS = "commands.withdraw_rewards.messages.log.success"
     WITHDRAW_REWARDS_LOG_FAILURE = "commands.withdraw_rewards.messages.log.failure"
+
+    KICK_COMMAND_USER_SUCCESS = "commands.kick.messages.user.success"
+    KICK_COMMAND_LOG_SUCCESS = "commands.kick.messages.log.success"
 
     BAN_COMMAND_USER_SUCCESS = "commands.ban.messages.user.success"
     BAN_COMMAND_LOG_SUCCESS = "commands.ban.messages.log.success"
