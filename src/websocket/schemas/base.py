@@ -21,7 +21,7 @@ class ServerBaseSchema(BaseSchema):
     @classmethod
     def validate_server(cls, value: str) -> str:
         # Check if the server name is built-in
-        if value == "all":
+        if value in ["all", "bungeecord", "velocity"]:
             return value
 
         # Import inside method to avoid circular import

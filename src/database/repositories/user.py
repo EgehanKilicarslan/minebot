@@ -31,6 +31,16 @@ class UserRepository:
         logger.debug(f"User with ID {user_id} found: {user is not None}")
         return user
 
+    async def get_by_minecraft_username(self, minecraft_username: str) -> User | None:
+        """Get a user by their Minecraft username."""
+        logger.debug(f"Fetching user with Minecraft username: {minecraft_username}")
+        result: Result[tuple[User]] = await self.session.execute(
+            select(User).where(User.minecraft_username == minecraft_username)
+        )
+        user = result.scalars().first()
+        logger.debug(f"User with Minecraft username {minecraft_username} found: {user is not None}")
+        return user
+
     async def create(self, user_schema: UserSchema) -> User:
         """Create a new user."""
         logger.debug(

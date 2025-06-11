@@ -8,4 +8,6 @@ changes occur within the bot, enabling real-time monitoring and reactive
 programming by external services.
 """
 
-__all__: list[str] = []
+from .command_executed import command_executed
+
+__all__: list[str] = ["command_executed"]

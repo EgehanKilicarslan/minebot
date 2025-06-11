@@ -36,6 +36,27 @@ class UserService:
             return None
 
     @staticmethod
+    async def get_user_by_minecraft_username(minecraft_username: str) -> UserSchema | None:
+        """
+        Get a user by their Minecraft username.
+
+        Args:
+            minecraft_username: The Minecraft username
+
+        Returns:
+            UserSchema or None if the user doesn't exist
+        """
+        logger.debug(f"Getting user with Minecraft username: {minecraft_username}")
+        async with get_db_session() as session:
+            repository = UserRepository(session)
+            user: User | None = await repository.get_by_minecraft_username(minecraft_username)
+            if user:
+                logger.debug(f"Found user with Minecraft username {minecraft_username}: {user}")
+                return UserSchema.model_validate(user)
+            logger.debug(f"No user found with Minecraft username: {minecraft_username}")
+            return None
+
+    @staticmethod
     async def create_or_update_user(
         user_data: UserSchema, preserve_existing: bool = True
     ) -> UserSchema:
