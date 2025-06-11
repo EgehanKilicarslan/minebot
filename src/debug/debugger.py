@@ -2,7 +2,6 @@ import json
 import logging
 import logging.config
 import sys
-from functools import lru_cache
 from pathlib import Path
 from typing import Any, ClassVar, Final
 
@@ -181,7 +180,6 @@ def _setup_emergency_logging() -> None:
     )
 
 
-@lru_cache(maxsize=128)
 def get_logger(name: str) -> logging.Logger:
     """
     Retrieves a logger instance with a specified name, prefixed by 'minebot.'.
