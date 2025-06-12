@@ -402,6 +402,13 @@ COMMAND_HANDLERS = {
 
 @websocket_action("command-executed", CommandExecutedSchema)
 async def command_executed(data: CommandExecutedSchema, client: lightbulb.Client) -> None:
+    # Check command sync permission - tempban uses BAN permission
+    command_type_for_check = (
+        PunishmentType.BAN if data.command_type == "tempban" else data.command_type
+    )
+    if not GlobalState.commands.is_minecraft_to_discord(command_type_for_check):
+        return
+
     # Extract data - safely handle potentially missing arguments
     args = data.args or {}
     raw_executor = data.executor

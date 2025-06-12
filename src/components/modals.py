@@ -16,8 +16,8 @@ from helper import (
 )
 from model import CommandsKeys, MessageKeys, ModalKeys, SecretKeys
 from model.schemas import (
-    LinkAccountCommandConfig,
     LinkAccountConfirmationModal,
+    LoggedRewardableCommandConfig,
     SuggestCommandConfig,
     SuggestRespondModal,
     SuggestSendModal,
@@ -124,7 +124,7 @@ class LinkAccountConfirmModal(Modal):
             or None if no rewards are configured
         """
         # Fetch reward configuration from settings
-        data: LinkAccountCommandConfig = Settings.get(CommandsKeys.LINK_ACCOUNT)
+        data: LoggedRewardableCommandConfig = Settings.get(CommandsKeys.LINK_ACCOUNT)
         rewards: UserReward | None = data.reward
 
         if rewards is None:

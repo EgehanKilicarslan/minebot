@@ -75,7 +75,11 @@
                 "window_length": null,
                 "allowed_invocations": null
             },
-            "log": null
+            "log": null,
+            "synchronization": {
+                "minecraft_to_discord": null,
+                "discord_to_minecraft": null
+            }
         },
         "ban": {
             "permissions": [],
@@ -85,7 +89,11 @@
                 "window_length": null,
                 "allowed_invocations": null
             },
-            "log": null
+            "log": null,
+            "synchronization": {
+                "minecraft_to_discord": null,
+                "discord_to_minecraft": null
+            }
         },
         "unban": {
             "permissions": [],
@@ -95,7 +103,11 @@
                 "window_length": null,
                 "allowed_invocations": null
             },
-            "log": null
+            "log": null,
+            "synchronization": {
+                "minecraft_to_discord": null,
+                "discord_to_minecraft": null
+            }
         },
         "timeout": {
             "permissions": [],
@@ -105,7 +117,11 @@
                 "window_length": null,
                 "allowed_invocations": null
             },
-            "log": null
+            "log": null,
+            "synchronization": {
+                "minecraft_to_discord": null,
+                "discord_to_minecraft": null
+            }
         },
         "untimeout": {
             "permissions": [],
@@ -115,7 +131,11 @@
                 "window_length": null,
                 "allowed_invocations": null
             },
-            "log": null
+            "log": null,
+            "synchronization": {
+                "minecraft_to_discord": null,
+                "discord_to_minecraft": null
+            }
         },
         "clear": {
             "permissions": [],

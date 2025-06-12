@@ -318,14 +318,9 @@ class MessageHelper:
             None: The method returns early if logging is disabled or no channel is configured.
         """
         logger.debug(f"[Message: {self.key.name}] Checking if logging is enabled")
-        if not helper.has_logging_enabled():
-            logger.debug(f"[Message: {self.key.name}] Logging is disabled, skipping")
-            return None
-
-        logger.debug(f"[Message: {self.key.name}] Getting log channel ID")
         channel_id = helper.get_log_channel_id()
         if not channel_id:
-            logger.debug(f"[Message: {self.key.name}] No log channel configured, skipping")
+            logger.debug(f"[Message: {self.key.name}] Logging is disabled, skipping")
             return None
 
         logger.debug(f"[Message: {self.key.name}] Fetching channel {channel_id}")

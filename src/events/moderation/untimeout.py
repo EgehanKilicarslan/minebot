@@ -5,12 +5,11 @@ import lightbulb
 
 from core import GlobalState
 from database.schemas import PunishmentLogSchema, TemporaryActionSchema
-from database.services import PunishmentLogService, TemporaryActionService
-from helper import CommandHelper, PunishmentHelper
-from helper.message import MessageHelper
-from helper.user import UserHelper
-from model import CommandsKeys, PunishmentSource, PunishmentType
-from model.message import MessageKeys
+from database.services import PunishmentLogService, TemporaryActionService, UserService
+from helper import CommandHelper, MessageHelper, PunishmentHelper, UserHelper
+from model import CommandsKeys, MessageKeys, PunishmentSource, PunishmentType
+from websocket import WebSocketManager
+from websocket.schemas.event import CommandExecutedSchema
 
 helper: CommandHelper = CommandHelper(CommandsKeys.UNBAN)
 loader: lightbulb.Loader = helper.get_loader()
@@ -88,6 +87,24 @@ async def on_member_update(event: hikari.AuditLogEntryCreateEvent) -> None:
 
     # Ensure the punishment is a valid schema instance
     assert isinstance(punishment, PunishmentLogSchema)
+
+    # --- Synchronize punishment with server if enabled ---
+    if GlobalState.commands.is_discord_to_minecraft(PunishmentType.UNTIMEOUT):
+        user_data = await UserService.get_user(target_id)
+        if not user_data or not user_data.minecraft_username:
+            return
+
+        await WebSocketManager.send_message(
+            CommandExecutedSchema(
+                server="all",
+                command_type=PunishmentType.UNTIMEOUT,
+                executor="MineBot",
+                args={
+                    "target": user_data.minecraft_username,
+                    "reason": punishment.reason,
+                },
+            )
+        )
 
     # --- Fetch user information for logging ---
     target_member = await UserHelper.fetch_user(target_id)

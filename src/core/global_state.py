@@ -75,6 +75,37 @@ class GuildState:
         return GuildState._booster_role
 
 
+class CommandState:
+    """Manages command synchronization state."""
+
+    _sync_state: dict[str, dict[str, bool]] = {}
+
+    @staticmethod
+    def add_sync_state(
+        command_name: str, minecraft_to_discord: bool, discord_to_minecraft: bool
+    ) -> None:
+        """Add a command to the synchronization state."""
+        CommandState._sync_state[command_name] = {
+            "minecraft_to_discord": minecraft_to_discord,
+            "discord_to_minecraft": discord_to_minecraft,
+        }
+
+    @staticmethod
+    def get_command_sync_state(command_name: str) -> dict[str, bool] | None:
+        """Get the synchronization state for a command."""
+        return CommandState._sync_state.get(command_name)
+
+    @staticmethod
+    def is_minecraft_to_discord(command_name: str) -> bool:
+        """Check if the command syncs from Minecraft to Discord."""
+        return CommandState._sync_state.get(command_name, {}).get("minecraft_to_discord", False)
+
+    @staticmethod
+    def is_discord_to_minecraft(command_name: str) -> bool:
+        """Check if the command syncs from Discord to Minecraft."""
+        return CommandState._sync_state.get(command_name, {}).get("discord_to_minecraft", False)
+
+
 class MinecraftState:
     """Manages Minecraft-related state data."""
 
@@ -262,5 +293,6 @@ class GlobalState:
 
     bot: BotState = BotState()
     guild: GuildState = GuildState()
+    commands: CommandState = CommandState()
     minecraft: MinecraftState = MinecraftState()
     tasks: TasksState = TasksState()

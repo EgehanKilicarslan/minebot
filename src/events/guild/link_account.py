@@ -8,7 +8,7 @@ from database.services import UserService
 from debug import get_logger
 from helper import CommandHelper
 from model import CommandsKeys
-from model.schemas import LinkAccountCommandConfig, UserReward
+from model.schemas import LoggedRewardableCommandConfig, UserReward
 from settings import Settings
 
 helper: CommandHelper = CommandHelper(CommandsKeys.LINK_ACCOUNT)
@@ -25,7 +25,7 @@ async def on_member_create(event: hikari.MemberCreateEvent) -> None:
         return
 
     # Get reward configuration
-    data: LinkAccountCommandConfig = Settings.get(CommandsKeys.LINK_ACCOUNT)
+    data: LoggedRewardableCommandConfig = Settings.get(CommandsKeys.LINK_ACCOUNT)
     rewards: UserReward | None = data.reward
 
     # Check if rewards exist and are not items

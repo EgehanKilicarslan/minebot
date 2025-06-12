@@ -158,6 +158,12 @@ class UserReward(BaseModel):
         return self
 
 
+# ==== Synchronization Schema ====
+class MinecraftSynchronization(BaseModel):
+    minecraft_to_discord: bool = False
+    discord_to_minecraft: bool = False
+
+
 # ==== Settings Schema ====
 class BotCredentials(BaseModel):
     token: str
@@ -277,24 +283,45 @@ class LoggedCommandConfig(BasicCommand):
     log: PositiveInt | None = None
 
 
-class LinkAccountCommandConfig(LoggedCommandConfig):
+class RewardableCommandConfig(BasicCommand):
     reward: UserReward | None = None
 
 
-class SuggestCommandConfig(BasicCommand):
+class TransferableCommandConfig(BasicCommand):
+    synchronization: MinecraftSynchronization | None = None
+
+
+class LoggedRewardableCommandConfig(RewardableCommandConfig, LoggedCommandConfig):
+    pass
+
+
+class LoggedTransferableCommandConfig(TransferableCommandConfig, LoggedCommandConfig):
+    pass
+
+
+class LoggedRewardableTransferableCommandConfig(
+    LoggedCommandConfig, RewardableCommandConfig, TransferableCommandConfig
+):
+    pass
+
+
+class RewardableTransferableCommandConfig(RewardableCommandConfig, TransferableCommandConfig):
+    pass
+
+
+class SuggestCommandConfig(RewardableCommandConfig):
     pending_channel: PositiveInt
     result_channel: PositiveInt
-    reward: UserReward | None = None
 
 
 class CommandConfiguration(BaseModel):
-    link_account: LinkAccountCommandConfig | None = None
+    link_account: LoggedRewardableCommandConfig | None = None
     withdraw_rewards: LoggedCommandConfig | None = None
-    kick: LoggedCommandConfig | None = None
-    ban: LoggedCommandConfig | None = None
-    unban: LoggedCommandConfig | None = None
-    timeout: LoggedCommandConfig | None = None
-    untimeout: LoggedCommandConfig | None = None
+    kick: LoggedTransferableCommandConfig | None = None
+    ban: LoggedTransferableCommandConfig | None = None
+    unban: LoggedTransferableCommandConfig | None = None
+    timeout: LoggedTransferableCommandConfig | None = None
+    untimeout: LoggedTransferableCommandConfig | None = None
     clear: LoggedCommandConfig | None = None
     lock: LoggedCommandConfig | None = None
     unlock: LoggedCommandConfig | None = None

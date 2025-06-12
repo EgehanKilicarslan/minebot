@@ -4,12 +4,13 @@ from typing import cast
 import hikari
 import lightbulb
 
-from database.schemas import PunishmentLogSchema
-from database.schemas.temporary_action import TemporaryActionSchema
-from database.services import PunishmentLogService
-from database.services.temporary_action import TemporaryActionService
+from core import GlobalState
+from database.schemas import PunishmentLogSchema, TemporaryActionSchema
+from database.services import PunishmentLogService, TemporaryActionService, UserService
 from helper import CommandHelper, MessageHelper, PunishmentHelper, TimeHelper, UserHelper
 from model import CommandsKeys, MessageKeys, PunishmentSource, PunishmentType
+from websocket import WebSocketManager
+from websocket.schemas.event import CommandExecutedSchema
 
 # Helper that manages event configuration and localization
 helper: CommandHelper = CommandHelper(CommandsKeys.TIMEOUT)
@@ -116,6 +117,25 @@ async def on_member_update(event: hikari.AuditLogEntryCreateEvent) -> None:
     if punishment.duration is None:
         # Invalid punishment entry without duration
         return
+
+    # --- Synchronize punishment with server if enabled ---
+    if GlobalState.commands.is_discord_to_minecraft(PunishmentType.TIMEOUT):
+        user_data = await UserService.get_user(target_id)
+        if not user_data or not user_data.minecraft_username:
+            return
+
+        await WebSocketManager.send_message(
+            CommandExecutedSchema(
+                server="all",
+                command_type=PunishmentType.TIMEOUT,
+                executor="MineBot",
+                args={
+                    "target": user_data.minecraft_username,
+                    "duration": f"{punishment.duration}s",
+                    "reason": punishment.reason,
+                },
+            )
+        )
 
     # --- Fetch user information for logging ---
     target_member = await UserHelper.fetch_member(target_id)

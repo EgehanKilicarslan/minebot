@@ -1,5 +1,3 @@
-from typing import Any
-
 from ..base import ServerBaseSchema
 
 
@@ -8,4 +6,4 @@ class CommandExecutedSchema(ServerBaseSchema, action="command-executed"):
 
     command_type: str
     executor: str
-    args: dict[str, Any] | None = None
+    args: dict[str, str] | None = None

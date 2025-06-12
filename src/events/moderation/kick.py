@@ -3,10 +3,13 @@ from datetime import datetime, timezone
 import hikari
 import lightbulb
 
+from core import GlobalState
 from database.schemas import PunishmentLogSchema
-from database.services import PunishmentLogService
+from database.services import PunishmentLogService, UserService
 from helper import CommandHelper, MessageHelper, PunishmentHelper, UserHelper
 from model import CommandsKeys, MessageKeys, PunishmentSource, PunishmentType
+from websocket import WebSocketManager
+from websocket.schemas.event import CommandExecutedSchema
 
 # Helper that manages event configuration and localization
 helper: CommandHelper = CommandHelper(CommandsKeys.KICK)
@@ -73,6 +76,21 @@ async def on_kick_create(event: hikari.AuditLogEntryCreateEvent) -> None:
 
     # Ensure the punishment is a valid schema instance
     assert isinstance(punishment, PunishmentLogSchema)
+
+    # --- Synchronize punishment with server if enabled ---
+    if GlobalState.commands.is_discord_to_minecraft(PunishmentType.KICK):
+        user_data = await UserService.get_user(target_id)
+        if not user_data or not user_data.minecraft_username:
+            return
+
+        await WebSocketManager.send_message(
+            CommandExecutedSchema(
+                server="all",
+                command_type=PunishmentType.KICK,
+                executor="MineBot",
+                args={"target": user_data.minecraft_username, "reason": punishment.reason},
+            )
+        )
 
     # --- Fetch user information for logging ---
     target_member = await UserHelper.fetch_user(target_id)

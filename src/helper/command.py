@@ -7,9 +7,16 @@ from lightbulb import ExecutionHook
 from lightbulb.prefab import cooldowns
 from pydantic import PositiveInt
 
+from core import GlobalState
 from debug import get_logger
 from model import CommandsKeys
-from model.schemas import BasicCommand, CommandCooldown, LoggedCommandConfig
+from model.schemas import (
+    BasicCommand,
+    CommandCooldown,
+    LoggedCommandConfig,
+    RewardableCommandConfig,
+    TransferableCommandConfig,
+)
 from settings import Settings
 
 # Get logger but with a reduced verbosity for debug messages
@@ -54,6 +61,12 @@ class CommandHelper:
             # Handle logging configuration
             self._configure_logging(command_info)
 
+            # Handle reward configuration
+            self._configure_reward(command_info)
+
+            # Handle synchronization configuration
+            self._configure_synchronization(command_info)
+
         except Exception as e:
             # Provide a clear error message with the command name and error
             logger.error(f"[Command: {self.command_name}] Initialization FAILED: {str(e)}")
@@ -89,15 +102,78 @@ class CommandHelper:
     def _configure_logging(self, command_info: BasicCommand) -> None:
         """Configure logging properties if available."""
         # Default values
-        self.command_log_enabled = False
-        self.command_log_channel = None
+        self.command_log_channel: PositiveInt | None = None
 
         if isinstance(command_info, LoggedCommandConfig):
-            self.command_log_enabled: bool = command_info.log is not None
-            self.command_log_channel: PositiveInt | None = command_info.log
+            self.command_log_channel = command_info.log
             logger.debug(
-                f"[Command: {self.command_name}] Logging configured - Enabled: {self.command_log_enabled}, "
+                f"[Command: {self.command_name}] Logging configured - Enabled: {bool(self.command_log_channel)}, "
                 f"Channel: {self.command_log_channel}"
+            )
+
+    def _configure_reward(self, command_info: BasicCommand) -> None:
+        """Configure command reward settings if applicable."""
+        # Default values
+        self.command_reward_mode: str | None = None
+        self.command_reward_role: list[PositiveInt] | None = None
+        self.command_reward_item: dict[str, list[str]] | None = None
+
+        if isinstance(command_info, RewardableCommandConfig) and command_info.reward is not None:
+            self.command_reward_mode = command_info.reward.mode
+
+            # Convert single PositiveInt to list
+            if command_info.reward.role is not None:
+                self.command_reward_role = (
+                    [command_info.reward.role]
+                    if isinstance(command_info.reward.role, int)
+                    else command_info.reward.role
+                )
+
+            # Convert string values to list[str]
+            if command_info.reward.item is not None:
+                self.command_reward_item = {
+                    k: [v] if isinstance(v, str) else v for k, v in command_info.reward.item.items()
+                }
+
+            logger.debug(
+                f"[Command: {self.command_name}] Reward configured - "
+                f"Enabled: {bool(self.command_reward_mode)}, "
+                f"Role: {self.command_reward_role}, "
+                f"Item: {self.command_reward_item}"
+            )
+
+    def _configure_synchronization(self, command_info: BasicCommand) -> None:
+        """Configure command synchronization settings if applicable."""
+        # Default values
+        self.command_synchronization_minecraft_to_discord: bool = False
+        self.command_synchronization_discord_to_minecraft: bool = False
+
+        if (
+            isinstance(command_info, TransferableCommandConfig)
+            and command_info.synchronization is not None
+        ):
+            self.command_synchronization_minecraft_to_discord = (
+                command_info.synchronization.minecraft_to_discord
+            )
+            self.command_synchronization_discord_to_minecraft = (
+                command_info.synchronization.discord_to_minecraft
+            )
+
+            if enabled := bool(
+                self.command_synchronization_minecraft_to_discord
+                or self.command_synchronization_discord_to_minecraft
+            ):
+                GlobalState.commands.add_sync_state(
+                    self.command_name,
+                    self.command_synchronization_minecraft_to_discord,
+                    self.command_synchronization_discord_to_minecraft,
+                )
+
+            logger.debug(
+                f"[Command: {self.command_name}] Synchronization configured - "
+                f"Enabled: {enabled}, "
+                f"MC to Discord: {self.command_synchronization_minecraft_to_discord}, "
+                f"Discord to MC: {self.command_synchronization_discord_to_minecraft}"
             )
 
     def get_loader(self) -> lightbulb.Loader:
@@ -172,15 +248,6 @@ class CommandHelper:
 
         return hooks
 
-    def has_logging_enabled(self) -> bool:
-        """
-        Check if logging is enabled for the command.
-
-        Returns:
-            bool: True if logging is enabled, False otherwise.
-        """
-        return self.command_log_enabled
-
     def get_log_channel_id(self) -> PositiveInt | None:
         """
         Get the ID of the channel where command logs should be sent.
@@ -188,7 +255,68 @@ class CommandHelper:
         Returns:
             PositiveInt | None: The channel ID if logging is enabled, None otherwise.
         """
-        return self.command_log_channel if self.command_log_enabled else None
+        return self.command_log_channel
+
+    def get_reward_role_ids(self) -> list[PositiveInt] | None:
+        """
+        Get the roles that should be rewarded for using the command.
+
+        Returns:
+            list[PositiveInt] | None: The role ID(s) if rewards are enabled, None otherwise.
+        """
+        return self.command_reward_role
+
+    def get_reward_items(self) -> dict[str, list[str]] | None:
+        """
+        Get the items that should be rewarded for using the command.
+
+        Returns:
+            dict[str, list[str]] | None: The item data if rewards are enabled, None otherwise.
+        """
+        if self.command_reward_item is None:
+            return None
+
+        final_item_reward: dict[str, list[str]] = {}
+        default_reward: list[str] | None = self.command_reward_item.get("defualt", None)
+
+        for server_name, items in self.command_reward_item.items():
+            if GlobalState.minecraft.contains_server(server_name):
+                final_item_reward[server_name] = items
+            elif server_name != "default":
+                final_item_reward[server_name] = default_reward or []
+
+    def has_synchronization_minecraft_to_discord(self) -> bool:
+        """
+        Check if the command has synchronization from Minecraft to Discord enabled.
+
+        Returns:
+            bool: True if synchronization is enabled, False otherwise.
+        """
+        return self.command_synchronization_minecraft_to_discord
+
+    def has_synchronization_discord_to_minecraft(self) -> bool:
+        """
+        Check if the command has synchronization from Discord to Minecraft enabled.
+
+        Returns:
+            bool: True if synchronization is enabled, False otherwise.
+        """
+        return self.command_synchronization_discord_to_minecraft
+
+    async def synchronize_to_minecraft(
+        self, server: str, command_type: str, args: dict[str, str] | None = None
+    ) -> bool:
+        from websocket import WebSocketManager
+        from websocket.schemas.event import CommandExecutedSchema
+
+        if not self.command_synchronization_discord_to_minecraft:
+            return False
+
+        return await WebSocketManager.send_message(
+            CommandExecutedSchema(
+                server=server, command_type=command_type, executor="MineBot", args=args
+            )
+        )
 
     def _get_cooldown(self) -> ExecutionHook | None:
         """
