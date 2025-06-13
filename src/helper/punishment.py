@@ -62,11 +62,11 @@ class PunishmentHelper:
             return reason, reason
 
         if locale is None:
-            message = MessageHelper(MessageKeys.GENERAL_NO_REASON)._decode_plain()
+            message = MessageHelper(MessageKeys.general.NO_REASON)._decode_plain()
             return message, message
 
         messages = MessageHelper(
-            MessageKeys.GENERAL_NO_REASON, user_locale=locale
+            MessageKeys.general.NO_REASON, user_locale=locale
         ).get_localized_message_pair("text")
 
         return (str(messages[0]), str(messages[1]))
@@ -95,7 +95,7 @@ class PunishmentHelper:
 
         logger.debug(f"Retrieved {len(temp_actions)} temporary actions")
         guild = Settings.get(SecretKeys.DEFAULT_GUILD)
-        no_reason = MessageHelper(MessageKeys.GENERAL_NO_REASON)._decode_plain()
+        no_reason = MessageHelper(MessageKeys.general.NO_REASON)._decode_plain()
         now = datetime.now(timezone.utc)
 
         handlers = {

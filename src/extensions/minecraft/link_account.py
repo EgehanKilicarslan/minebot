@@ -43,7 +43,7 @@ class LinkAccount(
         if not await MinecraftHelper.fetch_player_status(username=self.username):
             # Send error message if player isn't online
             await MessageHelper(
-                key=MessageKeys.PLAYER_NOT_ONLINE,
+                key=MessageKeys.error.PLAYER_NOT_ONLINE,
                 locale=user_locale,
                 discord_username=ctx.user.username,
                 discord_user_id=ctx.user.id,
@@ -58,7 +58,7 @@ class LinkAccount(
             message_type=MessageType.INFO,
             username=self.username,
             message=MessageHelper(
-                key=MessageKeys.LINK_ACCOUNT_MINECRAFT_CONFIRMATION_CODE,
+                key=MessageKeys.commands.LINK_ACCOUNT_MINECRAFT_CONFIRMATION_CODE,
                 locale=user_locale,
                 confirmation_code=code,
             )._decode_plain(),
@@ -84,4 +84,4 @@ class LinkAccount(
             await modal.attach(ctx.client, c_id)
         except asyncio.TimeoutError:
             # Handle case when user doesn't complete the modal in time
-            await MessageHelper(MessageKeys.TIMEOUT_ERROR).send_response(ctx, ephemeral=True)
+            await MessageHelper(MessageKeys.error.TIMEOUT).send_response(ctx, ephemeral=True)

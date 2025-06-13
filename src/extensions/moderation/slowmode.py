@@ -60,7 +60,7 @@ class Slowmode(
         # Validate that target is a text channel where slowmode is possible
         if not isinstance(channel, hikari.GuildTextChannel):
             await MessageHelper(
-                MessageKeys.CHANNEL_NOT_FOUND, ctx.interaction.locale
+                MessageKeys.error.CHANNEL_NOT_FOUND, ctx.interaction.locale
             ).send_response(ctx, ephemeral=True)
             return
 
@@ -72,7 +72,7 @@ class Slowmode(
             min_duration = TimeHelper(ctx.interaction.locale).from_timedelta(timedelta(seconds=0))
             max_duration = TimeHelper(ctx.interaction.locale).from_timedelta(timedelta(hours=6))
             await MessageHelper(
-                MessageKeys.DURATION_OUT_OF_RANGE,
+                MessageKeys.error.DURATION_OUT_OF_RANGE,
                 ctx.interaction.locale,
                 min_duration=min_duration,
                 max_duration=max_duration,
@@ -92,7 +92,7 @@ class Slowmode(
 
         # Notify moderator of successful action (visible only to them)
         await MessageHelper(
-            MessageKeys.SLOWMODE_COMMAND_USER_SUCCESS,
+            MessageKeys.commands.SLOWMODE_USER_SUCCESS,
             ctx.interaction.locale,
             **common_params,
             reason=reason_messages[0],  # User-facing reason
@@ -100,7 +100,7 @@ class Slowmode(
 
         # Log action to designated logging channel for moderation transparency
         await MessageHelper(
-            MessageKeys.SLOWMODE_COMMAND_LOG_SUCCESS,
+            MessageKeys.commands.SLOWMODE_LOG_SUCCESS,
             ctx.interaction.locale,
             **common_params,
             discord_staff_username=ctx.user.username,

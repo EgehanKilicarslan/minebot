@@ -73,7 +73,7 @@ class Clear(
 
         # Send confirmation message to the moderator with deletion details
         await MessageHelper(
-            MessageKeys.CLEAR_COMMAND_USER_SUCCESS,
+            MessageKeys.commands.CLEAR_USER_SUCCESS,
             ctx.interaction.locale,
             reason=reason_messages[0],  # User-facing reason
             **common_params,
@@ -81,7 +81,7 @@ class Clear(
 
         # Send notification to moderation log channel for accountability
         await MessageHelper(
-            MessageKeys.CLEAR_COMMAND_LOG_SUCCESS,
+            MessageKeys.commands.CLEAR_LOG_SUCCESS,
             ctx.interaction.locale,
             discord_staff_username=ctx.user.username,
             discord_staff_user_id=ctx.user.id,

@@ -273,7 +273,7 @@ async def _handle_tempban(
         try:
             # Remove the ban when time period completes
             await target_member.unban(
-                reason=MessageHelper(key=MessageKeys.GENERAL_NO_REASON)._decode_plain()
+                reason=MessageHelper(key=MessageKeys.general.NO_REASON)._decode_plain()
             )
 
             # Remove temporary action record from database after completion

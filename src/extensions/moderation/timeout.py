@@ -203,7 +203,7 @@ class Timeout(
         # Check if user can be moderated
         if not PunishmentHelper.can_moderate(target_member, ctx.member):
             await MessageHelper(
-                MessageKeys.CAN_NOT_MODERATE,
+                MessageKeys.error.CAN_NOT_MODERATE,
                 locale=ctx.interaction.locale,
                 discord_username=target_member.username,
                 discord_user_id=str(target_member.id),
@@ -217,7 +217,7 @@ class Timeout(
         # Check if user is already timed out
         if target_member.communication_disabled_until() is not None:
             await MessageHelper(
-                MessageKeys.USER_ALREADY_TIMED_OUT,
+                MessageKeys.error.USER_ALREADY_TIMED_OUT,
                 locale=ctx.interaction.locale,
                 discord_username=target_member.username,
                 discord_user_id=str(target_member.id),
@@ -234,7 +234,7 @@ class Timeout(
 
         # Send success message
         await MessageHelper(
-            MessageKeys.TIMEOUT_COMMAND_USER_SUCCESS,
+            MessageKeys.commands.TIMEOUT_USER_SUCCESS,
             locale=ctx.interaction.locale,
             discord_username=target_member.username,
             discord_user_id=str(target_member.id),

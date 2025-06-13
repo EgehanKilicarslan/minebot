@@ -64,7 +64,7 @@ class Wiki(
         if not wiki_data or self.query not in wiki_data.keys():
             # Send failure message if wiki entry not found
             await MessageHelper(
-                MessageKeys.WIKI_COMMAND_USER_FAILURE,
+                MessageKeys.commands.WIKI_USER_FAILURE,
                 locale=user_locale,
             ).send_response(ctx, ephemeral=True)
             return
@@ -74,7 +74,7 @@ class Wiki(
 
         # Send successful response with wiki content to the user
         await MessageHelper(
-            MessageKeys.WIKI_COMMAND_USER_SUCCESS,
+            MessageKeys.commands.WIKI_USER_SUCCESS,
             locale=user_locale,
             query=self.query,
             result=content,

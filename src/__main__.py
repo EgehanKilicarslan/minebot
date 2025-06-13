@@ -63,7 +63,7 @@ if __name__ == "__main__":
             elif isinstance(exc.causes[0], CommandExecutionError):
                 await exc.context.respond(
                     MessageHelper(
-                        key=MessageKeys.COMMAND_EXECUTION_ERROR,
+                        key=MessageKeys.error.COMMAND_EXECUTION,
                         locale=exc.context.interaction.locale,
                         error_message=exc.causes[0],
                     ).decode(),
@@ -73,7 +73,7 @@ if __name__ == "__main__":
             elif isinstance(exc.causes[0], lightbulb.prefab.OnCooldown):
                 await exc.context.respond(
                     MessageHelper(
-                        key=MessageKeys.COMMAND_ON_COOLDOWN,
+                        key=MessageKeys.error.COMMAND_ON_COOLDOWN,
                         locale=exc.context.interaction.locale,
                         remaining_cooldown=TimeHelper(
                             exc.context.interaction.locale
@@ -85,7 +85,7 @@ if __name__ == "__main__":
             else:
                 await exc.context.respond(
                     MessageHelper(
-                        key=MessageKeys.UNKNOWN_ERROR, locale=exc.context.interaction.locale
+                        key=MessageKeys.error.UNKNOWN, locale=exc.context.interaction.locale
                     ).decode(),
                     ephemeral=True,
                 )

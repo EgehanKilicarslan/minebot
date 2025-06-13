@@ -15,6 +15,7 @@ from helper import (
     ModalHelper,
 )
 from model import CommandsKeys, MessageKeys, ModalKeys, SecretKeys
+from model.message import CommandMessageKeys
 from model.schemas import (
     LinkAccountConfirmationModal,
     LoggedRewardableCommandConfig,
@@ -69,15 +70,15 @@ class LinkAccountConfirmModal(Modal):
         based on whether the account linking was successful.
         """
         # Select appropriate message keys based on success/failure
-        user_key: MessageKeys = (
-            MessageKeys.LINK_ACCOUNT_USER_SUCCESS
+        user_key: CommandMessageKeys = (
+            MessageKeys.commands.LINK_ACCOUNT_USER_SUCCESS
             if success
-            else MessageKeys.LINK_ACCOUNT_USER_FAILURE
+            else MessageKeys.commands.LINK_ACCOUNT_USER_FAILURE
         )
-        log_key: MessageKeys = (
-            MessageKeys.LINK_ACCOUNT_LOG_SUCCESS
+        log_key: CommandMessageKeys = (
+            MessageKeys.commands.LINK_ACCOUNT_LOG_SUCCESS
             if success
-            else MessageKeys.LINK_ACCOUNT_LOG_FAILURE
+            else MessageKeys.commands.LINK_ACCOUNT_LOG_FAILURE
         )
 
         # Common parameters for both messages
@@ -241,7 +242,7 @@ class SuggestRequestModal(Modal):
             menu = SuggestConfirmMenu()
 
             await MessageHelper(
-                key=MessageKeys.SUGGEST_USER_SUCCESS,
+                key=MessageKeys.commands.SUGGEST_USER_SUCCESS,
                 locale=self._user_locale,
                 **common_params,
             ).send_response(ctx, ephemeral=True)
@@ -251,7 +252,7 @@ class SuggestRequestModal(Modal):
             )
 
             pending_message: hikari.Message | None = await MessageHelper(
-                key=MessageKeys.SUGGEST_PENDING_SUCCESS, **common_params
+                key=MessageKeys.commands.SUGGEST_PENDING_SUCCESS, **common_params
             ).send_to_channel(pending_channel, components=menu)
 
             if pending_message:
@@ -266,12 +267,12 @@ class SuggestRequestModal(Modal):
 
         except Exception:
             await MessageHelper(
-                key=MessageKeys.SUGGEST_USER_FAILURE,
+                key=MessageKeys.commands.SUGGEST_USER_FAILURE,
                 locale=self._user_locale,
                 **common_params,
             ).send_response(ctx, ephemeral=True)
             await MessageHelper(
-                key=MessageKeys.SUGGEST_PENDING_FAILURE, **common_params
+                key=MessageKeys.commands.SUGGEST_PENDING_FAILURE, **common_params
             ).send_to_channel(pending_channel)
 
 
@@ -301,9 +302,9 @@ class SuggestResponseModal(Modal):
         self._message_id: int = message_id
         self._respond_type: str = respond_type
         # Cache message keys mapping for respond types
-        self._message_key_map: dict[str, MessageKeys] = {
-            "approved": MessageKeys.SUGGEST_RESULT_APPROVE,
-            "rejected": MessageKeys.SUGGEST_RESULT_REJECT,
+        self._message_key_map: dict[str, CommandMessageKeys] = {
+            "approved": MessageKeys.commands.SUGGEST_RESULT_APPROVE,
+            "rejected": MessageKeys.commands.SUGGEST_RESULT_REJECT,
         }
 
     async def give_rewards(self, ctx: ModalContext, user_id: int) -> None:
@@ -324,7 +325,7 @@ class SuggestResponseModal(Modal):
 
             if not suggestion_data:
                 await MessageHelper(
-                    key=MessageKeys.GENERAL_FAILURE, locale=self._user_locale
+                    key=MessageKeys.general.FAILURE, locale=self._user_locale
                 ).send_response(ctx, ephemeral=True)
                 return
 
@@ -379,7 +380,7 @@ class SuggestResponseModal(Modal):
 
             # Send success response to user
             await MessageHelper(
-                MessageKeys.GENERAL_SUCCESS, locale=self._user_locale
+                MessageKeys.general.SUCCESS, locale=self._user_locale
             ).send_response(ctx, ephemeral=True)
 
             # Fetch pending channel to remove buttons
@@ -397,10 +398,10 @@ class SuggestResponseModal(Modal):
         except CommandExecutionError as e:
             # Handle specific command execution errors
             await MessageHelper(
-                key=MessageKeys.GENERAL_FAILURE, locale=self._user_locale, error_message=str(e)
+                key=MessageKeys.general.FAILURE, locale=self._user_locale, error_message=str(e)
             ).send_response(ctx, ephemeral=True)
         except Exception:
             # Handle general errors
             await MessageHelper(
-                key=MessageKeys.CHANNEL_NOT_FOUND, locale=self._user_locale
+                key=MessageKeys.error.CHANNEL_NOT_FOUND, locale=self._user_locale
             ).send_response(ctx, ephemeral=True)

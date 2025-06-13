@@ -71,7 +71,7 @@ class Ban(
             try:
                 # Remove the ban when time period completes
                 await target_member.unban(
-                    reason=MessageHelper(key=MessageKeys.GENERAL_NO_REASON)._decode_plain()
+                    reason=MessageHelper(key=MessageKeys.general.NO_REASON)._decode_plain()
                 )
 
                 # Remove temporary action record from database after completion
@@ -98,14 +98,14 @@ class Ban(
         target_member = await UserHelper.fetch_member(self.user)
         if not target_member:
             await MessageHelper(
-                MessageKeys.MEMBER_NOT_FOUND, locale=ctx.interaction.locale
+                MessageKeys.error.MEMBER_NOT_FOUND, locale=ctx.interaction.locale
             ).send_response(ctx, ephemeral=True)
             return
 
         # Verify permission hierarchy allows this moderation action
         if not PunishmentHelper.can_moderate(target_member, ctx.member):
             await MessageHelper(
-                MessageKeys.CAN_NOT_MODERATE, locale=ctx.interaction.locale
+                MessageKeys.error.CAN_NOT_MODERATE, locale=ctx.interaction.locale
             ).send_response(ctx, ephemeral=True)
             return
 
@@ -159,7 +159,7 @@ class Ban(
             formatted_duration = time_helper.from_timedelta(parsed_duration)
 
         await MessageHelper(
-            MessageKeys.BAN_COMMAND_USER_SUCCESS,
+            MessageKeys.commands.BAN_USER_SUCCESS,
             locale=ctx.interaction.locale,
             discord_username=target_member.username,
             discord_user_id=str(target_member.id),

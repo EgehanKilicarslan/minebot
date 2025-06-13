@@ -36,7 +36,7 @@ async def _retrieve_user_and_validate_minecraft_status(
     # Validate user exists
     if not user_record:
         await MessageHelper(
-            key=MessageKeys.USER_RECORD_NOT_FOUND,
+            key=MessageKeys.error.USER_RECORD_NOT_FOUND,
             locale=ctx.interaction.locale,
             discord_username=ctx.user.username,
             discord_user_id=ctx.user.id,
@@ -50,7 +50,7 @@ async def _retrieve_user_and_validate_minecraft_status(
     # Validate link status based on requirement
     if link_status_requirement is True and not minecraft_uuid:
         await MessageHelper(
-            key=MessageKeys.ACCOUNT_NOT_LINKED,
+            key=MessageKeys.error.ACCOUNT_NOT_LINKED,
             locale=ctx.interaction.locale,
             discord_username=ctx.user.username,
             discord_user_id=ctx.user.id,
@@ -59,7 +59,7 @@ async def _retrieve_user_and_validate_minecraft_status(
         raise EmptyException
     elif link_status_requirement is False and minecraft_uuid:
         await MessageHelper(
-            key=MessageKeys.ACCOUNT_ALREADY_LINKED,
+            key=MessageKeys.error.ACCOUNT_ALREADY_LINKED,
             locale=ctx.interaction.locale,
             discord_username=ctx.user.username,
             discord_user_id=ctx.user.id,
@@ -124,7 +124,7 @@ async def require_minecraft_player_online(
 
     if not is_online:
         await MessageHelper(
-            key=MessageKeys.PLAYER_NOT_ONLINE,
+            key=MessageKeys.error.PLAYER_NOT_ONLINE,
             locale=ctx.interaction.locale,
             discord_username=ctx.user.username,
             discord_user_id=ctx.user.id,

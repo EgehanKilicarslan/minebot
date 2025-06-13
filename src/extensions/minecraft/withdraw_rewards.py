@@ -44,21 +44,23 @@ class WithdrawRewards(
 
             # Send success message to the user
             await MessageHelper(
-                MessageKeys.WITHDRAW_REWARDS_USER_SUCCESS,
+                MessageKeys.commands.WITHDRAW_REWARDS_USER_SUCCESS,
                 locale=ctx.interaction.locale,
                 **default_params,
                 **minecraft_params,
             ).send_response(ctx, ephemeral=True)
             # Log successful reward withdrawal in log channel
             await MessageHelper(
-                MessageKeys.WITHDRAW_REWARDS_LOG_SUCCESS, **default_params, **minecraft_params
+                MessageKeys.commands.WITHDRAW_REWARDS_LOG_SUCCESS,
+                **default_params,
+                **minecraft_params,
             ).send_to_log_channel(helper)
         else:
             # Rewards could not be given - notify user of failure
             await MessageHelper(
-                MessageKeys.WITHDRAW_REWARDS_USER_FAILURE, **default_params
+                MessageKeys.commands.WITHDRAW_REWARDS_USER_FAILURE, **default_params
             ).send_response(ctx, ephemeral=True)
             # Log failed reward withdrawal attempt in log channel
             await MessageHelper(
-                MessageKeys.WITHDRAW_REWARDS_LOG_FAILURE, **default_params
+                MessageKeys.commands.WITHDRAW_REWARDS_LOG_FAILURE, **default_params
             ).send_to_log_channel(helper)

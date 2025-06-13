@@ -41,4 +41,4 @@ class Suggest(
         except asyncio.TimeoutError:
             # If the user doesn't submit the modal within the timeout period
             # Send an ephemeral error message that only the user can see
-            await MessageHelper(MessageKeys.TIMEOUT_ERROR).send_response(ctx, ephemeral=True)
+            await MessageHelper(MessageKeys.error.TIMEOUT).send_response(ctx, ephemeral=True)

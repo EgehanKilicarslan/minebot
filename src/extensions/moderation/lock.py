@@ -51,7 +51,7 @@ class Lock(
         # Validate that target is a text channel where locking is possible
         if not isinstance(channel, hikari.GuildTextChannel):
             await MessageHelper(
-                MessageKeys.CHANNEL_NOT_FOUND, ctx.interaction.locale
+                MessageKeys.error.CHANNEL_NOT_FOUND, ctx.interaction.locale
             ).send_response(ctx, ephemeral=True)
             return
 
@@ -72,7 +72,7 @@ class Lock(
 
         # Notify moderator of successful action
         await MessageHelper(
-            MessageKeys.LOCK_COMMAND_USER_SUCCESS,
+            MessageKeys.commands.LOCK_USER_SUCCESS,
             ctx.interaction.locale,
             **common_params,
             reason=reason_messages[0],  # User-facing reason
@@ -80,7 +80,7 @@ class Lock(
 
         # Log action to designated logging channel for moderation transparency
         await MessageHelper(
-            MessageKeys.LOCK_COMMAND_LOG_SUCCESS,
+            MessageKeys.commands.LOCK_LOG_SUCCESS,
             ctx.interaction.locale,
             **common_params,
             discord_staff_username=ctx.user.username,

@@ -115,7 +115,7 @@ async def on_member_update(event: hikari.AuditLogEntryCreateEvent) -> None:
 
     # --- Send log message ---
     await MessageHelper(
-        MessageKeys.UNTIMEOUT_COMMAND_LOG_SUCCESS,
+        MessageKeys.commands.UNTIMEOUT_LOG_SUCCESS,
         discord_username=target_member.username,
         discord_user_id=str(target_member.id),
         discord_user_mention=target_member.mention,

@@ -6,7 +6,15 @@ import lightbulb
 
 from debug import get_logger
 from helper import ChannelHelper, CommandHelper, EventHelper
-from model import DiscordEmbed, DiscordMessage, MessageKeys, TextMessage
+from model import (
+    CommandMessageKeys,
+    DiscordEmbed,
+    DiscordMessage,
+    ErrorMessageKeys,
+    EventMessageKeys,
+    GeneralMessageKeys,
+    TextMessage,
+)
 from settings import Localization
 
 # Set up logger for this module
@@ -19,6 +27,9 @@ ContextType = (
 # Replace DecodeType with more specific typing
 MessagePairMode = Literal["text", "embed", "mixed"]
 
+# Define the MessageKeyType as a union of all possible enum types
+MessageKeyType = CommandMessageKeys | ErrorMessageKeys | EventMessageKeys | GeneralMessageKeys
+
 
 class MessageHelper:
     """
@@ -29,7 +40,7 @@ class MessageHelper:
     embedded rich messages.
 
     Attributes:
-        key (MessageKeys): The key identifier for the message to be retrieved.
+        key (MessageKeyType): The key identifier for the message to be retrieved.
         locale (str | hikari.Locale | None): The locale for the message. If None,
             the default locale will be used.
         kwargs (dict[str, Any]): Format parameters to be substituted in the message.
@@ -40,7 +51,7 @@ class MessageHelper:
     """
 
     def __init__(
-        self, key: MessageKeys, locale: str | hikari.Locale | None = None, **kwargs
+        self, key: MessageKeyType, locale: str | hikari.Locale | None = None, **kwargs
     ) -> None:
         """
         Initialize a new MessageHelper instance.
@@ -49,7 +60,7 @@ class MessageHelper:
         allowing for messages to be retrieved by key and locale.
 
         Args:
-            key (MessageKeys): The message key to identify the message.
+            key (MessageKeyType): The message key to identify the message.
             locale (str | hikari.Locale | None, optional): The locale to use for the message.
                 If None, the default locale will be used. Defaults to None.
             **kwargs: Additional arguments to format the message with.
@@ -57,7 +68,7 @@ class MessageHelper:
         Note:
             The initialization is logged at debug level with the provided parameters.
         """
-        self.key: MessageKeys = key
+        self.key: MessageKeyType = key
         self.locale: str | hikari.Locale | None = locale
         self.kwargs: dict[str, Any] = kwargs
         logger.debug(f"[Message: {key.name}] Initialized with locale: {locale}, params: {kwargs}")

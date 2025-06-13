@@ -33,7 +33,7 @@ class SuggestConfirmMenu(Menu):
             await modal.attach(ctx.client, c_id, timeout=600)
         except asyncio.TimeoutError:
             await MessageHelper(
-                MessageKeys.TIMEOUT_ERROR, locale=ctx.interaction.locale
+                MessageKeys.error.TIMEOUT, locale=ctx.interaction.locale
             ).send_response(ctx, ephemeral=True)
 
     async def on_reject(self, ctx: MenuContext) -> None:
@@ -48,5 +48,5 @@ class SuggestConfirmMenu(Menu):
             await modal.attach(ctx.client, c_id, timeout=600)
         except asyncio.TimeoutError:
             await MessageHelper(
-                MessageKeys.TIMEOUT_ERROR, locale=ctx.interaction.locale
+                MessageKeys.error.TIMEOUT, locale=ctx.interaction.locale
             ).send_response(ctx, ephemeral=True)

@@ -205,5 +205,51 @@
                 "allowed_invocations": null
             }
         }
+    },
+    "systems": {
+        "ticket": {
+            "ticket_categories": {
+                "general": {
+                    "category_emoji": "",
+                    "category_name": "",
+                    "category_description": "",
+                    "channel_format": "",
+                    "channel_id": null,
+                    "staff_role": null
+                },
+                "report": {
+                    "category_emoji": "",
+                    "category_name": "",
+                    "category_description": "",
+                    "channel_format": "",
+                    "channel_id": null,
+                    "staff_role": null
+                }
+            },
+            "creation": {
+                "method": "",
+                "channel_id": null,
+                "max_tickets_per_user": null
+            },
+            "transcript": {
+                "format": "",
+                "file_name": "",
+                "upload": {
+                    "token": "",
+                    "repository": "",
+                    "branch": ""
+                }
+            },
+            "notification": {
+                "staff": {
+                    "mention_on_new_ticket": null,
+                    "notify_on_mention": null
+                },
+                "user": {
+                    "notify_on_mention": null,
+                    "notify_on_close": null
+                }
+            }
+        }
     }
 }

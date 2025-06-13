@@ -111,7 +111,7 @@ async def on_ban_delete(event: hikari.AuditLogEntryCreateEvent) -> None:
 
     # --- Send log message ---
     await MessageHelper(
-        MessageKeys.UNBAN_COMMAND_LOG_SUCCESS,
+        MessageKeys.commands.UNBAN_LOG_SUCCESS,
         discord_username=target_member.username,
         discord_user_id=str(target_member.id),
         discord_user_mention=target_member.mention,

@@ -88,7 +88,7 @@ async def on_guild_boost(event: hikari.MemberUpdateEvent) -> None:
 
             # Send confirmation to log channel
             await MessageHelper(
-                MessageKeys.GUILD_BOOST_LOG_SUCCESS,
+                MessageKeys.events.GUILD_BOOST_LOG_SUCCESS,
                 discord_username=event.member.username,
                 disord_user_id=event.member.id,
                 discord_user_mention=event.member.mention,
@@ -101,7 +101,7 @@ async def on_guild_boost(event: hikari.MemberUpdateEvent) -> None:
             # Attempt to send error to log channel
             try:
                 await MessageHelper(
-                    MessageKeys.UNKNOWN_ERROR,
+                    MessageKeys.error.UNKNOWN,
                 ).send_to_log_channel(helper)
             except Exception as log_error:
                 logger.error(f"Failed to send error to log channel: {log_error}")

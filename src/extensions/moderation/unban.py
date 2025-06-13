@@ -76,7 +76,7 @@ class UnBan(
         # Handle case where user isn't found in the ban list
         if not target_user:
             await MessageHelper(
-                key=MessageKeys.USER_NOT_FOUND,
+                key=MessageKeys.error.USER_NOT_FOUND,
                 locale=ctx.interaction.locale,
                 discord_user_id="N/A",
                 discord_username=username_to_check,
@@ -104,7 +104,7 @@ class UnBan(
 
         # Notify moderator of successful unban action
         await MessageHelper(
-            MessageKeys.UNBAN_COMMAND_USER_SUCCESS,
+            MessageKeys.commands.UNBAN_USER_SUCCESS,
             locale=ctx.interaction.locale,
             discord_username=target_user.username,
             discord_user_id=str(target_user.id),

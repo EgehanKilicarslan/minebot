@@ -45,14 +45,14 @@ class Kick(
         target_member = await UserHelper.fetch_member(self.user)
         if not target_member:
             await MessageHelper(
-                MessageKeys.MEMBER_NOT_FOUND, locale=ctx.interaction.locale
+                MessageKeys.error.MEMBER_NOT_FOUND, locale=ctx.interaction.locale
             ).send_response(ctx, ephemeral=True)
             return
 
         # Verify permission hierarchy allows this moderation action
         if not PunishmentHelper.can_moderate(target_member, ctx.member):
             await MessageHelper(
-                MessageKeys.CAN_NOT_MODERATE, locale=ctx.interaction.locale
+                MessageKeys.error.CAN_NOT_MODERATE, locale=ctx.interaction.locale
             ).send_response(ctx, ephemeral=True)
             return
 
@@ -76,7 +76,7 @@ class Kick(
         # Notify the moderator that the kick was successful
         # Ephemeral response ensures only the command user sees the confirmation
         await MessageHelper(
-            MessageKeys.KICK_COMMAND_USER_SUCCESS,
+            MessageKeys.commands.KICK_USER_SUCCESS,
             ctx.interaction.locale,
             discord_username=target_member.username,
             discord_user_id=str(target_member.id),

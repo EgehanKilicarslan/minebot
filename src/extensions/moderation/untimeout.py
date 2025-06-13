@@ -46,14 +46,14 @@ class UnTimeout(
         target_member: hikari.Member | None = await UserHelper.fetch_member(self.user)
         if not target_member:
             await MessageHelper(
-                MessageKeys.MEMBER_NOT_FOUND, locale=ctx.interaction.locale
+                MessageKeys.error.MEMBER_NOT_FOUND, locale=ctx.interaction.locale
             ).send_response(ctx, ephemeral=True)
             return
 
         # Check if the user currently has a timeout active
         if target_member.communication_disabled_until() is None:
             await MessageHelper(
-                MessageKeys.USER_NOT_TIMED_OUT,
+                MessageKeys.error.USER_NOT_TIMED_OUT,
                 locale=ctx.interaction.locale,
                 discord_user_id=target_member.id,
                 discord_username=target_member.username,
@@ -80,7 +80,7 @@ class UnTimeout(
 
         # Notify about the successful removal of timeout
         await MessageHelper(
-            MessageKeys.UNTIMEOUT_COMMAND_USER_SUCCESS,
+            MessageKeys.commands.UNTIMEOUT_USER_SUCCESS,
             locale=ctx.interaction.locale,
             discord_user_id=target_member.id,
             discord_username=target_member.username,
