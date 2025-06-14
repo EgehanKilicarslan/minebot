@@ -798,6 +798,165 @@
       }
     }
   },
+  "systems": {
+    "ticket": {
+      "messages": {
+        "minecraft": {
+          "staff": {
+            "notify_on_mention": {
+              "text": "{discord_username}, <click:open_url:'{discord_channel_url}'>bir destek kanalında</click> sizi etiketledi. Detaylar için lütfen bileti kontrol edin."
+            }
+          },
+          "user": {
+            "notify_on_mention": {
+              "text": "Bir yetkili sizi <click:open_url:'{discord_channel_url}'>bir destek kanalında</click> etiketledi. Detaylar için lütfen bileti kontrol edin."
+            },
+            "notify_on_close": {
+              "text": "Biletiniz {discord_staff_username} tarafından kapatıldı. Daha fazla sorunuz varsa lütfen yeni bir bilet oluşturun."
+            }
+          }
+        },
+        "system": {
+          "startup": {
+            "message_type": "embed",
+            "content": {
+              "title": "Destek Sistemi",
+              "description": "Destek sistemi şimdi çevrimiçi. Kategorilerden birini seçerek bilet oluşturabilirsiniz.",
+              "color": "GREEN"
+            }
+          },
+          "creation": {
+            "general": {
+              "message_type": "embed",
+              "content": {
+                "title": "Yeni Bilet Oluşturuldu",
+                "description": "{ticket_owner_discord_user_mention} tarafından yeni bir bilet oluşturuldu.",
+                "color": "BLUE",
+                "fields": [
+                  {
+                    "name": "İçerik",
+                    "value": "{ticket_general_content}"
+                  }
+                ]
+              }
+            },
+            "report": {
+              "message_type": "embed",
+              "content": {
+                "title": "Yeni Rapor Bileti Oluşturuldu",
+                "description": "{ticket_owner_discord_user_mention}, bir rapor bileti oluşturdu.",
+                "color": "RED",
+                "fields": [
+                  {
+                    "name": "Kullanıcı Adı",
+                    "value": "{ticket_report_username}"
+                  },
+                  {
+                    "name": "Rapor İçeriği",
+                    "value": "{ticket_report_content}"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Bilet Oluşturuldu",
+              "description": "Biletiniz başarıyla oluşturuldu. Daha fazla bilgi için lütfen özel mesajlarınızı kontrol edin.",
+              "color": "BLUE"
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Bilet Oluşturulamadı",
+              "description": "Bilet oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+              "color": "RED"
+            }
+          }
+        },
+        "log": {
+          "transcript": {
+            "message_type": "embed",
+            "content": {
+              "title": "Bilet Transkripti",
+              "description": "{ticket_owner_discord_user_mention} kullanıcısının bilet transkripti.",
+              "color": "BLUE",
+              "fields": [
+                {
+                  "name": "Bilet Sahibi",
+                  "value": "{ticket_owner_discord_user_mention}"
+                },
+                {
+                  "name": "Bilet Kategorisi",
+                  "value": "{ticket_category}"
+                },
+                {
+                  "name": "Bilet ID",
+                  "value": "{ticket_channel_id}"
+                },
+                {
+                  "name": "Transkript",
+                  "value": "[Transkripti görmek için tıklayın]({ticket_transcript_url})"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "menu": {
+        "inner": {
+          "close": {
+            "emoji": "🔒",
+            "label": "Bileti Kapat",
+            "style": "DANGER"
+          }
+        },
+        "outer": {
+          "confirm": {
+            "emoji": "✅",
+            "label": "Onayla",
+            "style": "SUCCESS"
+          },
+          "cancel": {
+            "emoji": "❌",
+            "label": "İptal Et",
+            "style": "SECONDARY"
+          }
+        }
+      },
+      "modal": {
+        "general": {
+          "title": "Genel Bilet",
+          "fields": {
+            "content": {
+              "style": "PARAGRAPH",
+              "label": "İçerik",
+              "placeholder": "Biletinizin içeriğini buraya girin."
+            }
+          }
+        },
+        "report": {
+          "title": "Şikayet Bileti",
+          "fields": {
+            "username": {
+              "style": "SHORT",
+              "label": "Kullanıcı Adı",
+              "placeholder": "Şikayet etmek istediğiniz kullanıcının adını girin."
+            },
+            "content": {
+              "style": "PARAGRAPH",
+              "label": "Şikayet İçeriği",
+              "placeholder": "Şikayetinizin içeriğini buraya girin."
+            }
+          }
+        }
+      }
+    }
+  },
   "general": {
     "success": {
       "message_type": "embed",
@@ -1019,6 +1178,14 @@
             "value": "{max_duration}"
           }
         ],
+        "color": "RED"
+      }
+    },
+    "max_amount_of_tickets_reached": {
+      "message_type": "embed",
+      "content": {
+        "title": "Maksimum Bilet Sayısına Ulaşıldı",
+        "description": "Maksimum bilet sayısı olan {max_tickets} bilet sayısına ulaşıldı. Lütfen başka bir bilet oluşturmadan önce mevcut biletinizi kapatın.",
         "color": "RED"
       }
     }

@@ -15,6 +15,7 @@ from model import (
     GeneralMessageKeys,
     TextMessage,
 )
+from model.message import SystemMessageKeys
 from settings import Localization
 
 # Set up logger for this module
@@ -28,7 +29,13 @@ ContextType = (
 MessagePairMode = Literal["text", "embed", "mixed"]
 
 # Define the MessageKeyType as a union of all possible enum types
-MessageKeyType = CommandMessageKeys | ErrorMessageKeys | EventMessageKeys | GeneralMessageKeys
+MessageKeyType = (
+    CommandMessageKeys
+    | ErrorMessageKeys
+    | EventMessageKeys
+    | GeneralMessageKeys
+    | SystemMessageKeys
+)
 
 
 class MessageHelper:
@@ -279,6 +286,7 @@ class MessageHelper:
         ctx: ContextType,
         ephemeral: bool = False,
         components: Sequence[hikari.api.ComponentBuilder] | None = None,
+        attachment: hikari.Resourceish | None = None,
     ) -> hikari.Message:
         """
         Responds to a context with a message.
@@ -304,7 +312,10 @@ class MessageHelper:
         response_message: hikari.Message = cast(
             hikari.Message,
             await ctx.respond(
-                content=message, ephemeral=ephemeral, components=components or hikari.UNDEFINED
+                content=message,
+                ephemeral=ephemeral,
+                components=components or hikari.UNDEFINED,
+                attachment=attachment or hikari.UNDEFINED,
             ),
         )
         logger.debug(f"[Message: {self.key.name}] Response sent successfully")
@@ -315,6 +326,7 @@ class MessageHelper:
         self,
         helper: CommandHelper | EventHelper,
         components: Sequence[hikari.api.ComponentBuilder] | None = None,
+        attachment: hikari.Resourceish | None = None,
     ) -> hikari.Message | None:
         """
         Sends the message to the configured log channel.
@@ -344,7 +356,9 @@ class MessageHelper:
         logger.debug(f"[Message: {self.key.name}] Sending {message_type} message to log channel")
 
         response_message: hikari.Message = await channel.send(
-            content=message, components=components or hikari.UNDEFINED
+            content=message,
+            components=components or hikari.UNDEFINED,
+            attachment=attachment or hikari.UNDEFINED,
         )
         logger.debug(f"[Message: {self.key.name}] Log message sent successfully")
 
@@ -354,6 +368,7 @@ class MessageHelper:
         self,
         channel: int | hikari.TextableChannel,
         components: Sequence[hikari.api.ComponentBuilder] | None = None,
+        attachment: hikari.Resourceish | None = None,
     ) -> hikari.Message | None:
         """
         Sends the message to a specific channel.
@@ -376,7 +391,9 @@ class MessageHelper:
         logger.debug(f"[Message: {self.key.name}] Sending {message_type} message to channel")
 
         response_message: hikari.Message = await channel.send(
-            content=message, components=components or hikari.UNDEFINED
+            content=message,
+            components=components or hikari.UNDEFINED,
+            attachment=attachment or hikari.UNDEFINED,
         )
         logger.debug(f"[Message: {self.key.name}] Message sent successfully to channel")
 

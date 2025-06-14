@@ -55,3 +55,9 @@ class CommandsKeys(Enum):
     SLOWMODE = "commands.slowmode"
     SUGGEST = "commands.suggest"
     WIKI = "commands.wiki"
+
+
+class SystemsKeys(Enum):
+    """Enum for system keys in the configuration."""
+
+    TICKET = "systems.ticket"

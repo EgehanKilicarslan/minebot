@@ -208,7 +208,7 @@
     },
     "systems": {
         "ticket": {
-            "ticket_categories": {
+            "categories": {
                 "general": {
                     "category_emoji": "",
                     "category_name": "",
@@ -227,12 +227,10 @@
                 }
             },
             "creation": {
-                "method": "",
                 "channel_id": null,
                 "max_tickets_per_user": null
             },
             "transcript": {
-                "format": "",
                 "file_name": "",
                 "upload": {
                     "token": "",
@@ -240,16 +238,7 @@
                     "branch": ""
                 }
             },
-            "notification": {
-                "staff": {
-                    "mention_on_new_ticket": null,
-                    "notify_on_mention": null
-                },
-                "user": {
-                    "notify_on_mention": null,
-                    "notify_on_close": null
-                }
-            }
+            "log": null
         }
     }
 }

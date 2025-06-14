@@ -3,7 +3,7 @@ import uuid
 
 from lightbulb.components.menus import Menu, MenuContext
 
-from components.modals import SuggestResponseModal
+from components.modals.suggest import SuggestResponseModal
 from helper import MenuHelper, MessageHelper
 from model import MenuKeys, MessageKeys
 from model.schemas import SuggestConfirmationButtons

@@ -417,11 +417,13 @@ class Localization:
 
         Args:
             key (LocalizationType): The key representing the localization value to retrieve.
-            locale (str | hikari.Locale): The locale identifier (e.g., "en-US"). Defaults to guild language.
+            locale (str | hikari.Locale | "all"): The locale identifier (e.g., "en-US") or "all" to get
+                                                  values for all locales. Defaults to guild language.
             default (Any): The default value to return if the key is not found. Defaults to "Unknown".
 
         Returns:
-            Any: The localized value for the specified key, or the default value if not found.
+            Any | dict[str, Any]: The localized value for the specified key, or a dictionary mapping
+                                 locales to values if locale="all", or the default value if not found.
         """
         # Load data if needed
         if cls._data is None:
@@ -429,6 +431,19 @@ class Localization:
             cls.load()
             if cls._data is None:
                 return default
+
+        # Special case: return values for all locales
+        if locale == "all" and cls._data:
+            all_values = {}
+            for loc, data in cls._data.items():
+                try:
+                    value = data
+                    for part in key.value.split("."):
+                        value = getattr(value, part)
+                    all_values[loc] = value
+                except AttributeError:
+                    all_values[loc] = default
+            return all_values
 
         # Resolve locale
         locale_key = locale

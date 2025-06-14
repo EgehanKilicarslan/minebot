@@ -43,3 +43,31 @@ class PunishmentSource(str, Enum):
 
     DISCORD = "discord"
     MINECRAFT = "minecraft"
+
+
+class TicketCreationMethod(str, Enum):
+    """Methods for creating tickets in the ticket system"""
+
+    CHANNEL = "channel"
+    THREAD = "thread"
+
+
+class TicketCreationStyle(str, Enum):
+    """Styles for ticket creation in the ticket system"""
+
+    BUTTON = "button"
+    DROPDOWN = "dropdown"
+
+
+class TicketTranscriptFormat(str, Enum):
+    """Formats for ticket transcripts in the ticket system"""
+
+    TEXT = "text"
+    HTML = "html"
+
+
+class TicketTranscriptUploadMethod(str, Enum):
+    """Methods for uploading ticket transcripts in the ticket system"""
+
+    DISCORD = "discord"
+    GITHUB = "github"

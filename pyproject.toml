@@ -16,4 +16,6 @@ dependencies = [
     "websockets==15.0.1",
     "uvloop==0.21.0; sys_platform != 'win32'",
     "cryptography>=45.0.3",
+    "hikari-chat-exporter>=0.0.3",
+    "pygithub>=2.6.1",
 ]

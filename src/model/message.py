@@ -65,6 +65,21 @@ class CommandMessageKeys(Enum):
     WIKI_USER_FAILURE = "commands.wiki.messages.user.failure"
 
 
+class SystemMessageKeys(Enum):
+    TICKET_MINECRAFT_STAFF_NOTIFY_ON_MENTION = (
+        "systems.ticket.messages.minecraft.staff.notify_on_mention"
+    )
+    TICKET_MINECRAFT_USER_NOTIFY_ON_MENTION = (
+        "systems.ticket.messages.minecraft.user.notify_on_mention"
+    )
+    TICKET_MINECRAFT_USER_NOTIFY_ON_CLOSE = "systems.ticket.messages.minecraft.user.notify_on_close"
+    TICKET_SYSTEM_STARTUP = "systems.ticket.messages.system.startup"
+    TICKET_SYSTEM_CREATIONS = "systems.ticket.messages.system.creation"
+    TICKET_USER_SUCCESS = "systems.ticket.messages.user.success"
+    TICKET_USER_FAILURE = "systems.ticket.messages.user.failure"
+    TICKET_LOG_TRANSCRIPT = "systems.ticket.messages.log.transcript"
+
+
 class GeneralMessageKeys(Enum):
     """General message keys for the bot"""
 
@@ -91,6 +106,7 @@ class ErrorMessageKeys(Enum):
     USER_ALREADY_TIMED_OUT = "error.user_already_timed_out"
     USER_NOT_TIMED_OUT = "error.user_not_timed_out"
     DURATION_OUT_OF_RANGE = "error.duration_out_of_range"
+    MAX_AMOUNT_OF_TICKETS_REACHED = "error.max_amount_of_tickets_reached"
 
 
 class MessageKeys:
@@ -98,6 +114,7 @@ class MessageKeys:
 
     events = EventMessageKeys
     commands = CommandMessageKeys
+    systems = SystemMessageKeys
     general = GeneralMessageKeys
     error = ErrorMessageKeys
 
@@ -109,11 +126,17 @@ class ModalKeys(Enum):
     SUGGEST_SEND = "commands.suggest.modal.send"
     SUGGEST_RESPOND = "commands.suggest.modal.respond"
 
+    TICKET_MODALS = "systems.ticket.modal"
+
 
 class MenuKeys(Enum):
     """Menu keys for the bot"""
 
     SUGGEST_CONFIRMATION = "commands.suggest.menu.confirmation"
+
+    TICKET_CLOSE = "systems.ticket.menu.inner.close"
+    TICKET_CONFIRM = "systems.ticket.menu.outer.confirm"
+    TICKET_CANCEL = "systems.ticket.menu.outer.cancel"
 
 
 class TimeUnitKeys(Enum):

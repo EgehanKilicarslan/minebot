@@ -4,7 +4,7 @@ import uuid
 import hikari
 import lightbulb
 
-from components.modals import SuggestRequestModal
+from components.modals.suggest import SuggestRequestModal
 from helper import CommandHelper
 from helper.message import MessageHelper
 from model import CommandsKeys

@@ -70,8 +70,13 @@ class DiscordEmbed(BaseModel):
 
 
 class DiscordMessage(BaseModel):
-    message_type: str = Field(..., pattern=r"^(plain|embed)$")
+    message_type: str = Field(..., pattern=r"^(?i)(plain|embed)$")
     content: TextMessage | DiscordEmbed
+
+    @field_validator("message_type", mode="after")
+    @classmethod
+    def lowercase_message_type(cls, v: str) -> str:
+        return v.lower()
 
     @field_validator("content")
     @classmethod
@@ -112,7 +117,12 @@ class SelectBase(BaseModel):
 
 
 class ActionButton(ButtonBase):
-    style: str = Field(..., pattern=r"^(PRIMARY|SECONDARY|SUCCESS|DANGER)$")
+    style: str = Field(..., pattern=r"^(?i)(PRIMARY|SECONDARY|SUCCESS|DANGER)$")
+
+    @field_validator("style", mode="after")
+    @classmethod
+    def uppercase_style(cls, v: str) -> str:
+        return v.upper()
 
 
 class HyperlinkButton(ButtonBase):
@@ -125,17 +135,27 @@ class ModalBase(BaseModel):
 
 
 class TextInputField(BaseModel):
-    style: str = Field(..., pattern=r"^(SHORT|PARAGRAPH)$")
+    style: str = Field(..., pattern=r"^(?i)(SHORT|PARAGRAPH)$")
     label: str = Field(..., max_length=80)
     placeholder: str | None = Field(default=None, max_length=150)
     value: str | None = Field(default=None, max_length=4000)
 
+    @field_validator("style", mode="after")
+    @classmethod
+    def uppercase_style(cls, v: str) -> str:
+        return v.upper()
+
 
 # ==== Reward Schema =====
 class UserReward(BaseModel):
-    mode: str = Field(..., pattern=r"^(ROLE|ITEM|BOTH)$")
+    mode: str = Field(..., pattern=r"^(?i)(ROLE|ITEM|BOTH)$")
     role: PositiveInt | list[PositiveInt] | None = None
     item: dict[str, str | list[str]] | None = None
+
+    @field_validator("mode", mode="after")
+    @classmethod
+    def uppercase_mode(cls, v: str) -> str:
+        return v.upper()
 
     @field_validator("role", mode="before")
     @classmethod
@@ -186,12 +206,17 @@ class BotActivity(BaseModel):
     )
     type: str = Field(
         default="PLAYING",
-        pattern=r"^(PLAYING|STREAMING|LISTENING|WATCHING|COMPETING)$",
+        pattern=r"^(?i)(PLAYING|STREAMING|LISTENING|WATCHING|COMPETING)$",
     )
+
+    @field_validator("type", mode="after")
+    @classmethod
+    def uppercase_type(cls, v: str) -> str:
+        return v.upper()
 
     @model_validator(mode="after")
     def validate_streaming_url(self) -> "BotActivity":
-        is_streaming = self.type == "STREAMING"
+        is_streaming = self.type.upper() == "STREAMING"
         has_url = self.url is not None
         if is_streaming and not has_url:
             raise ValueError("URL must be provided if type is 'STREAMING'")
@@ -201,8 +226,15 @@ class BotActivity(BaseModel):
 
 
 class BotConfiguration(BaseModel):
-    status: str | None = Field(default=None, pattern=r"^(ONLINE|IDLE|DO_NOT_DISTURB|OFFLINE)$")
+    status: str | None = Field(default=None, pattern=r"^(?i)(ONLINE|IDLE|DO_NOT_DISTURB|OFFLINE)$")
     activity: BotActivity
+
+    @field_validator("status", mode="after")
+    @classmethod
+    def uppercase_status(cls, v: str | None) -> str | None:
+        if v is not None:
+            return v.upper()
+        return v
 
 
 class DatabaseConnection(BaseModel):
@@ -259,10 +291,15 @@ class EventConfiguration(BaseModel):
 
 
 class CommandCooldown(BaseModel):
-    algorithm: str = Field(..., pattern=r"^(fixed_window|sliding_window)$")
-    bucket: str = Field(..., pattern=r"^(global|user|channel|guild)$")
+    algorithm: str = Field(..., pattern=r"^(?i)(fixed_window|sliding_window)$")
+    bucket: str = Field(..., pattern=r"^(?i)(global|user|channel|guild)$")
     window_length: PositiveInt
     allowed_invocations: PositiveInt
+
+    @field_validator("algorithm", "bucket", mode="after")
+    @classmethod
+    def lowercase_algorithm_and_bucket(cls, v: str) -> str:
+        return v.lower()
 
 
 class BasicCommand(BaseModel):
@@ -330,6 +367,106 @@ class CommandConfiguration(BaseModel):
     wiki: BasicCommand | None = None
 
 
+# ==== Ticket System Schema ====
+class BasicTicketCategory(BaseModel):
+    category_button_style: str | None = Field(
+        default=None, pattern=r"^(?i)(PRIMARY|SECONDARY|SUCCESS|DANGER)$"
+    )
+    category_emoji: str | None = Field(default=None, max_length=1)
+    category_name: str = Field(..., max_length=100)
+    category_description: str | None = Field(default=None, max_length=100)
+    channel_format: str = Field(
+        ..., min_length=1, max_length=100, pattern=r"^(?:[a-zA-Z0-9_-]|\{[a-zA-Z0-9_-]+\})+$"
+    )
+    staff_role: PositiveInt
+
+    @model_validator(mode="after")
+    def validate_description_or_button_style(self) -> "BasicTicketCategory":
+        if self.category_description and self.category_button_style:
+            raise ValueError(
+                "Only one of category_description or category_button_style can be provided, not both."
+            )
+        return self
+
+
+class ThreadTicketCategory(BasicTicketCategory):
+    channel_id: PositiveInt
+
+
+class ChannelTicketCategory(BasicTicketCategory):
+    category_id: PositiveInt
+
+
+class TicketCreation(BaseModel):
+    channel_id: PositiveInt
+    max_tickets_per_user: PositiveInt
+
+
+class BasicTicketTranscription(BaseModel):
+    file_name: str = Field(
+        ...,
+        min_length=1,
+        max_length=255,
+        pattern=r"^(?:[a-zA-Z0-9_-]|\{[a-zA-Z0-9_-]+\})+\.(txt|html)$",
+    )
+
+
+class ChannelTicketTranscription(BaseModel):
+    channel_id: PositiveInt
+
+
+class GithubTicketTranscription(BaseModel):
+    token: str
+    repository: str
+    branch: str
+
+
+class TicketTranscription(BasicTicketTranscription):
+    upload: ChannelTicketTranscription | GithubTicketTranscription | None = None
+
+
+class TicketSystem(BaseModel):
+    categories: dict[str, ThreadTicketCategory | ChannelTicketCategory] = Field(
+        min_length=1, max_length=25
+    )
+    creation: TicketCreation
+    transcript: TicketTranscription | None = None
+    log: PositiveInt
+
+    @field_validator("categories", mode="after")
+    @classmethod
+    def validate_categories(
+        cls, v: dict[str, ThreadTicketCategory | ChannelTicketCategory]
+    ) -> dict[str, ThreadTicketCategory | ChannelTicketCategory]:
+        # Check if first category uses a button style
+        first_category = next(iter(v.values()))
+        has_button_style = first_category.category_button_style is not None
+
+        # Get the type of the first category
+        first_category_type = type(first_category)
+
+        # Ensure all categories consistently use or don't use button styles
+        # and are of the same type
+        for category_name, category_info in v.items():
+            current_has_button = category_info.category_button_style is not None
+            if current_has_button != has_button_style:
+                raise ValueError(
+                    "Either all categories must use a button style, or none of them should."
+                )
+
+            # Check if all categories are of the same type
+            if not isinstance(category_info, first_category_type):
+                raise ValueError(
+                    f"All categories must be of the same type. Expected {first_category_type.__name__}, but got {type(category_info).__name__} for category '{category_name}'."
+                )
+
+        return v
+
+
+class SystemConfiguration(BaseModel):
+    ticket: TicketSystem | None = None
+
+
 class BotSettings(BaseModel):
     secret: BotCredentials
     database: DatabaseConnection
@@ -337,9 +474,25 @@ class BotSettings(BaseModel):
     server: ServerConfiguration | None = None
     events: EventConfiguration | None = None
     commands: CommandConfiguration | None = None
+    systems: SystemConfiguration | None = None
 
 
 # ==== Localization Schema ====
+class GuildBoostMessages(BaseModel):
+    class Log(BaseModel):
+        success: DiscordMessage
+
+    log: Log
+
+
+class GuildBoostLocalization(BaseModel):
+    messages: GuildBoostMessages
+
+
+class EventLocalization(BaseModel):
+    guild_boost: GuildBoostLocalization
+
+
 class LinkAccountParameters(BaseModel):
     username: DescriptiveElement
 
@@ -673,19 +826,57 @@ class CommandLocalization(BaseModel):
     wiki: WikiLocalization
 
 
-class GuildBoostMessages(BaseModel):
-    class Log(BaseModel):
-        success: DiscordMessage
+class TicketMessages(BaseModel):
+    class Minecraft(BaseModel):
+        class Staff(BaseModel):
+            notify_on_mention: TextMessage
 
+        class User(BaseModel):
+            notify_on_mention: TextMessage
+            notify_on_close: TextMessage
+
+        staff: Staff
+        user: User
+
+    class System(BaseModel):
+        startup: DiscordMessage
+        creation: dict[str, DiscordMessage]
+
+    class Log(BaseModel):
+        transcript: DiscordMessage
+
+    minecraft: Minecraft
+    system: System
+    user: StatusMessagePair
     log: Log
 
 
-class GuildBoostLocalization(BaseModel):
-    messages: GuildBoostMessages
+class TicketInnerMenu(BaseModel):
+    close: ActionButton
 
 
-class EventLocalization(BaseModel):
-    guild_boost: GuildBoostLocalization
+class TicketOuterMenu(BaseModel):
+    confirm: ActionButton
+    cancel: ActionButton
+
+
+class TicketMenu(BaseModel):
+    inner: TicketInnerMenu
+    outer: TicketOuterMenu
+
+
+class BasicTicketModal(ModalBase):
+    fields: dict[str, TextInputField] = Field(min_length=1, max_length=5)
+
+
+class TicketLocalization(BaseModel):
+    messages: TicketMessages
+    menu: TicketMenu
+    modal: dict[str, BasicTicketModal] = Field(min_length=1, max_length=25)
+
+
+class SystemLocalization(BaseModel):
+    ticket: TicketLocalization | None = None
 
 
 class GeneralLocalization(BaseModel):
@@ -710,6 +901,7 @@ class ErrorLocalization(BaseModel):
     user_already_timed_out: DiscordMessage
     user_not_timed_out: DiscordMessage
     duration_out_of_range: DiscordMessage
+    max_amount_of_tickets_reached: DiscordMessage
 
 
 class TimeUnitsLocalization(BaseModel):
@@ -735,6 +927,7 @@ class LocalizationData(BaseModel):
     locale: str
     events: EventLocalization
     commands: CommandLocalization
+    systems: SystemLocalization
     general: GeneralLocalization
     error: ErrorLocalization
     time_units: TimeUnitsLocalization

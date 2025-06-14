@@ -89,6 +89,7 @@ if __name__ == "__main__":
                     ).decode(),
                     ephemeral=True,
                 )
+                logger.error(exc.causes[0], exc_info=True)
                 return True
 
         @bot.listen(hikari.StartingEvent)
@@ -108,11 +109,16 @@ if __name__ == "__main__":
 
             # Import menu for suggest command
             if CommandHelper(CommandsKeys.SUGGEST).command_enabled:
-                from components.menus import SuggestConfirmMenu
+                from components.menus.suggest import SuggestConfirmMenu
 
                 menu = SuggestConfirmMenu()
 
                 menu.attach_persistent(client, timeout=None)
+
+            # Inıtialize ticket system if enabled
+            from helper.ticket import TicketHelper
+
+            await TicketHelper.initialize()
 
             # Load extensions and events
             await client.load_extensions_from_package(events, recursive=True)

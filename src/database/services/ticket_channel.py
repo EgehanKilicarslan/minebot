@@ -54,21 +54,21 @@ class TicketChannelService:
             return [TicketChannelSchema.model_validate(channel) for channel in ticket_channels]
 
     @staticmethod
-    async def get_ticket_channels_by_category(category_id: int) -> list[TicketChannelSchema]:
+    async def get_ticket_channels_by_category(category: str) -> list[TicketChannelSchema]:
         """
-        Get all ticket channels in a specific category.
+        Get all ticket channels for a specific category.
 
         Args:
-            category_id: The Discord category ID
+            category: The category identifier for the ticket channels
 
         Returns:
             List of TicketChannelSchema objects
         """
-        logger.debug(f"Getting ticket channels for category with ID: {category_id}")
+        logger.debug(f"Getting ticket channels for category: {category}")
         async with get_db_session() as session:
             repository = TicketChannelRepository(session)
-            ticket_channels: list[TicketChannel] = await repository.get_by_category_id(category_id)
-            logger.debug(f"Found {len(ticket_channels)} ticket channels in category {category_id}")
+            ticket_channels: list[TicketChannel] = await repository.get_by_category(category)
+            logger.debug(f"Found {len(ticket_channels)} ticket channels for category {category}")
             return [TicketChannelSchema.model_validate(channel) for channel in ticket_channels]
 
     @staticmethod

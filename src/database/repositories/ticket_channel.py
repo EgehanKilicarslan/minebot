@@ -40,26 +40,24 @@ class TicketChannelRepository:
         logger.debug(f"Found {len(channels)} ticket channels for owner ID: {owner_id}")
         return channels
 
-    async def get_by_category_id(self, category_id: int) -> list[TicketChannel]:
-        """Get all ticket channels in a specific category."""
-        logger.debug(f"Fetching ticket channels for category ID: {category_id}")
+    async def get_by_category(self, category: str) -> list[TicketChannel]:
+        """Get all ticket channels for a specific category."""
+        logger.debug(f"Fetching ticket channels for category: {category}")
         result: Result[tuple[TicketChannel]] = await self.session.execute(
-            select(TicketChannel).where(TicketChannel.category_id == category_id)
+            select(TicketChannel).where(TicketChannel.category == category)
         )
         channels = list(result.scalars().all())
-        logger.debug(f"Found {len(channels)} ticket channels for category ID: {category_id}")
+        logger.debug(f"Found {len(channels)} ticket channels for category: {category}")
         return channels
 
     async def create(self, channel_schema: TicketChannelSchema) -> TicketChannel:
         """Create a new ticket channel."""
-        logger.debug(
-            f"Creating new ticket channel for owner ID: {channel_schema.owner_id}, category ID: {channel_schema.category_id}"
-        )
+        logger.debug(f"Creating new ticket channel for owner ID: {channel_schema.owner_id}")
         # Convert schema to model
         ticket_channel = TicketChannel(
             id=channel_schema.id,
             owner_id=channel_schema.owner_id,
-            category_id=channel_schema.category_id,
+            category=channel_schema.category,
         )
 
         self.session.add(ticket_channel)
@@ -79,7 +77,7 @@ class TicketChannelRepository:
 
         # Update fields
         ticket_channel.owner_id = channel_schema.owner_id
-        ticket_channel.category_id = channel_schema.category_id
+        ticket_channel.category = channel_schema.category
 
         await self.session.flush()
         logger.debug(f"Updated ticket channel with details: {vars(ticket_channel)}")

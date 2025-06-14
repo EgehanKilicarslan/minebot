@@ -776,6 +776,165 @@
       }
     }
   },
+  "systems": {
+    "ticket": {
+      "messages": {
+        "minecraft": {
+          "staff": {
+            "notify_on_mention": {
+              "text": "{discord_username} has mentioned you in <click:open_url:'{discord_channel_url}'>a ticket channel</click>. Please check the ticket for more details."
+            }
+          },
+          "user": {
+            "notify_on_mention": {
+              "text": "You have mentioned by staff member in <click:open_url:'{discord_channel_url}'>a ticket channel</click>. Please check the ticket for more details."
+            },
+            "notify_on_close": {
+              "text": "Your ticket has been closed by {discord_staff_username}. If you have any further questions, please create a new ticket."
+            }
+          }
+        },
+        "system": {
+          "startup": {
+            "message_type": "embed",
+            "content": {
+              "title": "Ticket System",
+              "description": "The ticket system is now online. You can create a ticket by selecting category under that message.",
+              "color": "GREEN"
+            }
+          },
+          "creation": {
+            "general": {
+              "message_type": "embed",
+              "content": {
+                "title": "New Ticket Created",
+                "description": "A new ticket has been created by {ticket_owner_discord_user_mention}.",
+                "color": "BLUE",
+                "fields": [
+                  {
+                    "name": "Content",
+                    "value": "{ticket_general_content}"
+                  }
+                ]
+              }
+            },
+            "report": {
+              "message_type": "embed",
+              "content": {
+                "title": "New Report Ticket Created",
+                "description": "{ticket_owner_discord_user_mention} has created a report ticket.",
+                "color": "RED",
+                "fields": [
+                  {
+                    "name": "Reported User",
+                    "value": "{ticket_report_username}"
+                  },
+                  {
+                    "name": "Report Content",
+                    "value": "{ticket_report_content}"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "user": {
+          "success": {
+            "message_type": "embed",
+            "content": {
+              "title": "Ticket Created",
+              "description": "Your ticket has been created successfully. Please check your DMs for further instructions.",
+              "color": "BLUE"
+            }
+          },
+          "failure": {
+            "message_type": "embed",
+            "content": {
+              "title": "Ticket Creation Failed",
+              "description": "Failed to create a ticket. Please try again later.",
+              "color": "RED"
+            }
+          }
+        },
+        "log": {
+          "transcript": {
+            "message_type": "embed",
+            "content": {
+              "title": "Ticket Transcript",
+              "description": "{ticket_owner_discord_user_mention}'s ticket transcript.",
+              "color": "BLUE",
+              "fields": [
+                {
+                  "name": "Ticket Owner",
+                  "value": "{ticket_owner_discord_user_mention}"
+                },
+                {
+                  "name": "Ticket Category",
+                  "value": "{ticket_category}"
+                },
+                {
+                  "name": "Ticket ID",
+                  "value": "{ticket_channel_id}"
+                },
+                {
+                  "name": "Transcript",
+                  "value": "[Click here to see the transcript]({ticket_transcript_url})"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "menu": {
+        "inner": {
+          "close": {
+            "emoji": "🔒",
+            "label": "Close Ticket",
+            "style": "DANGER"
+          }
+        },
+        "outer": {
+          "confirm": {
+            "emoji": "✅",
+            "label": "Confirm",
+            "style": "SUCCESS"
+          },
+          "cancel": {
+            "emoji": "❌",
+            "label": "Cancel",
+            "style": "SECONDARY"
+          }
+        }
+      },
+      "modal": {
+        "general": {
+          "title": "General Ticket",
+          "fields": {
+            "content": {
+              "style": "PARAGRAPH",
+              "label": "Content",
+              "placeholder": "Enter the content of your ticket here."
+            }
+          }
+        },
+        "report": {
+          "title": "Report Ticket",
+          "fields": {
+            "username": {
+              "style": "SHORT",
+              "label": "Username",
+              "placeholder": "Enter the username of the user you want to report."
+            },
+            "content": {
+              "style": "PARAGRAPH",
+              "label": "Report Content",
+              "placeholder": "Enter the content of your report here."
+            }
+          }
+        }
+      }
+    }
+  },
   "general": {
     "success": {
       "message_type": "embed",
@@ -1003,6 +1162,14 @@
             "value": "{max_duration}"
           }
         ],
+        "color": "RED"
+      }
+    },
+    "max_amount_of_tickets_reached": {
+      "message_type": "embed",
+      "content": {
+        "title": "Max Amount of Tickets Reached",
+        "description": "You have reached the maximum number of tickets allowed which is {max_tickets}. Please close an existing ticket before creating a new one.",
         "color": "RED"
       }
     }
