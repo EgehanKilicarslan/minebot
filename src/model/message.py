@@ -66,15 +66,9 @@ class CommandMessageKeys(Enum):
 
 
 class SystemMessageKeys(Enum):
-    TICKET_MINECRAFT_STAFF_NOTIFY_ON_MENTION = (
-        "systems.ticket.messages.minecraft.staff.notify_on_mention"
-    )
-    TICKET_MINECRAFT_USER_NOTIFY_ON_MENTION = (
-        "systems.ticket.messages.minecraft.user.notify_on_mention"
-    )
-    TICKET_MINECRAFT_USER_NOTIFY_ON_CLOSE = "systems.ticket.messages.minecraft.user.notify_on_close"
     TICKET_SYSTEM_STARTUP = "systems.ticket.messages.system.startup"
     TICKET_SYSTEM_CREATIONS = "systems.ticket.messages.system.creation"
+    TICKET_SYSTEM_CLOSING = "systems.ticket.messages.system.closing"
     TICKET_USER_SUCCESS = "systems.ticket.messages.user.success"
     TICKET_USER_FAILURE = "systems.ticket.messages.user.failure"
     TICKET_LOG_TRANSCRIPT = "systems.ticket.messages.log.transcript"

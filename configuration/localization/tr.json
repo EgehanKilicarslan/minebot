@@ -801,21 +801,6 @@
   "systems": {
     "ticket": {
       "messages": {
-        "minecraft": {
-          "staff": {
-            "notify_on_mention": {
-              "text": "{discord_username}, <click:open_url:'{discord_channel_url}'>bir destek kanalında</click> sizi etiketledi. Detaylar için lütfen bileti kontrol edin."
-            }
-          },
-          "user": {
-            "notify_on_mention": {
-              "text": "Bir yetkili sizi <click:open_url:'{discord_channel_url}'>bir destek kanalında</click> etiketledi. Detaylar için lütfen bileti kontrol edin."
-            },
-            "notify_on_close": {
-              "text": "Biletiniz {discord_staff_username} tarafından kapatıldı. Daha fazla sorunuz varsa lütfen yeni bir bilet oluşturun."
-            }
-          }
-        },
         "system": {
           "startup": {
             "message_type": "embed",
@@ -857,6 +842,14 @@
                   }
                 ]
               }
+            }
+          },
+          "closing": {
+            "message_type": "embed",
+            "content": {
+              "title": "Bileti kapatmak istediğinize emin misiniz?",
+              "description": "Bilet kapatıldıktan sonra geri alınamaz.",
+              "color": "YELLOW"
             }
           }
         },

@@ -122,32 +122,32 @@ class TicketInnerMenu(BaseTicketMenu):
         )
 
     async def on_close(self, ctx: MenuContext) -> None:
-        menu = TickerOuterMenu()
-        await ctx.client.rest.edit_message(
-            ctx.interaction.channel_id, ctx.interaction.message.id, components=menu
-        )
+        menu = TickerOuterMenu(ctx.interaction.message.id)
+        await MessageHelper(
+            MessageKeys.systems.TICKET_SYSTEM_CLOSING, locale=ctx.interaction.locale
+        ).send_response(ctx, ephemeral=True, components=menu)
         try:
             await menu.attach(ctx.client, timeout=60)  # 1 minute timeout
         except asyncio.TimeoutError:
-            await ctx.client.rest.edit_message(
-                ctx.interaction.channel_id, ctx.interaction.message.id, components=TicketInnerMenu()
-            )
+            await ctx.interaction.delete_initial_response()
 
 
 class TickerOuterMenu(BaseTicketMenu):
-    def __init__(self) -> None:
+    def __init__(self, message_id: int) -> None:
         super().__init__()
 
         MenuHelper.get_button(self, Localization.get(MenuKeys.TICKET_CONFIRM), self.on_confirm)
         MenuHelper.get_button(self, Localization.get(MenuKeys.TICKET_CANCEL), self.on_cancel)
 
+        self.message_id = message_id
+
     async def on_confirm(self, ctx: MenuContext) -> None:
         await ctx.client.rest.edit_message(
-            ctx.interaction.channel_id, ctx.interaction.message.id, components=[]
+            ctx.interaction.channel_id, self.message_id, components=[]
         )
         await self.ticket_helper.close_ticket_channel(ctx.interaction.channel_id)
 
     async def on_cancel(self, ctx: MenuContext) -> None:
         await ctx.client.rest.edit_message(
-            ctx.interaction.channel_id, ctx.interaction.message.id, components=TicketInnerMenu()
+            ctx.interaction.channel_id, self.message_id, components=TicketInnerMenu()
         )

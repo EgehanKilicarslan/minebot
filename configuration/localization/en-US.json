@@ -779,21 +779,6 @@
   "systems": {
     "ticket": {
       "messages": {
-        "minecraft": {
-          "staff": {
-            "notify_on_mention": {
-              "text": "{discord_username} has mentioned you in <click:open_url:'{discord_channel_url}'>a ticket channel</click>. Please check the ticket for more details."
-            }
-          },
-          "user": {
-            "notify_on_mention": {
-              "text": "You have mentioned by staff member in <click:open_url:'{discord_channel_url}'>a ticket channel</click>. Please check the ticket for more details."
-            },
-            "notify_on_close": {
-              "text": "Your ticket has been closed by {discord_staff_username}. If you have any further questions, please create a new ticket."
-            }
-          }
-        },
         "system": {
           "startup": {
             "message_type": "embed",
@@ -835,6 +820,14 @@
                   }
                 ]
               }
+            }
+          },
+          "closing": {
+            "message_type": "embed",
+            "content": {
+              "title": "Are you sure you want to close this ticket?",
+              "description": "Please confirm that you want to close this ticket. This action cannot be undone.",
+              "color": "YELLOW"
             }
           }
         },

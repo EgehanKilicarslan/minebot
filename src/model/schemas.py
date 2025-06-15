@@ -827,25 +827,14 @@ class CommandLocalization(BaseModel):
 
 
 class TicketMessages(BaseModel):
-    class Minecraft(BaseModel):
-        class Staff(BaseModel):
-            notify_on_mention: TextMessage
-
-        class User(BaseModel):
-            notify_on_mention: TextMessage
-            notify_on_close: TextMessage
-
-        staff: Staff
-        user: User
-
     class System(BaseModel):
         startup: DiscordMessage
         creation: dict[str, DiscordMessage]
+        closing: DiscordMessage
 
     class Log(BaseModel):
         transcript: DiscordMessage
 
-    minecraft: Minecraft
     system: System
     user: StatusMessagePair
     log: Log
