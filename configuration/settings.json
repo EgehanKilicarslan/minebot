@@ -238,6 +238,18 @@
                     "branch": ""
                 }
             },
+            "notification": {
+                "staff": {
+                    "mention_on_new_ticket": null,
+                    "notify_on_new_ticket": null,
+                    "notify_on_mention": null
+                },
+                "user": {
+                    "notify_on_mention": null,
+                    "notify_on_staff_response": null,
+                    "notify_on_ticket_close": null
+                }
+            },
             "log": null
         }
     }
