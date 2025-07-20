@@ -3,7 +3,7 @@
   "tasks": [
     {
       "label": "Run Development",
-      "command": "source /home/egehan/.miniconda3/etc/profile.d/conda.sh && conda activate hikari && python3 -OO src/__main__.py",
+      "command": "pixi run python -OO src/__main__.py",
       "type": "shell",
       "problemMatcher": [],
       "group": {
@@ -18,16 +18,6 @@
       "problemMatcher": [],
       "group": {
         "kind": "test",
-        "isDefault": true
-      }
-    },
-    {
-      "label": "Update Dependencies",
-      "command": "source /home/egehan/.miniconda3/etc/profile.d/conda.sh && conda activate hikari && pip install -r requirements.txt",
-      "type": "shell",
-      "problemMatcher": [],
-      "group": {
-        "kind": "none",
         "isDefault": true
       }
     }

@@ -3,9 +3,10 @@ from __future__ import annotations
 import json
 import logging
 import sys
+from collections.abc import Sequence
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Final, LiteralString, cast
+from typing import Any, Final, cast
 
 import hikari
 import lightbulb
@@ -170,7 +171,7 @@ class Settings:
             raise ValueError("Settings not loaded")
 
         try:
-            parts: list[LiteralString] = key.value.split(".")
+            parts: Sequence[str] = key.value.split(".")
             value: Any = cls._data
 
             for part in parts:

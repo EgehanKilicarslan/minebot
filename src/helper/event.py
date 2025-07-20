@@ -1,5 +1,4 @@
 from logging import Logger
-from typing import LiteralString
 
 import lightbulb
 from pydantic import PositiveInt
@@ -26,7 +25,7 @@ class EventHelper:
             event_log_enabled (bool): Whether logging is enabled for the event.
             event_log_channel (PositiveInt | None): The channel ID for logging.
         """
-        self.event_name: LiteralString = event.name.lower()
+        self.event_name: str = event.name.lower()
 
         try:
             event_info: BasicEvent = Settings.get(event)

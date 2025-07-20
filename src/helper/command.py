@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Literal, LiteralString, cast
+from typing import Literal, cast
 
 import hikari
 import lightbulb
@@ -32,14 +32,14 @@ class CommandHelper:
             command (CommandsKeys): The command key identifier.
 
         Attributes:
-            command_name (LiteralString): The lowercase name of the command.
+            command_name (str): The lowercase name of the command.
             command_enabled (bool): Whether the command is enabled.
             command_permissions (list[hikari.Permissions]): Permissions required to use the command.
             command_cooldown (Cooldown | None): The cooldown settings for the command.
             command_log_enabled (bool): Whether logging is enabled for the command.
             command_log_channel (PositiveInt): The channel ID for logging.
         """
-        self.command_name: LiteralString = command.name.lower()
+        self.command_name: str = command.name.lower()
         self._cached_permission_value: int | None = None
 
         try:
