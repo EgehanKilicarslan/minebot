@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [tool.pixi.dependencies]
-python = "3.10.*"
+python = "3.13.*"
 
 [tool.pixi.workspace]
 channels = ["conda-forge"]
