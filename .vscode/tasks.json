@@ -3,7 +3,7 @@
   "tasks": [
     {
       "label": "Run Development",
-      "command": "pixi run python -OO src/__main__.py",
+      "command": "conda activate hikari && python -OO src/__main__.py",
       "type": "shell",
       "problemMatcher": [],
       "group": {
