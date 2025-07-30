@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import ipaddress
 import ssl
 from logging import Logger
 from pathlib import Path
@@ -88,7 +89,7 @@ class WebSocketServer:
             # Always use 'localhost' for local development
             subject = issuer = x509.Name(
                 [
-                    x509.NameAttribute(NameOID.COMMON_NAME, "localhost"),
+                    x509.NameAttribute(NameOID.COMMON_NAME, cert_name),
                     x509.NameAttribute(NameOID.ORGANIZATION_NAME, "MineBotSSL"),
                 ]
             )
@@ -109,7 +110,9 @@ class WebSocketServer:
                     x509.SubjectAlternativeName(
                         [
                             x509.DNSName("localhost"),
-                            x509.DNSName("127.0.0.1"),
+                            x509.IPAddress(ipaddress.IPv4Address(cert_name))
+                            if self._is_valid_ip(cert_name)
+                            else x509.DNSName(cert_name),
                         ]
                     ),
                     critical=False,
@@ -130,6 +133,13 @@ class WebSocketServer:
         except Exception as e:
             logger.error(f"Failed to create SSL certificates: {e}", exc_info=True)
             return None, None
+
+    def _is_valid_ip(self, host: str) -> bool:
+        try:
+            ipaddress.IPv4Address(host)
+            return True
+        except ipaddress.AddressValueError:
+            return False
 
     def _setup_ssl_context(self):
         """
