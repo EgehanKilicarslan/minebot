@@ -10,7 +10,7 @@ dependencies = [
     "hikari-lightbulb==3.2.1",
     "hikari-toolbox==0.1.7",
     "hikari[speedups]==2.4.1",
-    "pydantic==2.11.7",
+    "pydantic==2.12.0",
     "pydantic-extra-types==2.10.5",
     "sqlalchemy==2.0.43",
     "websockets==15.0.1",
