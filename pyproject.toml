@@ -4,7 +4,7 @@ version = "1.1.1"
 description = "A modern, all-in-one Discord bot with a Minecraft connector and a ton of useful features."
 requires-python = ">=3.10"
 dependencies = [
-    "aiomysql==0.2.0",
+    "aiomysql==0.3.2",
     "aiosqlite==0.21.0",
     "asyncpg==0.30.0",
     "hikari-lightbulb==3.2.1",
