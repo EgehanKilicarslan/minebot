@@ -9,7 +9,7 @@ dependencies = [
     "asyncpg==0.30.0",
     "hikari-lightbulb==3.2.1",
     "hikari-toolbox==0.1.7",
-    "hikari[speedups]==2.4.1",
+    "hikari[speedups]==2.5.0",
     "pydantic==2.12.3",
     "pydantic-extra-types==2.10.6",
     "sqlalchemy==2.0.44",
