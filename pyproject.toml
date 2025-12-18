@@ -6,7 +6,7 @@ requires-python = ">=3.10"
 dependencies = [
     "aiomysql==0.3.2",
     "aiosqlite==0.21.0",
-    "asyncpg==0.30.0",
+    "asyncpg==0.31.0",
     "hikari-lightbulb==3.2.2",
     "hikari-toolbox==0.1.7",
     "hikari[speedups]==2.5.0",
