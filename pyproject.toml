@@ -5,7 +5,7 @@ description = "A modern, all-in-one Discord bot with a Minecraft connector and a
 requires-python = ">=3.10"
 dependencies = [
     "aiomysql==0.3.2",
-    "aiosqlite==0.21.0",
+    "aiosqlite==0.22.1",
     "asyncpg==0.31.0",
     "hikari-lightbulb==3.2.2",
     "hikari-toolbox==0.1.7",
