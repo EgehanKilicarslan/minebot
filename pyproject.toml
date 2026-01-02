@@ -7,7 +7,7 @@ dependencies = [
     "aiomysql==0.3.2",
     "aiosqlite==0.22.1",
     "asyncpg==0.31.0",
-    "hikari-lightbulb==3.2.2",
+    "hikari-lightbulb==3.2.3",
     "hikari-toolbox==0.1.7",
     "hikari[speedups]==2.5.0",
     "pydantic==2.12.5",
