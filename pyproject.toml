@@ -13,7 +13,7 @@ dependencies = [
     "pydantic==2.12.5",
     "pydantic-extra-types==2.11.0",
     "sqlalchemy==2.0.45",
-    "websockets==15.0.1",
+    "websockets==16.0",
     "uvloop==0.22.1; sys_platform != 'win32'",
     "cryptography>=45.0.3",
     "hikari-chat-exporter>=0.0.3",
